@@ -1,0 +1,32 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "9e44f2914f087425570039bfac125e53"
+name = "shopcomponentdev"
+handle = "shopcomponentdev"
+application_url = "https://gravity-globe-schedules-yamaha.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "unauthenticated_read_checkouts,unauthenticated_read_product_inventory,unauthenticated_read_product_listings,unauthenticated_write_checkouts,write_products"
+
+[auth]
+redirect_urls = ["https://gravity-globe-schedules-yamaha.trycloudflare.com/auth/callback", "https://gravity-globe-schedules-yamaha.trycloudflare.com/auth/shopify/callback", "https://gravity-globe-schedules-yamaha.trycloudflare.com/api/auth/callback"]
+
+[pos]
+embedded = false
