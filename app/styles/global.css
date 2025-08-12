@@ -1,0 +1,8 @@
+.collapsibleButtonDiv{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.collapsibleButtonDiv>button{
+    height: 60px;
+}
