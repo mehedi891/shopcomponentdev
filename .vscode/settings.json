@@ -1,5 +1,8 @@
 {
     "i18n-ally.localesPaths": [
         "public/locales"
-    ]
+    ],
+    "explorer.compactFolders": false,
+    "workbench.tree.indent": 12,
+    "thunder-client.sidebar.treeIndentation": 0
 }

@@ -1,8 +1,24 @@
-.collapsibleButtonDiv{
+.collapsibleButtonDiv {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.collapsibleButtonDiv>button{
+
+.collapsibleButtonDiv>button {
     height: 60px;
 }
+
+.spc_iframe {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+    margin: 0 auto;
+    display: flex;
+    margin-top: 10px;
+    transition: all 0.5s ease-in-out;
+}
+.spc_iframe_view_desktop{
+    max-width: 100%;
+}
+.spc_iframe_view_mobile {
+    max-width: 450px;
+}
+
