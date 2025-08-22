@@ -30,3 +30,38 @@ model Session {
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
 }
+
+model Component {
+  id                    Int     @id @default(autoincrement())
+  title                 String
+  description           String?
+  appliesTo             String  @default("product") // e.g. 'product'
+  addToCartType         Json
+  enableQtyField        Boolean @default(false)
+  layout                String  @default("grid")
+  status                String  @default("deactived")
+  componentSettings     Json?
+  shoppingCartSettings  Json?
+  productLayoutSettings Json?
+  buttonStyleSettings   Json?
+  tracking              String?
+  customerTracking      String?
+  compHtml              String
+  shopId                Int
+  shop                  Shop    @relation(fields: [shopId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Shop {
+  id                  Int         @id @default(autoincrement())
+  shopifyShopGid      String?      @unique
+  shopifyDomain       String      @unique
+  scAccessToken       String?
+  headlessAccessToken String?
+  installationCount   Int?
+  components          Component[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}

@@ -21,46 +21,56 @@ import CustomColorPicker from "../components/CustomColorPicker/CustomColorPicker
 import { emptyStateHtml } from "../webcomponentsHtml/emptyState";
 import { stylesPdT1 } from "../webcomponentsHtml/stylesProduct";
 import { floatingCartCountBuble } from "../webcomponentsHtml/generalHTML";
+import db from "../db.server";
 
 
 
 export const loader = async ({ request }) => {
-    const { admin } = await authenticate.admin(request);
-    const shopResponse = await admin.graphql(
-        `#graphql
-                query shopInfo{
-                    shop{
-                    id
-                    myshopifyDomain
-                    plan{
-                    partnerDevelopment
-                    }
-                }
-                
-                }`,
-    );
+    const { session, admin } = await authenticate.admin(request);
+    // const shopResponse = await admin.graphql(
+    //     `#graphql
+    //             query shopInfo{
+    //                 shop{
+    //                 id
+    //                 shopifyDomain
+    //                 plan{
+    //                 partnerDevelopment
+    //                 }
+    //             }
 
-    const data = await shopResponse.json();
+    //             }`,
+    // );
+
+    // const data = await shopResponse.json();
+
+    const shop = await db.shop.findUnique({
+        where: {
+            shopifyDomain: session.shop
+        }
+    });
+    console.log('shop', shop);
+
     const trackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
 
     return {
         trackingCode: trackingCode,
-        shopData: data.data.shop,
+        shopData: shop,
     }
 }
 
 const CreateComponent = () => {
     const { trackingCode, shopData } = useLoaderData();
+    const navigate = useNavigate();
+    const actionData = useActionData();
     const [titleAndDescToggleOpen, setTitleAndDescToggleOpen] = useState(true);
-    const [appliesToOpen, setAppliesToOpen] = useState(false);
-    const [chooseProductOpen, setChooseProductOpen] = useState(true);
-    const [chooseCollectionOpen, setChooseCollectionOpen] = useState(false);
+    const [appliesToOpen, setAppliesToOpen] = useState(true);
     const [layoutOpen, setLayoutOpen] = useState(false);
     const [statusOpen, setStatusOpen] = useState(false);
     const [buttonStyleOpen, setButtonStyleOpen] = useState(false);
     const [shoppingCartOpen, setShoppingCartOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [tranckingOpen, setTranckingOpen] = useState(false);
+    const [customCssOpen, setCustomCssOpen] = useState(false);
     const [selectedCollection, setSelectedCollection] = useState([]);
     const [selectedProductsInd, setSelectedProductsInd] = useState([]);
     const [selectedProductsBulk, setSelectedProductsBulk] = useState([]);
@@ -72,6 +82,9 @@ const CreateComponent = () => {
         productCardBorderColor: '#E5E5E5',
     })
     const [buttonStyleSettings, setButtonStyleSettings] = useState({
+        addToCartBtnTxt: 'Add to cart',
+        checkoutBtnTxt: 'Checkout',
+        viewBtnTxt: 'View product',
         buttonTextColor: '#FFFFFF',
         buttonBackgroundColor: '#000000',
         buttonBorderColor: '#E5E5E5',
@@ -90,11 +103,8 @@ const CreateComponent = () => {
         view: 'desktop'
     });
     const [embedPHtmlCode, setEmbedPHtmlCode] = useState('');
-
     const [checkMaxSelectedVariants, setCheckMaxSelectedVariants] = useState(false);
     const navigation = useNavigation();
-    const navigate = useNavigate();
-    const actionData = useActionData();
     const shopify = useAppBridge();
 
     const submit = useSubmit();
@@ -115,6 +125,7 @@ const CreateComponent = () => {
             componentSettings: {
                 fullView: false,
                 cartBehavior: 'cart',
+                customCss: '',
             },
             shoppingCartSettings: {
                 heading: 'Shopping cart',
@@ -135,6 +146,9 @@ const CreateComponent = () => {
                 productCardBorderColor: productLayoutSettings.productCardBorderColor || '#e5e5e5',
             },
             buttonStyleSettings: {
+                addToCartBtnTxt: 'Add to cart',
+                checkoutBtnTxt: 'Checkout',
+                viewBtnTxt: 'View product',
                 buttonFontWeight: '600',
                 buttonFontSize: '14px',
                 buttonTextColor: buttonStyleSettings.buttonTextColor || '#FFFFFF',
@@ -145,9 +159,15 @@ const CreateComponent = () => {
                 buttonLRPadding: buttonStyleSettings.buttonLRPadding || '16',
             },
             tracking: trackingCode || '',
+            customerTracking: '',
+            shopId: shopData?.id,
+            compHtml: ''
         }
     });
     const watchedValues = watch();
+
+
+
 
     useEffect(() => {
         if (watchedValues.appliesTo === 'product') {
@@ -160,12 +180,12 @@ const CreateComponent = () => {
             setValue('addToCartType.products', selectedCollection, { shouldDirty: true, shouldValidate: true });
         }
 
-    }, [selectedProductsInd, selectedCollection, watchedValues.appliesTo, selectedProductsBulk, watchedValues.addToCartType.type, setValue]);
+    }, [selectedProductsInd, selectedCollection, watchedValues.appliesTo, selectedProductsBulk, watchedValues.addToCartType.type]);
 
     const formHandleSubmit = (data) => {
-        const updatedWithShop = { ...data };
-        console.log(updatedWithShop);
-        submit(updatedWithShop, { method: 'POST' });
+        const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings), compHtml: embedPHtmlCode };
+        //console.log(updatedData);
+        submit(updatedData, { method: 'post' });
     };
 
     const handleChooseProductsInd = async (query) => {
@@ -192,8 +212,6 @@ const CreateComponent = () => {
 
     }
 
-
-
     const handleChooseProductsBulk = async (query) => {
         const selected = await shopify.resourcePicker({
             type: 'product',
@@ -219,7 +237,7 @@ const CreateComponent = () => {
 
         if (selected) {
             //console.log('selected', selected);
-            setSelectedProductsBulk(limitTotalVariants(selected, 12));
+            setSelectedProductsBulk(limitTotalVariants(selected, 10));
         }
 
     }
@@ -330,7 +348,7 @@ const CreateComponent = () => {
         setValue('productLayoutSettings.productPriceColor', productLayoutSettings.productPriceColor, { shouldDirty: true });
         setValue('productLayoutSettings.productCardBgColor', productLayoutSettings.productCardBgColor, { shouldDirty: true });
         setValue('productLayoutSettings.productCardBorderColor', productLayoutSettings.productCardBorderColor, { shouldDirty: true });
-    }, [productLayoutSettings.productTitleColor, setValue, productLayoutSettings.productPriceColor, productLayoutSettings.productCardBgColor, productLayoutSettings.productCardBorderColor]);
+    }, [productLayoutSettings.productTitleColor, productLayoutSettings.productPriceColor, productLayoutSettings.productCardBgColor, productLayoutSettings.productCardBorderColor]);
 
 
     useEffect(() => {
@@ -340,13 +358,13 @@ const CreateComponent = () => {
         setValue('buttonStyleSettings.buttonBorderRadius', buttonStyleSettings.buttonBorderRadius, { shouldDirty: true });
         setValue('buttonStyleSettings.buttonTBPadding', buttonStyleSettings.buttonTBPadding, { shouldDirty: true });
         setValue('buttonStyleSettings.buttonLRPadding', buttonStyleSettings.buttonLRPadding, { shouldDirty: true });
-    }, [buttonStyleSettings.buttonTextColor, buttonStyleSettings.buttonBackgroundColor, buttonStyleSettings.buttonBorderRadius, buttonStyleSettings.buttonTBPadding, buttonStyleSettings.buttonLRPadding, buttonStyleSettings.buttonBorderColor, setValue]);
+    }, [buttonStyleSettings.buttonTextColor, buttonStyleSettings.buttonBackgroundColor, buttonStyleSettings.buttonBorderRadius, buttonStyleSettings.buttonTBPadding, buttonStyleSettings.buttonLRPadding, buttonStyleSettings.buttonBorderColor]);
 
     useEffect(() => {
         setValue('shoppingCartSettings.shoppingCartBgColor', shoppingCartSettings.shoppingCartBgColor, { shouldDirty: true });
         setValue('shoppingCartSettings.shoppingCartTextColor', shoppingCartSettings.shoppingCartTextColor, { shouldDirty: true });
         setValue('shoppingCartSettings.shoppingCartBtnBgColor', shoppingCartSettings.shoppingCartBtnBgColor, { shouldDirty: true });
-    }, [setValue, shoppingCartSettings.shoppingCartBgColor, shoppingCartSettings.shoppingCartTextColor, shoppingCartSettings.shoppingCartBtnBgColor]);
+    }, [shoppingCartSettings.shoppingCartBgColor, shoppingCartSettings.shoppingCartTextColor, shoppingCartSettings.shoppingCartBtnBgColor]);
 
     useEffect(() => {
         if (isDirty) {
@@ -356,11 +374,11 @@ const CreateComponent = () => {
         }
     }, [isDirty]);
 
-    useEffect(()=>{
-        if(watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk'){
-            setValue('componentSettings.fullView', false, {shouldValidate: true});
+    useEffect(() => {
+        if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
+            setValue('componentSettings.fullView', false, { shouldValidate: true });
         }
-    },[setValue, watchedValues.appliesTo, watchedValues.addToCartType.type]);
+    }, [watchedValues.appliesTo, watchedValues.addToCartType.type]);
 
     //Start webcomponents 
 
@@ -621,23 +639,41 @@ const CreateComponent = () => {
         }
     }, [selectedViewMDF.id, selectedViewMDF.view]);
 
-    const pdAddToCartHtml = `
+    const pdAddToCartHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
              <button
                 class="product-card__add-button product-card__add-to-cart-button"
-                onclick="getElementById("cart").addLine(event).showModal();"
+                onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                Add to cart
+                ${watchedValues.buttonStyleSettings.addToCartBtnTxt}
               </button>
-    `;
+    ` :
+        `
+             <button
+                class="product-card__add-button product-card__add-to-cart-button"
+                onclick="addToCartNcheckoutIndProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
+                shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+              >
+                ${watchedValues.buttonStyleSettings.addToCartBtnTxt}
+              </button>
+    ` ;
 
-    const pdCheckoutBtnHtml = `
+    const pdCheckoutBtnHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
              <button
                 class="product-card__add-button product-card__checkout-button"
-                onclick="getElementById('cart').addLine(event).showModal();"
+                 onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                Checkout
+                ${watchedValues.buttonStyleSettings.checkoutBtnTxt}
+              </button>
+    ` :
+        `
+             <button
+                class="product-card__add-button product-card__checkout-button"
+                onclick="addToCartNcheckoutIndProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
+                shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+              >
+                 ${watchedValues.buttonStyleSettings.checkoutBtnTxt}
               </button>
     `;
 
@@ -775,7 +811,7 @@ const CreateComponent = () => {
                   ></shopify-money>
                 </div>
               </div>
-              <shopify-variant-selector></shopify-variant-selector>
+              <shopify-variant-selector class="product-card__variant-selector" shopify-attr--data-variant-id="product.selectedOrFirstAvailableVariant.id"></shopify-variant-selector>
 
               <div class="product-modal__buttons product-card__buttons">
                     ${watchedValues.componentSettings.cartBehavior === 'cart' ? pdAddToCartHtml : pdCheckoutBtnHtml}
@@ -800,11 +836,13 @@ const CreateComponent = () => {
                 class="product-card__add-button product-card__view-button"
                 onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
               >
-                View product
+               ${watchedValues.buttonStyleSettings.viewBtnTxt}
               </button>
 
               ${productFullViewModalHtml}
     `;
+
+
 
 
     const productLayoutIndCardHtml = selectedProductsInd?.length > 0 ? selectedProductsInd.map((product) => (
@@ -863,12 +901,12 @@ const CreateComponent = () => {
     )).join('\n') : emptyStateHtml;
 
     const productLayoutIndHtml = `
-        <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
-        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.myshopifyDomain}" country="US" language="en"></shopify-store>
+        
+        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' && floatingCartCountBuble}
+            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -880,13 +918,6 @@ const CreateComponent = () => {
                     ${productLayoutIndCardHtml}
                 </div>
                 <button class="shopcomponent__slider-button prev" onclick="moveSliderPrevNext('prev')">❮</button>
-            <script>
-                function moveSliderPrevNext (btnType) {
-                    const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
-                   const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
-                     slider.scrollBy({ left: btnType === 'next' ? slideWidth : -slideWidth , behavior: "smooth" });
-                }
-            </script>
             </div>
            
           
@@ -909,9 +940,12 @@ const CreateComponent = () => {
      
         ${stylesPdT1}
         ${globalStyles}
+         <style>
+            ${watchedValues.componentSettings.customCss}
+        </style>
 
-    `
-      const productLayoutBulkCardHtml = selectedProductsBulk?.length > 0 ? selectedProductsBulk.map((product) => (
+    `;
+    const productLayoutBulkCardHtml = selectedProductsBulk?.length > 0 ? selectedProductsBulk.map((product) => (
         `
             <div class="product-card">
     <!-- Set product you want to display -->
@@ -939,9 +973,9 @@ const CreateComponent = () => {
 
                 <div class="shopcomponent_variants_bulk_container ${watchedValues.enableQtyField ? 'shopcomponent_variants_bulk_enable_quantity_field_container' : ''}">
                     ${product.variants.map((variant) => (
-                        `
+            `
                             ${!watchedValues.enableQtyField ?
-                                    `<div class="shopcomponent_variants_bulk_fixed_quantity">
+                `<div class="shopcomponent_variants_bulk_fixed_quantity">
                                 <div class="shopcomponent_variant_title">${variant.title}  x  ${variant.quantity}</div>
                             </div>` : `
                                 <div class="shopcomponent_variants_bulk_enable_quantity_container">
@@ -949,15 +983,19 @@ const CreateComponent = () => {
                                         ${variant.title}
                                         </div>
                                     <div class="shopcomponent_variants_bulk_enable_quantity">
-                                        <div class="shopcomponent_variants_bulk_enable_quantity_dec">-</div>
-                                        <input class="shopcomponent_variants_bulk_enable_quantity_input" type="number" min="0" value="1"/>
-                                        <div class="shopcomponent_variants_bulk_enable_quantity_inc">+</div>
+                                        <div
+                                        onclick="updateQuantity(event,'dec')" 
+                                        class="shopcomponent_variants_bulk_enable_quantity_dec">-</div>
+                                        <input class="shopcomponent_variants_bulk_enable_quantity_input" type="number" min="0" value="0" data-variant-id="${variant.id}"/>
+                                        <div 
+                                        onclick="updateQuantity(event,'inc')"
+                                        class="shopcomponent_variants_bulk_enable_quantity_inc">+</div>
                                     </div>
                                 </div>
                             `
-                            }
+            }
                         `
-                    )).join('\n')}
+        )).join('\n')}
                 </div>
           </div>
         </div>
@@ -967,14 +1005,14 @@ const CreateComponent = () => {
   </div>
         `
     )).join('\n') : emptyStateHtml;
+
     const productLayoutBulkHtml = `
 
-    <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
-        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.myshopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' && floatingCartCountBuble}
+            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -986,17 +1024,12 @@ const CreateComponent = () => {
                     ${productLayoutBulkCardHtml}
                 </div>
                 <button class="shopcomponent__slider-button prev" onclick="moveSliderPrevNext('prev')">❮</button>
-            <script>
-                function moveSliderPrevNext (btnType) {
-                    const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
-                   const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
-                     slider.scrollBy({ left: btnType === 'next' ? slideWidth : -slideWidth , behavior: "smooth" });
-                }
-            </script>
             </div>
            
           
-                 
+                 <script class="shopcomponent_pd_bulk_script">
+                    ${JSON.stringify(watchedValues.addToCartType.products)}
+                 </script>
 
             <shopify-cart id="cart" class="shopcomponent_cart">
                 <div slot="header" class="shopcomponent_cart_header">
@@ -1027,17 +1060,156 @@ const CreateComponent = () => {
      
         ${stylesPdT1}
         ${globalStyles}
+         <style>
+            ${watchedValues.componentSettings.customCss}
+        </style>
     
-    `
+    `;
+    const pdQuickViewBtnCollectionHtml = `
+        <button
+                class="product-card__add-button product-card__view-button"
+                onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
+              >
+                View product
+              </button>
+    `;
+    const productLayoutCollectionCardHtml = selectedCollection?.length > 0 ?
+        `
+        <shopify-context type="collection" handle="${selectedCollection[0].handle}">
+      <template>
+           
+    
+       <shopify-list-context type="product" query="collection.products" first="12">
+       <template>
+        <div class="product-card">
+        <div class="product-card__container">
+          <div class="product-card__media">
+            <div class="product-card__main-image">
+              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+            </div>
+          </div>
+          <div class="product-card__details shopcomponent_product_card__details">
+            <div class="product-card__info">
+              <h1 class="product-card__title">
+                <shopify-data query="product.title"></shopify-data>
+              </h1>
+              <div class="product-card__price">
+                <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                <shopify-money
+                  class="product-card__compare-price"
+                  query="product.selectedOrFirstAvailableVariant.compareAtPrice"
+                ></shopify-money>
+              </div>
+            </div>
+            ${!watchedValues.componentSettings.fullView ?
+            '<shopify-variant-selector class="product-card__variant-selector" shopify-attr--data-variant-id="product.selectedOrFirstAvailableVariant.id"></shopify-variant-selector>' : ''
+        }
+            
+
+            <div class="product-card__buttons">
+              <!-- Add behavior to an existing button -->
+               
+              ${!watchedValues.componentSettings.fullView
+            ? (watchedValues.componentSettings.cartBehavior === 'cart'
+                ? pdAddToCartHtml
+                : pdCheckoutBtnHtml)
+            : pdQuickViewBtnCollectionHtml
+        }
+             
+
+
+              <!-- Add buy button -->
+            </div>
+
+             </div>
+          </div>
+        </div>
+        </template>
+        </shopify-list-context>
+    </template>
+    </shopify-context>
+    ${watchedValues.componentSettings.fullView ? productFullViewModalHtml : ''}
+
+        `
+        : emptyStateHtml;
+
+    const collectionLayoutIndHtml = `
+       
+        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+
+
+        <div class="shopcomponent_pd_container">
+            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            <div class="shopcomponent_title_N_description">
+                <div class="shopcomponent_title">${watchedValues.title}</div>
+                <div class="shopcomponent_description">${watchedValues.description}</div>
+            </div>
+
+            <div class="shopcomponent_slider_container_${watchedValues.layout}">
+                <button class="shopcomponent__slider-button next" onclick="moveSliderPrevNext('next')">❯</button>
+                <div class="shopcomponent_products_flex shopcomponent_product_layout_${watchedValues.layout}">
+                    ${productLayoutCollectionCardHtml}
+                </div>
+                <button class="shopcomponent__slider-button prev" onclick="moveSliderPrevNext('prev')">❮</button>
+            </div>
+           
+          
+                 
+        <div class="shopcomponent_cart_container">
+            <shopify-cart id="cart" class="shopcomponent_cart">
+                <div slot="header" class="shopcomponent_cart_header">
+                           ${watchedValues.shoppingCartSettings.heading}
+                    </div>
+                    <div class="shopcomponent_discount_title" slot="discounts-title">
+                        ${watchedValues.shoppingCartSettings.additionalInfo}
+                    </div>
+                    <div class="shopcomponent_empty_cart_txt" slot="empty">
+                        ${watchedValues.shoppingCartSettings.emptyCartText}
+                    </div>
+            </shopify-cart>
+            </div>
+        </div>
+
+        
+        ${stylesPdT1}
+        ${globalStyles}
+        <style>
+            ${watchedValues.componentSettings.customCss}
+        </style>
+
+    `;
 
     useEffect(() => {
-        if(watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'individual') {
-            setEmbedPHtmlCode(productLayoutIndHtml)
-        }else if(watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
-            setEmbedPHtmlCode(productLayoutBulkHtml)
+        if (watchedValues.appliesTo === 'collection') {
+            setEmbedPHtmlCode(collectionLayoutIndHtml)
+        } else {
+            if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'individual') {
+                setEmbedPHtmlCode(productLayoutIndHtml)
+            } else if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
+                setEmbedPHtmlCode(productLayoutBulkHtml)
+            }
         }
-    },[productLayoutBulkHtml,productLayoutIndHtml,watchedValues.addToCartType.type,watchedValues.appliesTo]);
 
+    }, [productLayoutBulkHtml, productLayoutIndHtml, watchedValues.addToCartType.type, watchedValues.appliesTo, collectionLayoutIndHtml]);
+
+    const handleCopyHtmlCode = () => {
+        navigator.clipboard.writeText(embedPHtmlCode);
+        shopify.toast.show('Copied SuccessFully', {
+            duration: 1000,
+        });
+    }
+
+    const scriptsAll = `
+         <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+         <script src="/shopcomponent/js/shopcomponent.js"></script>
+    `;
+
+    useEffect(() => {
+        if ( actionData?.success && actionData?.createCompData?.id && navigation.state === 'idle') {
+            shopify.toast.show(actionData?.message || 'Component Created Successfully', { duration: 2000 });
+            navigate(`/app/component/${actionData?.createCompData?.id}?new_created=true`, { replace: true });
+        }
+    }, [actionData,navigation.state]);
 
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -1191,385 +1363,331 @@ const CreateComponent = () => {
                                                         )}
                                                     />
 
-                                                    {watchedValues.appliesTo === "product" &&
-                                                        <Box paddingBlockStart={'200'}>
-                                                            <Controller
-                                                                name="addToCartType.type"
-                                                                control={control}
-                                                                render={({ field }) => (
-                                                                    <Select
-                                                                        label={t("add_to_cart_type")}
-                                                                        options={[
-                                                                            { label: t("individual_add_to_cart"), value: 'individual' },
-                                                                            { label: t("bulk_add_to_cart"), value: 'bulk' },]}
-                                                                        selected={field.value}
-                                                                        onChange={field.onChange}
-                                                                        value={field.value}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </Box>
-                                                    }
+
                                                 </BlockStack>
                                             </Box>
-                                        </Collapsible>
-                                    </Box>
-                                </Box>
-                                {watchedValues.appliesTo === "collection" &&
-                                    <Box paddingBlockEnd={'400'}>
-                                        <Box background="bg-fill" borderRadius="200">
-                                            <Box minHeight="50px">
-                                                <div className="collapsibleButtonDiv">
-                                                    <Button onClick={() => { setChooseCollectionOpen(!chooseCollectionOpen) }} textAlign="left"
-                                                        variant="monochromePlain"
-                                                        size="large"
-                                                        fullWidth
-                                                        disclosure={chooseCollectionOpen ? 'up' : 'down'}
-                                                    >
-                                                        <Text variant="bodyMd" fontWeight="medium">{t("choose_collection")}</Text>
-                                                    </Button>
-                                                </div>
-                                            </Box>
 
-                                            <Collapsible
-                                                open={chooseCollectionOpen}
-                                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                                expandOnPrint
-                                            >
-                                                <Box padding={'300'}>
-                                                    <InlineStack blockAlign="center" align="space-between">
-                                                        <Controller
-                                                            name="addToCartType.products"
-                                                            control={control}
-                                                            rules={{
-                                                                validate: (value) => {
-                                                                    //console.log('v:', value);
-                                                                    return value?.length !== 0 ? true : t("product_required_msg");
-                                                                }
-                                                            }}
-                                                            render={({ field, fieldState }) => (
-                                                                <input type="hidden"
-                                                                    name="addToCartType.products"
-                                                                    value={field.value}
-                                                                    onChange={field.onChange}
-                                                                />
-
-                                                            )}
-                                                        />
-
-                                                        <Box width="78%">
-                                                            <TextField
-                                                                type="text"
-                                                                autoSize
-                                                                name="productSearchQuery"
-                                                                value={''}
-                                                                onChange={(value) => { handleChooseCollection(value) }}
-                                                                autoComplete="off"
-                                                                placeholder={t("browse_collection")}
-                                                                prefix={<Icon source={SearchIcon} />}
-                                                            />
-                                                        </Box>
-
-                                                        <Button onClick={() => { handleChooseCollection('') }} size="large">Browse</Button>
-                                                    </InlineStack>
-                                                </Box>
-
-                                                {errors?.addToCartType?.products?.message && (
-                                                    <Box paddingInlineStart={'300'} >
-                                                        <InlineError
-                                                            message={errors.addToCartType.products.message}
-                                                        />
-                                                    </Box>
-                                                )}
-
-                                                <Box paddingBlock={'400'} paddingInline={'300'}>
-                                                    <BlockStack gap={'300'}>
-                                                        {selectedCollection?.length > 0 && selectedCollection.map((item) => {
-                                                            return <InlineStack key={item.id} blockAlign="center" align="space-between">
-                                                                <InlineStack blockAlign="center" gap={'200'}>
-                                                                    <Thumbnail
-                                                                        source={item.image ? item.image : ''}
-                                                                        alt={item.handle}
-                                                                        size="small"
+                                            {watchedValues.appliesTo === "collection" &&
+                                                <Box>
+                                                    <Box padding={'300'}>
+                                                        <InlineStack blockAlign="center" align="space-between">
+                                                            <Controller
+                                                                name="addToCartType.products"
+                                                                control={control}
+                                                                rules={{
+                                                                    validate: (value) => {
+                                                                        //console.log('v:', value);
+                                                                        return value?.length !== 0 ? true : t("collection_required_msg");
+                                                                    }
+                                                                }}
+                                                                render={({ field, fieldState }) => (
+                                                                    <input type="hidden"
+                                                                        name="addToCartType.products"
+                                                                        value={field.value}
+                                                                        onChange={field.onChange}
                                                                     />
-                                                                    <Text fontWeight="medium">{item.title}</Text>
-                                                                </InlineStack>
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        setSelectedCollection([]);
-                                                                    }}
-                                                                    variant="monochromePlain">
-                                                                    <Icon tone="subdued" source={DeleteIcon} />
-                                                                </Button>
-                                                            </InlineStack>
-                                                        })
 
-                                                        }
-                                                    </BlockStack>
-                                                </Box>
-                                            </Collapsible>
-                                        </Box>
-                                    </Box>
-                                }
-                                {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "individual" &&
-                                    <Box paddingBlockEnd={'400'}>
-                                        <Box background="bg-fill" borderRadius="200">
-                                            <Box minHeight="50px">
-                                                <div className="collapsibleButtonDiv">
-                                                    <Button onClick={() => { setChooseProductOpen(!chooseProductOpen) }} textAlign="left"
-                                                        variant="monochromePlain"
-                                                        size="large"
-                                                        fullWidth
-                                                        disclosure={chooseProductOpen ? 'up' : 'down'}
-                                                    >
-                                                        <Text variant="bodyMd" fontWeight="medium">{t("choose_product")}</Text>
-                                                    </Button>
-                                                </div>
-                                            </Box>
+                                                                )}
+                                                            />
 
-                                            <Collapsible
-                                                open={chooseProductOpen}
-                                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                                expandOnPrint
-                                            >
-                                                <Box padding={'300'}>
-                                                    <InlineStack blockAlign="center" align="space-between">
-                                                        <Controller
-                                                            name="addToCartType.products"
-                                                            control={control}
-                                                            rules={{
-                                                                validate: (value) => {
-                                                                    //console.log('v:', value);
-                                                                    return value?.length !== 0 ? true : t("product_required_msg");
-                                                                }
-                                                            }}
-                                                            render={({ field, fieldState }) => (
-                                                                <input type="hidden"
-                                                                    name="addToCartType.products"
-                                                                    value={field.value}
-                                                                    onChange={field.onChange}
+                                                            <Box width="78%">
+                                                                <TextField
+                                                                    type="text"
+                                                                    autoSize
+                                                                    name="productSearchQuery"
+                                                                    value={''}
+                                                                    onChange={(value) => { handleChooseCollection(value) }}
+                                                                    autoComplete="off"
+                                                                    placeholder={t("browse_collection")}
+                                                                    prefix={<Icon source={SearchIcon} />}
                                                                 />
+                                                            </Box>
 
-                                                            )}
-                                                        />
+                                                            <Button onClick={() => { handleChooseCollection('') }} size="large">Browse</Button>
+                                                        </InlineStack>
+                                                    </Box>
 
-                                                        <Box width="78%">
-                                                            <TextField
-                                                                type="text"
-                                                                autoSize
-                                                                name="productSearchQuery"
-                                                                value={''}
-                                                                onChange={(value) => { handleChooseProductsInd(value) }}
-                                                                autoComplete="off"
-                                                                placeholder={t("browse_products")}
-                                                                prefix={<Icon source={SearchIcon} />}
+                                                    {errors?.addToCartType?.products?.message && (
+                                                        <Box paddingInlineStart={'300'} >
+                                                            <InlineError
+                                                                message={errors.addToCartType.products.message}
                                                             />
                                                         </Box>
+                                                    )}
 
-                                                        <Button onClick={() => { handleChooseProductsInd('') }} size="large">Browse</Button>
-                                                    </InlineStack>
-                                                </Box>
-
-                                                {errors?.addToCartType?.products?.message && (
-                                                    <Box paddingInlineStart={'300'} >
-                                                        <InlineError
-                                                            message={errors.addToCartType.products.message}
-                                                        />
-                                                    </Box>
-                                                )}
-
-                                                <Box paddingBlock={'400'} paddingInline={'300'}>
-                                                    <BlockStack gap={'300'}>
-                                                        {selectedProductsInd?.length > 0 && selectedProductsInd.map((product) => {
-                                                            return <InlineStack key={product.id} blockAlign="center" align="space-between">
-                                                                <InlineStack blockAlign="center" gap={'200'}>
-                                                                    <Thumbnail
-                                                                        source={product.image}
-                                                                        alt={product.handle}
-                                                                        size="small"
-                                                                    />
-                                                                    <Text fontWeight="medium">{product.title}</Text>
-                                                                </InlineStack>
-                                                                <Button onClick={() => { handleDeleteProductInd(product.id) }} variant="monochromePlain">
-                                                                    <Icon tone="subdued" source={DeleteIcon} />
-                                                                </Button>
-                                                            </InlineStack>
-                                                        })
-
-                                                        }
-                                                    </BlockStack>
-                                                </Box>
-                                            </Collapsible>
-                                        </Box>
-                                    </Box>
-                                }
-
-
-                                {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk" &&
-                                    <Box paddingBlockEnd={'400'}>
-                                        <Box background="bg-fill" borderRadius="200">
-                                            <Box minHeight="50px">
-                                                <div className="collapsibleButtonDiv">
-                                                    <Button onClick={() => { setChooseProductOpen(!chooseProductOpen) }} textAlign="left"
-                                                        variant="monochromePlain"
-                                                        size="large"
-                                                        fullWidth
-                                                        disclosure={chooseProductOpen ? 'up' : 'down'}
-                                                    >
-                                                        <Text variant="bodyMd" fontWeight="medium">{t("choose_product")}</Text>
-                                                    </Button>
-                                                </div>
-                                            </Box>
-
-                                            <Collapsible
-                                                open={chooseProductOpen}
-                                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                                expandOnPrint
-                                            >
-                                                <Box padding={'300'}>
-                                                    <InlineStack blockAlign="center" align="space-between">
-                                                        <Controller
-                                                            name="addToCartType.products"
-                                                            control={control}
-                                                            rules={{
-                                                                validate: (value) => {
-                                                                    //console.log('v:', value);
-                                                                    return value?.length !== 0 ? true : t("product_required_msg");
-                                                                }
-                                                            }}
-                                                            render={({ field, fieldState }) => (
-                                                                <input type="hidden"
-                                                                    name="addToCartType.products"
-                                                                    value={field.value}
-                                                                    onChange={field.onChange}
-                                                                />
-
-                                                            )}
-                                                        />
-
-                                                        <Box width="78%">
-                                                            <TextField
-                                                                type="text"
-                                                                autoSize
-                                                                name="productSearchQuery"
-                                                                value={''}
-                                                                onChange={(value) => { handleChooseProductsBulk(value) }}
-                                                                autoComplete="off"
-                                                                placeholder={t("browse_products")}
-                                                                prefix={<Icon source={SearchIcon} />}
-                                                            />
-                                                        </Box>
-
-                                                        <Button onClick={() => { handleChooseProductsBulk('') }} size="large">Browse</Button>
-                                                    </InlineStack>
-
-                                                </Box>
-
-                                                {errors?.addToCartType?.products?.message && (
-                                                    <Box paddingInlineStart={'300'} >
-                                                        <InlineError
-                                                            message={errors.addToCartType.products.message}
-                                                        />
-                                                    </Box>
-                                                )}
-
-                                                <Box paddingBlockStart={'200'} paddingInline={'300'}>
-                                                    <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
-                                                        <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
-                                                    </Box>
-                                                </Box>
-
-                                                <Box paddingBlock={'400'} paddingInline={'300'}>
-                                                    <BlockStack gap={'400'}>
-
-                                                        {selectedProductsBulk?.length > 0 && selectedProductsBulk.map((product) => (
-                                                            <Box key={product.id}>
-                                                                <InlineStack align="space-between" blockAlign="center">
-                                                                    <InlineStack gap={'200'} blockAlign="center">
-                                                                        <Thumbnail size="small" source={product?.image ? product?.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
-                                                                            alt={product.handle} />
-                                                                        <Text variant="bodyMd" fontWeight="medium">{product.title}</Text>
+                                                    <Box paddingBlock={'400'} paddingInline={'300'}>
+                                                        <BlockStack gap={'300'}>
+                                                            {selectedCollection?.length > 0 && selectedCollection.map((item) => {
+                                                                return <InlineStack key={item.id} blockAlign="center" align="space-between">
+                                                                    <InlineStack blockAlign="center" gap={'200'}>
+                                                                        <Thumbnail
+                                                                            source={item.image ? item.image : ''}
+                                                                            alt={item.handle}
+                                                                            size="small"
+                                                                        />
+                                                                        <Text fontWeight="medium">{item.title}</Text>
                                                                     </InlineStack>
-                                                                    <Button size="large" variant="monochromePlain" onClick={() => { handleDeleteProductBulk(product.id, 'product') }}>
+                                                                    <Button
+                                                                        onClick={() => {
+                                                                            setSelectedCollection([]);
+                                                                        }}
+                                                                        variant="monochromePlain">
                                                                         <Icon tone="subdued" source={DeleteIcon} />
                                                                     </Button>
                                                                 </InlineStack>
+                                                            })
 
-                                                                {product?.variants?.length > 0 && product?.variants.map((variant) => (
-                                                                    <Box key={variant.id} paddingBlockStart={'200'} paddingBlockEnd={'200'} paddingInlineStart={'400'} >
+                                                            }
+                                                        </BlockStack>
+                                                    </Box>
+                                                </Box>
+                                            }
+                                            {watchedValues.appliesTo === "product" &&
+                                                <Box paddingBlockStart={'100'} paddingInline={'300'} paddingBlockEnd={'300'}>
+                                                    <Controller
+                                                        name="addToCartType.type"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <Select
+                                                                label={t("add_to_cart_type")}
+                                                                options={[
+                                                                    { label: t("individual_add_to_cart"), value: 'individual' },
+                                                                    { label: t("bulk_add_to_cart"), value: 'bulk' },]}
+                                                                selected={field.value}
+                                                                onChange={field.onChange}
+                                                                value={field.value}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Box>
 
-                                                                        <InlineStack align="center" blockAlign="center" gap={'200'}>
-                                                                            <Thumbnail size="small" source={variant?.image ? variant.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
-                                                                                alt={variant.title} />
-
-                                                                            <BlockStack gap={'100'}>
-
-                                                                                <Box paddingInline={'100'}>
-                                                                                    <InlineStack align="space-between" blockAlign="center">
-                                                                                        <Text variant="bodySm">{variant.title}</Text>
-
-                                                                                        <Button size="medium" variant="monochromePlain" onClick={() => { handleDeleteProductBulk(variant.id, 'variant') }} >
-                                                                                            <Icon tone="subdued" source={XIcon} />
-                                                                                        </Button>
-                                                                                    </InlineStack>
-                                                                                </Box>
-                                                                                <TextField
-                                                                                    label='Quantity'
-                                                                                    labelHidden
-                                                                                    value={variant.quantity || 0}
-                                                                                    onChange={(value) => { handleChangeQuantityDefault(variant.id, value) }}
-                                                                                    align="center"
-                                                                                    size="slim"
-                                                                                    type="number"
-                                                                                    min={1}
-                                                                                    disabled={watchedValues?.enableQtyField === true ? true : false}
-                                                                                />
-
-                                                                            </BlockStack>
-
-                                                                        </InlineStack>
-                                                                    </Box>
-                                                                ))
-
-                                                                }
-
-                                                                <Divider />
-                                                            </Box>
-
-
-
-                                                        ))
-
-
-                                                        }
-                                                        <Box borderRadius="100" padding={'400'} background="bg-surface-secondary">
+                                            }
+                                            {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "individual" &&
+                                                <Box>
+                                                    <Box padding={'300'}>
+                                                        <InlineStack blockAlign="center" align="space-between">
                                                             <Controller
-                                                                name="enableQtyField"
+                                                                name="addToCartType.products"
                                                                 control={control}
+                                                                rules={{
+                                                                    validate: (value) => {
+                                                                        //console.log('v:', value);
+                                                                        return value?.length !== 0 ? true : t("product_required_msg");
+                                                                    }
+                                                                }}
+                                                                render={({ field, fieldState }) => (
+                                                                    <input type="hidden"
+                                                                        name="addToCartType.products"
+                                                                        value={field.value}
+                                                                        onChange={field.onChange}
+                                                                    />
 
-                                                                render={({ field }) => (
-                                                                    <BlockStack gap="200">
-                                                                        <Checkbox
-                                                                            label={t("fixed_qty")}
-                                                                            checked={field.value === false}
-                                                                            onChange={() => field.onChange(false)}
-                                                                        />
-                                                                        <Checkbox
-                                                                            label={t("enable_qty_field")}
-                                                                            checked={field.value === true}
-                                                                            onChange={() => field.onChange(true)}
-                                                                        />
-                                                                    </BlockStack>
                                                                 )}
                                                             />
 
+                                                            <Box width="78%">
+                                                                <TextField
+                                                                    type="text"
+                                                                    autoSize
+                                                                    name="productSearchQuery"
+                                                                    value={''}
+                                                                    onChange={(value) => { handleChooseProductsInd(value) }}
+                                                                    autoComplete="off"
+                                                                    placeholder={t("browse_products")}
+                                                                    prefix={<Icon source={SearchIcon} />}
+                                                                />
+                                                            </Box>
+
+                                                            <Button onClick={() => { handleChooseProductsInd('') }} size="large">Browse</Button>
+                                                        </InlineStack>
+                                                    </Box>
+
+                                                    {errors?.addToCartType?.products?.message && (
+                                                        <Box paddingInlineStart={'300'} >
+                                                            <InlineError
+                                                                message={errors.addToCartType.products.message}
+                                                            />
                                                         </Box>
-                                                    </BlockStack>
+                                                    )}
+
+                                                    <Box paddingBlock={'400'} paddingInline={'300'}>
+                                                        <BlockStack gap={'300'}>
+                                                            {selectedProductsInd?.length > 0 && selectedProductsInd.map((product) => {
+                                                                return <InlineStack key={product.id} blockAlign="center" align="space-between">
+                                                                    <InlineStack blockAlign="center" gap={'200'}>
+                                                                        <Thumbnail
+                                                                            source={product.image}
+                                                                            alt={product.handle}
+                                                                            size="small"
+                                                                        />
+                                                                        <Text fontWeight="medium">{product.title}</Text>
+                                                                    </InlineStack>
+                                                                    <Button onClick={() => { handleDeleteProductInd(product.id) }} variant="monochromePlain">
+                                                                        <Icon tone="subdued" source={DeleteIcon} />
+                                                                    </Button>
+                                                                </InlineStack>
+                                                            })
+
+                                                            }
+                                                        </BlockStack>
+                                                    </Box>
+
                                                 </Box>
-                                            </Collapsible>
-                                        </Box>
+
+                                            }
+                                            {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk" &&
+                                                <Box>
+                                                    <Box padding={'300'}>
+                                                        <InlineStack blockAlign="center" align="space-between">
+                                                            <Controller
+                                                                name="addToCartType.products"
+                                                                control={control}
+                                                                rules={{
+                                                                    validate: (value) => {
+                                                                        //console.log('v:', value);
+                                                                        return value?.length !== 0 ? true : t("product_required_msg");
+                                                                    }
+                                                                }}
+                                                                render={({ field, fieldState }) => (
+                                                                    <input type="hidden"
+                                                                        name="addToCartType.products"
+                                                                        value={field.value}
+                                                                        onChange={field.onChange}
+                                                                    />
+
+                                                                )}
+                                                            />
+
+                                                            <Box width="78%">
+                                                                <TextField
+                                                                    type="text"
+                                                                    autoSize
+                                                                    name="productSearchQuery"
+                                                                    value={''}
+                                                                    onChange={(value) => { handleChooseProductsBulk(value) }}
+                                                                    autoComplete="off"
+                                                                    placeholder={t("browse_products")}
+                                                                    prefix={<Icon source={SearchIcon} />}
+                                                                />
+                                                            </Box>
+
+                                                            <Button onClick={() => { handleChooseProductsBulk('') }} size="large">Browse</Button>
+                                                        </InlineStack>
+
+                                                    </Box>
+
+                                                    {errors?.addToCartType?.products?.message && (
+                                                        <Box paddingInlineStart={'300'} >
+                                                            <InlineError
+                                                                message={errors.addToCartType.products.message}
+                                                            />
+                                                        </Box>
+                                                    )}
+
+                                                    <Box paddingBlockStart={'200'} paddingInline={'300'}>
+                                                        <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
+                                                            <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
+                                                        </Box>
+                                                    </Box>
+
+                                                    <Box paddingBlock={'400'} paddingInline={'300'}>
+                                                        <BlockStack gap={'400'}>
+
+                                                            {selectedProductsBulk?.length > 0 && selectedProductsBulk.map((product) => (
+                                                                <Box key={product.id}>
+                                                                    <InlineStack align="space-between" blockAlign="center">
+                                                                        <InlineStack gap={'200'} blockAlign="center">
+                                                                            <Thumbnail size="small" source={product?.image ? product?.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
+                                                                                alt={product.handle} />
+                                                                            <Text variant="bodyMd" fontWeight="medium">{product.title}</Text>
+                                                                        </InlineStack>
+                                                                        <Button size="large" variant="monochromePlain" onClick={() => { handleDeleteProductBulk(product.id, 'product') }}>
+                                                                            <Icon tone="subdued" source={DeleteIcon} />
+                                                                        </Button>
+                                                                    </InlineStack>
+
+                                                                    {product?.variants?.length > 0 && product?.variants.map((variant) => (
+                                                                        <Box key={variant.id} paddingBlockStart={'200'} paddingBlockEnd={'200'} paddingInlineStart={'400'} >
+
+                                                                            <InlineStack align="start" blockAlign="center" gap={'200'}>
+                                                                                <Thumbnail size="small" source={variant?.image ? variant.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
+                                                                                    alt={variant.title} />
+
+                                                                                <BlockStack gap={'100'}>
+
+                                                                                    <Box paddingInline={'100'}>
+                                                                                        <InlineStack gap={'200'} align="space-between" blockAlign="center">
+                                                                                            <Text variant="bodySm">{variant.title}</Text>
+
+                                                                                            <Button size="medium" variant="monochromePlain" onClick={() => { handleDeleteProductBulk(variant.id, 'variant') }} >
+                                                                                                <Icon tone="subdued" source={XIcon} />
+                                                                                            </Button>
+                                                                                        </InlineStack>
+                                                                                    </Box>
+                                                                                    {!watchedValues.enableQtyField &&
+                                                                                        <Box maxWidth="100px">
+                                                                                            <TextField
+                                                                                                label='Quantity'
+                                                                                                labelHidden
+                                                                                                value={variant.quantity || 0}
+                                                                                                onChange={(value) => { handleChangeQuantityDefault(variant.id, value) }}
+                                                                                                align="center"
+                                                                                                size="slim"
+                                                                                                type="number"
+                                                                                                min={1}
+                                                                                                disabled={watchedValues?.enableQtyField === true ? true : false}
+
+                                                                                            />
+                                                                                        </Box>
+
+                                                                                    }
+
+                                                                                </BlockStack>
+
+                                                                            </InlineStack>
+                                                                        </Box>
+                                                                    ))
+
+                                                                    }
+
+                                                                    <Divider />
+                                                                </Box>
+
+
+
+                                                            ))
+
+
+                                                            }
+                                                            <Box borderRadius="100" padding={'400'} background="bg-surface-secondary">
+                                                                <Controller
+                                                                    name="enableQtyField"
+                                                                    control={control}
+
+                                                                    render={({ field }) => (
+                                                                        <BlockStack gap="200">
+                                                                            <Checkbox
+                                                                                label={t("fixed_qty")}
+                                                                                checked={field.value === false}
+                                                                                onChange={() => field.onChange(false)}
+                                                                            />
+                                                                            <Checkbox
+                                                                                label={t("enable_qty_field")}
+                                                                                checked={field.value === true}
+                                                                                onChange={() => field.onChange(true)}
+                                                                            />
+                                                                        </BlockStack>
+                                                                    )}
+                                                                />
+
+                                                            </Box>
+                                                        </BlockStack>
+                                                    </Box>
+                                                </Box>
+                                            }
+                                        </Collapsible>
                                     </Box>
-                                }
+                                </Box>
 
                                 <Box paddingBlockEnd={'400'}>
                                     <Box background="bg-fill" borderRadius="200">
@@ -1702,6 +1820,62 @@ const CreateComponent = () => {
                                         >
                                             <Box padding={'300'}>
                                                 <BlockStack gap={'300'}>
+                                                    <BlockStack gap={'300'}>
+                                                        {watchedValues.componentSettings.cartBehavior === 'cart' &&
+                                                            <Controller
+                                                                name="buttonStyleSettings.addToCartBtnTxt"
+                                                                control={control}
+                                                                render={({ field, fieldState }) => (
+                                                                    <TextField
+                                                                        type="text"
+                                                                        label={t("add_to_cart_label")}
+                                                                        name="buttonStyleSettings.addToCartBtnTxt"
+                                                                        value={field.value}
+                                                                        onChange={field.onChange}
+                                                                        error={fieldState.error?.message || actionData?.errors?.buttonStyleSettings?.addToCartBtnTxt}
+                                                                        autoComplete="off"
+                                                                        maxLength={100}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        }
+                                                        {watchedValues.componentSettings.cartBehavior === 'checkout' &&
+                                                            <Controller
+                                                                name="buttonStyleSettings.checkoutBtnTxt"
+                                                                control={control}
+                                                                render={({ field, fieldState }) => (
+                                                                    <TextField
+                                                                        type="text"
+                                                                        label={t("checkout_label")}
+                                                                        name="buttonStyleSettings.checkoutBtnTxt"
+                                                                        value={field.value}
+                                                                        onChange={field.onChange}
+                                                                        error={fieldState.error?.message || actionData?.errors?.buttonStyleSettings?.checkoutBtnTxt}
+                                                                        autoComplete="off"
+                                                                        maxLength={100}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        }
+                                                        {watchedValues.componentSettings.fullView &&
+                                                            <Controller
+                                                                name="buttonStyleSettings.viewBtnTxt"
+                                                                control={control}
+                                                                render={({ field, fieldState }) => (
+                                                                    <TextField
+                                                                        type="text"
+                                                                        label={t("view_product_label")}
+                                                                        name="buttonStyleSettings.viewBtnTxt"
+                                                                        value={field.value}
+                                                                        onChange={field.onChange}
+                                                                        error={fieldState.error?.message || actionData?.errors?.buttonStyleSettings?.viewBtnTxt}
+                                                                        autoComplete="off"
+                                                                        maxLength={100}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        }
+                                                    </BlockStack>
                                                     <InlineStack gap={'100'} blockAlign="center" align="space-between">
                                                         <Box minWidth="48%">
                                                             <Controller
@@ -1997,32 +2171,32 @@ const CreateComponent = () => {
                                                             <BlockStack gap={'300'}>
                                                                 <Box visuallyHidden={watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk"}>
                                                                     <BlockStack gap={'100'}>
-                                                                    <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text>
-                                                                    <Controller
-                                                                        name="componentSettings.fullView"
-                                                                        control={control}
-                                                                        defaultValue="active"
-                                                                        render={({ field }) => (
-                                                                            <InlineStack gap={'400'} blockAlign="center">
-                                                                                <RadioButton
-                                                                                    name="componentSettings.fullView"
-                                                                                    label={t("yes")}
-                                                                                    checked={field.value === true}
-                                                                                    onChange={() => field.onChange(true)}
+                                                                        <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text>
+                                                                        <Controller
+                                                                            name="componentSettings.fullView"
+                                                                            control={control}
+                                                                            defaultValue="active"
+                                                                            render={({ field }) => (
+                                                                                <InlineStack gap={'400'} blockAlign="center">
+                                                                                    <RadioButton
+                                                                                        name="componentSettings.fullView"
+                                                                                        label={t("yes")}
+                                                                                        checked={field.value === true}
+                                                                                        onChange={() => field.onChange(true)}
 
-                                                                                />
-                                                                                <RadioButton
-                                                                                    name="componentSettings.fullView"
-                                                                                    label={t("no")}
-                                                                                    checked={field.value === false}
-                                                                                    onChange={() => field.onChange(false)}
+                                                                                    />
+                                                                                    <RadioButton
+                                                                                        name="componentSettings.fullView"
+                                                                                        label={t("no")}
+                                                                                        checked={field.value === false}
+                                                                                        onChange={() => field.onChange(false)}
 
-                                                                                />
-                                                                            </InlineStack>
-                                                                        )}
-                                                                    />
+                                                                                    />
+                                                                                </InlineStack>
+                                                                            )}
+                                                                        />
 
-                                                                </BlockStack>
+                                                                    </BlockStack>
                                                                 </Box>
 
                                                                 <BlockStack gap={'100'}>
@@ -2181,6 +2355,50 @@ const CreateComponent = () => {
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
+                                                <Button onClick={() => { setCustomCssOpen(!customCssOpen) }} textAlign="left"
+                                                    variant="monochromePlain"
+                                                    size="large"
+                                                    fullWidth
+                                                    disclosure={customCssOpen ? 'up' : 'down'}
+                                                >
+                                                    <Text variant="bodyMd" fontWeight="medium">{t("custom_css")}</Text>
+                                                </Button>
+                                            </div>
+                                        </Box>
+
+                                        <Collapsible
+                                            open={customCssOpen}
+                                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                            expandOnPrint
+                                        >
+                                            <Box padding={'300'}>
+                                                <BlockStack gap={'100'}>
+                                                    <Controller
+                                                        name="componentSettings.customCss"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                name="componentSettings.customCss"
+                                                                label={t("custom_css_label")}
+                                                                labelHidden
+                                                                value={field.value}
+                                                                onChange={field.onChange}
+                                                                type="text"
+                                                                placeholder={t("custom_css_placeholder")}
+                                                                multiline={8}
+                                                            />
+                                                        )}
+                                                    />
+                                                </BlockStack>
+                                            </Box>
+                                        </Collapsible>
+                                    </Box>
+                                </Box>
+
+                                <Box paddingBlockEnd={'400'}>
+                                    <Box background="bg-fill" borderRadius="200">
+                                        <Box minHeight="50px">
+                                            <div className="collapsibleButtonDiv">
                                                 <Button onClick={() => { setTranckingOpen(!tranckingOpen) }} textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
@@ -2200,7 +2418,7 @@ const CreateComponent = () => {
                                             <Box padding={'300'}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
-                                                        name="tracking"
+                                                        name="customerTracking"
                                                         control={control}
                                                         // rules={{
                                                         //     required: true,
@@ -2208,12 +2426,10 @@ const CreateComponent = () => {
                                                         // }}
                                                         render={({ field }) => (
                                                             <TextField
-                                                                name="tracking"
+                                                                name="customerTracking"
                                                                 label={t("tracking_code")}
                                                                 value={field.value}
-                                                                onChange={(value) => {
-                                                                    value === '' ? field.onChange(trackingCode) : field.onChange(value.toUpperCase())
-                                                                }}
+                                                                onChange={field.onChange}
                                                                 type="text"
                                                                 minLength={2}
                                                                 maxLength={20}
@@ -2233,15 +2449,15 @@ const CreateComponent = () => {
 
                             <Box paddingBlockEnd={'400'}>
                                 <InlineStack align="end">
-                                    <Button disabled={!isDirty} size="large" variant="primary" submit>
-                                        Save
+                                    <Button loading={navigation.state === 'submitting'} disabled={!isDirty} size="large" variant="primary" submit>
+                                        Save Component
                                     </Button>
                                 </InlineStack>
                             </Box>
 
                         </Layout.Section>
 
-                        <Layout.Section>
+                        <div className="Polaris-Layout__Section previewSectionSticky">
                             <Box>
                                 <Card padding={'0'} roundedAbove="xs">
                                     <InlineStack align="space-between" blockAlign="center">
@@ -2264,13 +2480,13 @@ const CreateComponent = () => {
                                             </Box>
                                         </Box>
                                         <Box paddingBlockStart={'300'} paddingInlineEnd={'300'}>
-                                            <Button>Copy Code</Button>
+                                            <Button disabled onClick={handleCopyHtmlCode}>Copy Code</Button>
                                         </Box>
 
                                     </InlineStack>
                                     <iframe
                                         title="spc-iframe"
-                                        srcDoc={embedPHtmlCode}
+                                        srcDoc={scriptsAll + embedPHtmlCode}
                                         style={{ width: '100%', height: '100vh', border: 'none' }}
                                         sandbox="allow-scripts allow-same-origin allow-popups"
                                         className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
@@ -2281,7 +2497,7 @@ const CreateComponent = () => {
                                     }}>
                                         <iframe
                                             title="spc-iframe"
-                                            srcDoc={embedPHtmlCode}
+                                            srcDoc={scriptsAll + embedPHtmlCode}
                                             style={{ width: '100%', height: "100vh", border: 'none' }}
                                             sandbox="allow-scripts allow-same-origin allow-popups"
                                             className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
@@ -2289,13 +2505,13 @@ const CreateComponent = () => {
                                     </Modal>
                                     <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                                         <InlineStack align="end">
-                                            <Button>Copy Code</Button>
+                                            <Button disabled onClick={handleCopyHtmlCode}>Copy Code</Button>
                                         </InlineStack>
                                     </Box>
                                 </Card>
                             </Box>
 
-                        </Layout.Section>
+                        </div>
                     </Layout>
                 </Page >
             </form >
@@ -2307,6 +2523,49 @@ export default CreateComponent
 export const action = async ({ request }) => {
     const formData = await request.formData();
     const data = Object.fromEntries(formData);
-    console.log(data);
-    return null;
+    const jsonFields = [
+        "addToCartType",
+        "componentSettings",
+        "shoppingCartSettings",
+        "productLayoutSettings",
+        "buttonStyleSettings",
+    ];
+
+    for (const field of jsonFields) {
+        if (data[field]) {
+            try {
+                data[field] = JSON.parse(data[field]);
+            } catch {
+                data[field] = {}; // fallback if parsing fails
+            }
+        }
+    }
+    let customerTracking = formData.get('customerTracking');
+    const enableQtyField = formData.get('enableQtyField') === "true" ? true : false;
+    const shopId = Number(formData.get('shopId'));
+    if (customerTracking === '') {
+        customerTracking = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
+    }
+    const updatedData = { ...data, customerTracking: customerTracking, enableQtyField: enableQtyField, shopId: shopId };
+
+
+    const createComp = await db.component.create({
+        data: updatedData,
+    });
+
+    if (createComp?.id) {
+        return {
+            success: true,
+            createCompData: createComp,
+            message: "Component created successfully"
+        };
+
+    } else {
+        return {
+            success: false,
+            error: "There was an error creating the component"
+        };
+    }
+
+
 }

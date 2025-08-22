@@ -7,7 +7,15 @@
 .collapsibleButtonDiv>button {
     height: 60px;
 }
-
+.previewSectionSticky{
+    position: sticky;
+    top: 0;
+    transition: all 0.5s ease-in-out;
+    scroll-behavior: smooth;
+}
+.sc-addToCartType{
+    padding: 14px 0 !important;
+}
 .spc_iframe {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
     margin: 0 auto;

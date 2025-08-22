@@ -22,6 +22,9 @@ export default function App() {
         <Link to="/app" rel="home">
           Home
         </Link>
+        <Link to="/app">
+          {t("components")}
+        </Link>
         <Link to="/app/createcomponent">{t("create_componet")}</Link>
         <Link to="/app/settings">{t("settings")}</Link>
       </NavMenu>

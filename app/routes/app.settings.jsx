@@ -28,7 +28,7 @@ const Settings = () => {
                                     suffix={ <Button variant="plain" onClick={() => setShowAccessToken(!showAccessToken)} size="large" icon={!showAccessToken ? ViewIcon : HideIcon}></Button> }
                                 />
                                 <Box>
-                                    <Button size="large" variant="primary">Change Now</Button>
+                                    <Button size="large" variant="primary">Update Now</Button>
                                 </Box>
                             </BlockStack>
                         </Card>

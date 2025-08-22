@@ -36,7 +36,15 @@ const floatingCartCountBuble = `
                         <path d="M12 21.3334C12 22.0697 11.403 22.6667 10.6667 22.6667C9.93029 22.6667 9.33333 22.0697 9.33333 21.3334C9.33333 20.597 9.93029 20 10.6667 20C11.403 20 12 20.597 12 21.3334Z" fill="white"/>
                         <path d="M18.6667 21.3334C18.6667 22.0697 18.0697 22.6667 17.3333 22.6667C16.597 22.6667 16 22.0697 16 21.3334C16 20.597 16.597 20 17.3333 20C18.0697 20 18.6667 20.597 18.6667 21.3334Z" fill="white"/>
                         </svg>
-                        <div class="shopcomponent_cart_count">0</div>
+                            <div class="shopcomponent_cart_count">
+                            <shopify-context id="cart_modal_context" type="cart" wait-for-update>
+                              <template>
+                                <shopify-data class="shopcomponent_cart_count_qty" query="cart.totalQuantity"></shopify-data>
+                          
+                              </template>
+                            </shopify-context>
+                           
+                          </div>
                 </div>
             </div>
 

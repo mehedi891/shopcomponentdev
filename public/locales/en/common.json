@@ -1,6 +1,8 @@
 {
     "welcome":"Hello world",
     "create_componet":"Create component",
+    "updated_componet":"Update component",
+    "components":"Components",
     "settings":"Settings",
     "titleAndDesc": "Title & Description*",
     "title_require_msg":"Title is required",
@@ -22,7 +24,8 @@
     "choose_product": "Choose product*",
     "browse_products": "Browse products",
     "product_required_msg":"Product is required",
-    "product_max_limit_msg":"*The maximum limit is 12 product variants per component.",
+    "collection_required_msg":"Collection is required",
+    "product_max_limit_msg":"*The maximum limit is 10 product variants per component.",
     "fixed_qty": "Set fixed quantity",
     "enable_qty_field": "Enable quantity field",
     "layout_preview": "Layout preview",
@@ -51,6 +54,9 @@
     "product_price_font_color":"Product price font color",
     "product_card_bg_color":"Product card background color",
     "product_card_border_color":"Product card border color",
+    "add_to_cart_label":"Add to cart button label",
+    "view_product_label":"View product button label",
+    "checkout_label":"Checkout button label",
     "button_style":"Button Style",
     "button_font_weight":"Button font weight",
     "button_font_size":"Button font size",
@@ -70,6 +76,10 @@
     "shopping_cart_btn_bg_color":"Shopping cart button BG color",
     "choose_collection":"Choose collection",
     "browse_collection":"Browse collection",
+    "custom_css":"Custom CSS",
+    "custom_css_label":"Custom CSS",
+    "custom_css_placeholder":"Enter your custom CSS here",
+    "component_created_msg":"Component Created Successfully",
     "end_txt":"End"
     
 

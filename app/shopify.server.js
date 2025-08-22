@@ -13,12 +13,78 @@ const shopify = shopifyApp({
   apiVersion: ApiVersion.January25,
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
+  
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
+  },
+  hooks: {
+    afterAuth: async ({ session, admin }) => {
+      const shopResponse = await admin.graphql(
+        `#graphql
+            query shopInfo{
+                shop{
+                  id
+                }
+        }`,
+
+      );
+
+      const shop = await shopResponse.json();
+
+
+      const createStorefrontAccessToken = await admin.graphql(
+        `#graphql
+            mutation StorefrontAccessTokenCreate($input: StorefrontAccessTokenInput!) {
+              storefrontAccessTokenCreate(input: $input) {
+                userErrors {
+                  field
+                  message
+                }
+                shop {
+                  id
+                }
+                storefrontAccessToken {
+                  
+                  accessToken
+
+                }
+              }
+            }`,
+        {
+          variables: {
+            "input": {
+              "title": `sc${session.shop.replace('.myshopify.com', '')}`,
+            }
+          },
+        },
+      );
+
+      const scToken = await createStorefrontAccessToken.json();
+      console.log('Token:', scToken.data.storefrontAccessTokenCreate.storefrontAccessToken.accessToken);
+      await prisma.shop.upsert({
+        where: {
+          shopifyDomain: session.shop,
+        },
+        update: {
+          installationCount: {
+            increment: 1,
+          },
+        },
+        create: {
+          shopifyDomain: session.shop,
+          scAccessToken: scToken.data.storefrontAccessTokenCreate.storefrontAccessToken.accessToken,
+          installationCount: 1,
+          shopifyShopGid: shop.data.shop.id,
+        },
+      });
+
+
+
+    }
   },
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
