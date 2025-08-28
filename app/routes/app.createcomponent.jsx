@@ -1,5 +1,5 @@
 import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
-import { BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
+import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
 import {
     DeleteIcon,
     DesktopIcon,
@@ -22,11 +22,14 @@ import { emptyStateHtml } from "../webcomponentsHtml/emptyState";
 import { stylesPdT1 } from "../webcomponentsHtml/stylesProduct";
 import { floatingCartCountBuble } from "../webcomponentsHtml/generalHTML";
 import db from "../db.server";
+import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
+import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
+
 
 
 
 export const loader = async ({ request }) => {
-    const { session, admin } = await authenticate.admin(request);
+    const { session, admin, redirect } = await authenticate.admin(request);
     // const shopResponse = await admin.graphql(
     //     `#graphql
     //             query shopInfo{
@@ -46,9 +49,16 @@ export const loader = async ({ request }) => {
     const shop = await db.shop.findUnique({
         where: {
             shopifyDomain: session.shop
+        },
+        include: {
+            plan: true,
+            components: true
         }
     });
-    console.log('shop', shop);
+
+    if (!shop?.plan) {
+        throw redirect('/app/plans')
+    }
 
     const trackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
 
@@ -62,15 +72,19 @@ const CreateComponent = () => {
     const { trackingCode, shopData } = useLoaderData();
     const navigate = useNavigate();
     const actionData = useActionData();
-    const [titleAndDescToggleOpen, setTitleAndDescToggleOpen] = useState(true);
-    const [appliesToOpen, setAppliesToOpen] = useState(true);
-    const [layoutOpen, setLayoutOpen] = useState(false);
-    const [statusOpen, setStatusOpen] = useState(false);
-    const [buttonStyleOpen, setButtonStyleOpen] = useState(false);
-    const [shoppingCartOpen, setShoppingCartOpen] = useState(false);
-    const [settingsOpen, setSettingsOpen] = useState(false);
-    const [tranckingOpen, setTranckingOpen] = useState(false);
-    const [customCssOpen, setCustomCssOpen] = useState(false);
+    const [toogleBtnDisabled, setToogleBtnDisabled] = useState(false);
+    const [toogleOpen, setToogleOpen] = useState({
+        titleAndDescToggleOpen: true,
+        cartBehaviorOpen: true,
+        appliesToOpen: true,
+        layoutOpen: false,
+        statusOpen: false,
+        buttonStyleOpen: false,
+        shoppingCartOpen: false,
+        settingsOpen: false,
+        customCssOpen: false,
+        tranckingOpen: false,
+    });
     const [selectedCollection, setSelectedCollection] = useState([]);
     const [selectedProductsInd, setSelectedProductsInd] = useState([]);
     const [selectedProductsBulk, setSelectedProductsBulk] = useState([]);
@@ -103,6 +117,7 @@ const CreateComponent = () => {
         view: 'desktop'
     });
     const [embedPHtmlCode, setEmbedPHtmlCode] = useState('');
+    const [disabledContentByPlan, setDisabledContentByPlan] = useState(false);
     const [checkMaxSelectedVariants, setCheckMaxSelectedVariants] = useState(false);
     const navigation = useNavigation();
     const shopify = useAppBridge();
@@ -110,7 +125,8 @@ const CreateComponent = () => {
     const submit = useSubmit();
     const { t } = useTranslation();
 
-    const { register, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
+
+    const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
         defaultValues: {
             title: '',
             description: '',
@@ -124,7 +140,7 @@ const CreateComponent = () => {
             status: 'activate',
             componentSettings: {
                 fullView: false,
-                cartBehavior: 'cart',
+                cartBehavior: 'checkout',
                 customCss: '',
             },
             shoppingCartSettings: {
@@ -167,6 +183,10 @@ const CreateComponent = () => {
     const watchedValues = watch();
 
 
+    useEffect(() => {
+        setDisabledContentByPlan(shopData?.plan?.planName === 'Free' ? true : false)
+    }, [shopData]);
+
 
 
     useEffect(() => {
@@ -183,6 +203,14 @@ const CreateComponent = () => {
     }, [selectedProductsInd, selectedCollection, watchedValues.appliesTo, selectedProductsBulk, watchedValues.addToCartType.type]);
 
     const formHandleSubmit = (data) => {
+        if (data.componentSettings.cartBehavior === "cart" && !shopData?.headlessAccessToken) {
+            setError("componentSettings.cartBehavior", {
+                type: "manual",
+                message: t("headless_token_required_msg"),
+            });
+            shopify.toast.show(t("headless_token_required_msg"), { duration: 2000 });
+            return;
+        }
         const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings), compHtml: embedPHtmlCode };
         //console.log(updatedData);
         submit(updatedData, { method: 'post' });
@@ -191,8 +219,8 @@ const CreateComponent = () => {
     const handleChooseProductsInd = async (query) => {
         const selected = await shopify.resourcePicker({
             type: 'product',
-            multiple: 3,
-            selectionIds: selectedProductsInd.length > 0 ? selectedProductsInd.map(product => {
+            multiple: disabledContentByPlan ? 3 : 10,
+            selectionIds: selectedProductsInd.length > 0 ? selectedProductsInd?.map(product => {
                 return {
                     id: product.id
                 }
@@ -203,7 +231,7 @@ const CreateComponent = () => {
         });
         if (selected) {
             setSelectedProductsInd(() => {
-                const selectedProducts = selected.map(product => {
+                const selectedProducts = selected?.map(product => {
                     return { id: product.id, title: product.title, handle: product.handle, image: product.images[0].originalSrc };
                 })
                 return selectedProducts
@@ -215,7 +243,7 @@ const CreateComponent = () => {
     const handleChooseProductsBulk = async (query) => {
         const selected = await shopify.resourcePicker({
             type: 'product',
-            multiple: 12,
+            multiple: 10,
             query: '',
             selectionIds: selectedProductsBulk?.length > 0 && selectedProductsBulk?.map(item => {
                 return {
@@ -331,10 +359,16 @@ const CreateComponent = () => {
             panelID: 'settingsTab-content-1',
         },
         {
-            id: 'product-laoput',
-            content: t("product_layout"),
+            id: disabledContentByPlan ? 'product-layout-disabled' : 'product-layout',
+            content: disabledContentByPlan ?
+                <InlineStack blockAlign="center" gap={'150'}>
+                    {t("product_layout")}
+                    <UpgradeTooltip />
+                </InlineStack>
+                : t("product_layout"),
             accessibilityLabel: t("product_layout"),
             panelID: 'settingsTab-content-2',
+
         }
     ];
 
@@ -368,17 +402,58 @@ const CreateComponent = () => {
 
     useEffect(() => {
         if (isDirty) {
-            shopify.saveBar.show('spc-save-bar');
+            if (disabledContentByPlan && shopData?.components?.length > 0) {
+                shopify.saveBar.hide('spc-save-bar');
+            } else if (shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === 'Growth') {
+                shopify.saveBar.hide('spc-save-bar');
+            } else {
+                shopify.saveBar.show('spc-save-bar');
+            }
         } else {
             shopify.saveBar.hide('spc-save-bar');
         }
     }, [isDirty]);
+
+
 
     useEffect(() => {
         if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
             setValue('componentSettings.fullView', false, { shouldValidate: true });
         }
     }, [watchedValues.appliesTo, watchedValues.addToCartType.type]);
+
+    useEffect(() => {
+        if (watchedValues.componentSettings.cartBehavior === "cart" && !shopData?.headlessAccessToken) {
+            setToogleBtnDisabled(true);
+        } else {
+            setToogleBtnDisabled(false);
+        }
+    }, [watchedValues, shopData]);
+
+
+    const handleDiscard = () => {
+        reset();
+        setProductLayoutSettings({
+            productTitleColor: '#303030',
+            productPriceColor: '#303030',
+            productCardBgColor: '#FFF',
+            productCardBorderColor: '#E5E5E5',
+        });
+        setButtonStyleSettings({
+            ...buttonStyleSettings,
+            buttonTextColor: '#FFFFFF',
+            buttonBackgroundColor: '#000000',
+            buttonBorderColor: '#E5E5E5',
+        });
+
+        setShoppingCartSettings({
+            shoppingCartBgColor: '#ffffff',
+            shoppingCartTextColor: '#000000',
+            shoppingCartBtnBgColor: '#2563EB',
+        });
+
+
+    }
 
     //Start webcomponents 
 
@@ -902,7 +977,7 @@ const CreateComponent = () => {
 
     const productLayoutIndHtml = `
         
-        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1008,7 +1083,7 @@ const CreateComponent = () => {
 
     const productLayoutBulkHtml = `
 
-        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1135,7 +1210,7 @@ const CreateComponent = () => {
 
     const collectionLayoutIndHtml = `
        
-        <shopify-store public-access-token="40e54142b7de3372a26b591477308f56" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1205,12 +1280,13 @@ const CreateComponent = () => {
     `;
 
     useEffect(() => {
-        if ( actionData?.success && actionData?.createCompData?.id && navigation.state === 'idle') {
+        if (actionData?.success && actionData?.createCompData?.id && navigation.state === 'idle') {
             shopify.toast.show(actionData?.message || 'Component Created Successfully', { duration: 2000 });
             navigate(`/app/component/${actionData?.createCompData?.id}?new_created=true`, { replace: true });
         }
-    }, [actionData,navigation.state]);
+    }, [actionData, navigation.state]);
 
+    console.log('Cart behave:', watchedValues.componentSettings.cartBehavior);
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1221,7 +1297,7 @@ const CreateComponent = () => {
                     <button
                         type="button"
                         onClick={() => {
-                            reset();
+                            handleDiscard();
                         }}
                     >
                     </button>
@@ -1229,22 +1305,55 @@ const CreateComponent = () => {
                 <Page
                     fullWidth
                     title={t("create_componet")}
-                    backAction={{ onAction: () => navigate('/app') }}
+                    backAction={{ onAction: () => { navigate('/app'); reset(getValues()); } }}
                 >
                     <Layout>
+                        {disabledContentByPlan && shopData?.components?.length > 0 &&
+                            <Layout.Section variant="fullWidth">
+                                <Banner
+                                    title={"Need to upgrade the plan to create more"}
+                                    tone="warning"
+
+                                >
+                                    <InlineStack gap={'300'} align="start">
+                                        <Button variant="primary" onClick={() => navigate(`/app/plans`)}>Upgrade Plan</Button>
+                                    </InlineStack>
+                                </Banner>
+                            </Layout.Section>
+                        }
+
+                        {shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === 'Growth' &&
+                            <Layout.Section variant="fullWidth">
+                                <Banner
+                                    title={"Maximum Component Limit (10)"}
+                                    tone="info"
+
+                                >
+                                    <InlineStack gap={'300'} align="start">
+                                        <Text>The maximum number of components you can create is 10. Once this limit is reached, no additional components can be added unless you delete or modify existing ones.</Text>
+                                    </InlineStack>
+                                </Banner>
+                            </Layout.Section>
+                        }
 
                         <Layout.Section variant="oneThird">
 
                             <BlockStack>
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setTitleAndDescToggleOpen(!titleAndDescToggleOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        titleAndDescToggleOpen: !toogleOpen.titleAndDescToggleOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={titleAndDescToggleOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.titleAndDescToggleOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("titleAndDesc")}</Text>
                                                 </Button>
@@ -1252,7 +1361,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={titleAndDescToggleOpen}
+                                            open={toogleOpen.titleAndDescToggleOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -1318,16 +1427,86 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-
                                 <Box paddingBlockEnd={'400'}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setAppliesToOpen(!appliesToOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        cartBehaviorOpen: !toogleOpen.cartBehaviorOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={appliesToOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.cartBehaviorOpen ? 'up' : 'down'}
+                                                >
+                                                    <Text variant="bodyMd" fontWeight="medium">{t("cart_behavior")}</Text>
+                                                </Button>
+                                            </div>
+                                        </Box>
+
+                                        <Collapsible
+                                            open={toogleOpen.cartBehaviorOpen}
+                                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                            expandOnPrint
+                                        >
+                                            <Box paddingInlineEnd={'300'} paddingInlineStart={'300'} paddingBlockEnd={'300'}>
+                                                <BlockStack gap={'100'}>
+                                                    {/* <Text variant="bodyMd" fontWeight="regular">{t("cart_behavior")}</Text> */}
+                                                    <Controller
+                                                        name="componentSettings.cartBehavior"
+                                                        control={control}
+                                                        defaultValue="active"
+                                                        render={({ field }) => (
+                                                            <BlockStack gap={'200'}>
+                                                                <RadioButton
+                                                                    name="componentSettings.cartBehavior"
+                                                                    label={t("checkout")}
+                                                                    checked={field.value === 'checkout'}
+                                                                    onChange={() => field.onChange('checkout')}
+
+                                                                />
+                                                                <RadioButton
+                                                                    name="componentSettings.cartBehavior"
+                                                                    label={t("open_to_cart")}
+                                                                    checked={field.value === 'cart'}
+                                                                    onChange={() => field.onChange('cart')}
+
+                                                                />
+                                                            </BlockStack>
+                                                        )}
+                                                    />
+
+
+                                                </BlockStack>
+                                                {watchedValues.componentSettings.cartBehavior === 'cart' && !shopData?.headlessAccessToken &&
+                                                    <Box paddingBlockStart={'200'}>
+                                                        <HeadlessVerify />
+                                                    </Box>
+                                                }
+                                            </Box>
+                                        </Collapsible>
+                                    </Box>
+                                </Box>
+
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                                    <Box background="bg-fill" borderRadius="200">
+                                        <Box minHeight="50px">
+                                            <div className="collapsibleButtonDiv">
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        appliesToOpen: !toogleOpen.appliesToOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
+                                                    variant="monochromePlain"
+                                                    size="large"
+                                                    fullWidth
+                                                    disclosure={toogleOpen.appliesToOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("applies_to")}</Text>
                                                 </Button>
@@ -1335,7 +1514,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={appliesToOpen}
+                                            open={toogleOpen.appliesToOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -1452,7 +1631,7 @@ const CreateComponent = () => {
                                                                 label={t("add_to_cart_type")}
                                                                 options={[
                                                                     { label: t("individual_add_to_cart"), value: 'individual' },
-                                                                    { label: t("bulk_add_to_cart"), value: 'bulk' },]}
+                                                                    { label: t("bulk_add_to_cart"), value: 'bulk', disabled: disabledContentByPlan }]}
                                                                 selected={field.value}
                                                                 onChange={field.onChange}
                                                                 value={field.value}
@@ -1689,15 +1868,21 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setLayoutOpen(!layoutOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        layoutOpen: !toogleOpen.layoutOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={layoutOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.layoutOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("layout_preview")}</Text>
                                                 </Button>
@@ -1705,7 +1890,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={layoutOpen}
+                                            open={toogleOpen.layoutOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -1731,13 +1916,18 @@ const CreateComponent = () => {
                                                                     onChange={() => field.onChange('grid')}
 
                                                                 />
-                                                                <RadioButton
-                                                                    name="layout"
-                                                                    label={t("grid_slider")}
-                                                                    checked={field.value === 'gridSlider'}
-                                                                    onChange={() => field.onChange('gridSlider')}
-
-                                                                />
+                                                                <InlineStack align="start" blockAlign="center" gap={'150'}>
+                                                                    <RadioButton
+                                                                        name="layout"
+                                                                        label={t("grid_slider")}
+                                                                        checked={field.value === 'gridSlider'}
+                                                                        onChange={() => field.onChange('gridSlider')}
+                                                                        disabled={disabledContentByPlan}
+                                                                    />
+                                                                    {disabledContentByPlan &&
+                                                                        <UpgradeTooltip />
+                                                                    }
+                                                                </InlineStack>
                                                             </>
                                                         )}
                                                     />
@@ -1747,15 +1937,21 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setStatusOpen(!statusOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        statusOpen: !toogleOpen.statusOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={statusOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.statusOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("status")}</Text>
                                                 </Button>
@@ -1763,7 +1959,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={statusOpen}
+                                            open={toogleOpen.statusOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -1798,15 +1994,21 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setButtonStyleOpen(!buttonStyleOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        buttonStyleOpen: !toogleOpen.buttonStyleOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={buttonStyleOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.buttonStyleOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("button_style")}</Text>
                                                 </Button>
@@ -1814,7 +2016,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={buttonStyleOpen}
+                                            open={toogleOpen.buttonStyleOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -1983,15 +2185,22 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setShoppingCartOpen(!shoppingCartOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        shoppingCartOpen: !toogleOpen.shoppingCartOpen,
+                                                    });
+                                                }}
+
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={shoppingCartOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.shoppingCartOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("shopping_cart")}</Text>
                                                 </Button>
@@ -1999,7 +2208,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={shoppingCartOpen}
+                                            open={toogleOpen.shoppingCartOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -2118,15 +2327,21 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setSettingsOpen(!settingsOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        settingsOpen: !toogleOpen.settingsOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={settingsOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.settingsOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("settings")}</Text>
                                                 </Button>
@@ -2134,32 +2349,11 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={settingsOpen}
+                                            open={toogleOpen.settingsOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
                                             <Box padding={'300'}>
-                                                {/* <InlineStack  gap={'100'} direction={'row'} align="start" blockAlign="stretch">
-                                                    {settingsTab.map((item, index) => (
-                                                        <Box 
-                                                        key={index} 
-                                                        background={settingsTabSelected === index ? "bg" : "bg-fill"} 
-                                                        borderRadius="200"
-                                                        >
-                                                            <Button
-                                                                size="medium"
-                                                                variant="tertiary"
-                                                                onClick={() => { handleSettingsTabChange(index) }}
-                                                                fullWidth
-                                                                >
-                                                                {item.content}
-                                                            </Button>
-                                                        </Box>
-                                                    ))
-
-                                                    }
-                                                </InlineStack> */}
-
                                                 <Tabs
                                                     selected={settingsTabSelected}
                                                     onSelect={handleSettingsTabChange}
@@ -2199,33 +2393,7 @@ const CreateComponent = () => {
                                                                     </BlockStack>
                                                                 </Box>
 
-                                                                <BlockStack gap={'100'}>
-                                                                    <Text variant="bodyMd" fontWeight="regular">{t("cart_behavior")}</Text>
-                                                                    <Controller
-                                                                        name="componentSettings.cartBehavior"
-                                                                        control={control}
-                                                                        defaultValue="active"
-                                                                        render={({ field }) => (
-                                                                            <InlineStack gap={'400'} blockAlign="center">
-                                                                                <RadioButton
-                                                                                    name="componentSettings.cartBehavior"
-                                                                                    label={t("open_to_cart")}
-                                                                                    checked={field.value === 'cart'}
-                                                                                    onChange={() => field.onChange('cart')}
 
-                                                                                />
-                                                                                <RadioButton
-                                                                                    name="componentSettings.cartBehavior"
-                                                                                    label={t("checkout")}
-                                                                                    checked={field.value === 'checkout'}
-                                                                                    onChange={() => field.onChange('checkout')}
-
-                                                                                />
-                                                                            </InlineStack>
-                                                                        )}
-                                                                    />
-
-                                                                </BlockStack>
                                                             </BlockStack>
                                                         </Box>
 
@@ -2351,27 +2519,44 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setCustomCssOpen(!customCssOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        customCssOpen: !toogleOpen.customCssOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={customCssOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.customCssOpen ? 'up' : 'down'}
+
                                                 >
-                                                    <Text variant="bodyMd" fontWeight="medium">{t("custom_css")}</Text>
+                                                    {disabledContentByPlan ?
+                                                        <InlineStack blockAlign="center" gap={"150"}>
+                                                            <Text variant="bodyMd" fontWeight="medium">
+                                                                {t("custom_css")}
+                                                            </Text>
+                                                            <UpgradeTooltip />
+                                                        </InlineStack>
+                                                        :
+                                                        <Text variant="bodyMd" fontWeight="medium"> {t("custom_css")}</Text>
+                                                    }
+
                                                 </Button>
                                             </div>
                                         </Box>
 
                                         <Collapsible
-                                            open={customCssOpen}
+                                            open={toogleOpen.customCssOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="componentSettings.customCss"
@@ -2395,15 +2580,21 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => { setTranckingOpen(!tranckingOpen) }} textAlign="left"
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        tranckingOpen: !toogleOpen.tranckingOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
                                                     variant="monochromePlain"
                                                     size="large"
                                                     fullWidth
-                                                    disclosure={tranckingOpen ? 'up' : 'down'}
+                                                    disclosure={toogleOpen.tranckingOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
                                                 </Button>
@@ -2411,7 +2602,7 @@ const CreateComponent = () => {
                                         </Box>
 
                                         <Collapsible
-                                            open={tranckingOpen}
+                                            open={toogleOpen.tranckingOpen}
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
@@ -2447,13 +2638,36 @@ const CreateComponent = () => {
 
                             </BlockStack>
 
-                            <Box paddingBlockEnd={'400'}>
-                                <InlineStack align="end">
-                                    <Button loading={navigation.state === 'submitting'} disabled={!isDirty} size="large" variant="primary" submit>
-                                        Save Component
-                                    </Button>
+                            {disabledContentByPlan && shopData?.components?.length > 0 ?
+                                <InlineStack align="end" blockAlign="center" gap={'150'}>
+                                    <UpgradeTooltip />
+
+                                    <InlineStack align="end">
+                                        <Button loading={navigation.state === 'submitting'} disabled={true} size="large" variant="primary">
+                                            Save Component
+                                        </Button>
+                                    </InlineStack>
                                 </InlineStack>
-                            </Box>
+
+                                : shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === 'Growth' ?
+                                    <InlineStack align="end" blockAlign="center" gap={'150'}>
+                                        {/* <UpgradeTooltip /> */}
+
+                                        <InlineStack align="end">
+                                            <Button loading={navigation.state === 'submitting'} disabled={true} size="large" variant="primary">
+                                                Save Component
+                                            </Button>
+                                        </InlineStack>
+                                    </InlineStack>
+                                    :
+                                    <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                                        <InlineStack align="end">
+                                            <Button loading={navigation.state === 'submitting'} disabled={!isDirty} size="large" variant="primary" submit>
+                                                Save Component
+                                            </Button>
+                                        </InlineStack>
+                                    </Box>
+                            }
 
                         </Layout.Section>
 

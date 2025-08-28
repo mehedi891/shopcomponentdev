@@ -14,13 +14,13 @@
     window.addEventListener('DOMContentLoaded', async () => {
 
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
-      const isExistWebcomJs2 = document.querySelector('script[src="https://magnet-participate-v-armor.trycloudflare.com/api/webcompjs"]');
+      const isExistWebcomJs2 = document.querySelector('script[src="https://romantic-andrea-ff-quotes.trycloudflare.com/api/webcompjs"]');
 
       if (!isExistWebcomJs2) {
         const scriptTag2 = document.createElement('script');
         scriptTag2.type = 'text/javascript';
         scriptTag2.id = 'shopcomponents-js';
-        scriptTag2.src = 'https://magnet-participate-v-armor.trycloudflare.com/api/webcompjs';
+        scriptTag2.src = 'https://romantic-andrea-ff-quotes.trycloudflare.com/api/webcompjs';
         document.head.appendChild(scriptTag2);
       }
 
@@ -36,7 +36,7 @@
 
       const holder = document.getElementById('compId');
       if (holder) {
-        const response = await fetch('https://magnet-participate-v-armor.trycloudflare.com/api/component?id=5');
+        const response = await fetch('https://romantic-andrea-ff-quotes.trycloudflare.com/api/component?id=5');
         const data = await response.json();
         holder.innerHTML = data.data.compHtml;
       }
@@ -50,21 +50,21 @@
 
 
 
-  <div id="shopcomponent-ILFERMKZS8_DP"></div>
+
+  <!-------------- Shopcomponent app code start -------------->
+  <!-- <div id="shopcomponent-WRYVXHULA9"></div>
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
-
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
-      const isExistWebcomJs2 = document.querySelector('script[src="https://magnet-participate-v-armor.trycloudflare.com/api/webcompjs"]');
+      const isExistWebcomJs2 = document.querySelector('script[src="https://romantic-andrea-ff-quotes.trycloudflare.com/api/webcompjs"]');
 
       if (!isExistWebcomJs2) {
         const scriptTag2 = document.createElement('script');
         scriptTag2.type = 'text/javascript';
         scriptTag2.id = 'shopcomponents-js';
-        scriptTag2.src = 'https://magnet-participate-v-armor.trycloudflare.com/api/webcompjs';
+        scriptTag2.src = 'https://romantic-andrea-ff-quotes.trycloudflare.com/api/webcompjs';
         document.head.appendChild(scriptTag2);
       }
-
       if (!isExistWebcomJs) {
         const scriptTag = document.createElement('script');
         scriptTag.type = 'module';
@@ -72,58 +72,66 @@
         scriptTag.src = 'https://cdn.shopify.com/storefront/web-components.js';
         document.body.appendChild(scriptTag);
       }
-      const holder = document.getElementById('shopcomponent-ILFERMKZS8_DP');
+      const holder = document.getElementById('shopcomponent-WRYVXHULA9');
       if (holder) {
-        const response = await fetch('https://magnet-participate-v-armor.trycloudflare.com/api/component?id=8');
+        const response = await fetch('https://romantic-andrea-ff-quotes.trycloudflare.com/api/component?id=31');
         const data = await response.json();
         holder.innerHTML = data.data.compHtml;
       }
-      
+     
     })
-  </script>
+  </script> -->
+  <!-------------- Shopcomponent app code end -------------->
 
-  <!-------------- Shopcomponent code start -------------->
-  <div id="shopcomponent-ILFERMKZS8"></div>
+
+
+
+
+
+
+
+   
+   
+    <!-------------- Shopcomponent app code start -------------->
+  <div id="shopcomponent-BH2LMVJ3IW"></div>
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
-
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
-      const isExistWebcomJs2 = document.querySelector('script[src="https://magnet-participate-v-armor.trycloudflare.com/api/webcompjs"]');
+      const isExistWebcomJs2 = document.querySelector('script[src="https://exists-country-mass-cycles.trycloudflare.com/api/webcompjs"]');
 
-     
-
-      if (!isExistWebcomJs) {
-        const scriptTag = document.createElement('script');
-        scriptTag.type = 'module';
-        scriptTag.id = 'shopcomponents-webcomJs';
-        scriptTag.src = 'https://cdn.shopify.com/storefront/web-components.js';
-        document.body.appendChild(scriptTag);
-      }
-
-       if (!isExistWebcomJs2) {
+      if (!isExistWebcomJs2) {
         const scriptTag2 = document.createElement('script');
         scriptTag2.type = 'text/javascript';
         scriptTag2.id = 'shopcomponents-js';
-        scriptTag2.src = 'https://magnet-participate-v-armor.trycloudflare.com/api/webcompjs';
+        scriptTag2.src = 'https://exists-country-mass-cycles.trycloudflare.com/api/webcompjs';
         document.head.appendChild(scriptTag2);
       }
-
-      const holder = document.getElementById('shopcomponent-ILFERMKZS8');
-      if (holder) {
-        const response = await fetch('https://magnet-participate-v-armor.trycloudflare.com/api/component?id=5');
-        const data = await response.json();
-        holder.innerHTML = data.data.compHtml;
+      if (!isExistWebcomJs) {
+        const scriptTag = document.createElement('script');
+        scriptTag.type = 'module';
+        scriptTag.id = 'shopcomponents-webcomJs';
+        scriptTag.src = 'https://cdn.shopify.com/storefront/web-components.js';
+        document.body.appendChild(scriptTag);
       }
-
-      const scCartQty = document.querySelectorAll('.shopcomponent_cart_count_qty');
-
-      
-    });
-
-
+      const holder = document.getElementById('shopcomponent-BH2LMVJ3IW');
+      if (holder) {
+        const response = await fetch('https://exists-country-mass-cycles.trycloudflare.com/api/component?id=37');
+        const data = await response.json();
+        if (data?.data?.compHtml) {
+          holder.innerHTML = data.data.compHtml;
+          localStorage.setItem('shopcomponentData', JSON.stringify({ plan: data?.data?.shop?.plan?.planName, shop: data?.data?.shop?.shopifyDomain }));
+        }
+      }
+     
+    })
   </script>
+  <!-------------- Shopcomponent app code end -------------->
+    
+    
+    
 
-  <!-------------- Shopcomponent code end -------------->
+
+
 
 
 

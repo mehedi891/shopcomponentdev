@@ -14,6 +14,7 @@ import i18next from "./i18next.server";
 import { existsSync } from "node:fs";
 import styles from "./styles/global.css?url";
 import { useEffect } from "react";
+import SpcFooter from "./components/SpcFooter/SpcFooter";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -102,6 +103,7 @@ export default function App() {
       <body>
         <Outlet />
         <ScrollRestoration />
+     
         <Scripts />
       </body>
     </html>

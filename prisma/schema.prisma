@@ -32,14 +32,14 @@ model Session {
 }
 
 model Component {
-  id                    Int     @id @default(autoincrement())
+  id                    Int      @id @default(autoincrement())
   title                 String
   description           String?
-  appliesTo             String  @default("product") // e.g. 'product'
+  appliesTo             String   @default("product") // e.g. 'product'
   addToCartType         Json
-  enableQtyField        Boolean @default(false)
-  layout                String  @default("grid")
-  status                String  @default("deactived")
+  enableQtyField        Boolean  @default(false)
+  layout                String   @default("grid")
+  status                String   @default("deactived")
   componentSettings     Json?
   shoppingCartSettings  Json?
   productLayoutSettings Json?
@@ -48,20 +48,52 @@ model Component {
   customerTracking      String?
   compHtml              String
   shopId                Int
-  shop                  Shop    @relation(fields: [shopId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  softDelete            Boolean  @default(false)
+  shop                  Shop     @relation(fields: [shopId], references: [id])
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
 model Shop {
-  id                  Int         @id @default(autoincrement())
-  shopifyShopGid      String?      @unique
-  shopifyDomain       String      @unique
-  scAccessToken       String?
-  headlessAccessToken String?
-  installationCount   Int?
-  components          Component[]
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  id                   Int         @id @default(autoincrement())
+  shopifyShopGid       String?     @unique
+  shopifyDomain        String      @unique
+  scAccessToken        String?
+  headlessAccessToken  String?
+  installationCount    Int?
+  maxAllowedComponents Int?        @default(1)
+  name                 String?
+  url                  String?
+  isFirstInstall       Boolean?    @default(true)
+  partnerDevelopment   Boolean?    @default(true)
+  shopOwnerName        String?
+  email                String?
+  shopOwnerPhone       String?
+  currencyCode         String?
+  weightUnit           String?
+  billingAddress       String?
+  shopifyPlan          String?
+  appPlan              String?     @default("Free")
+  trialDays            Int?        @default(7)
+  planActivatedAt      String?
+  shopifyPlus          Boolean?    @default(false)
+  myshopifyDomain      String?
+  appDisabled          Boolean?    @default(false)
+  plan                 Plan?
+  components           Component[]
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+model Plan {
+  id         Int      @id @default(autoincrement())
+  planId     String?  @unique
+  planName   String?
+  price      Float?   @default(0.00)
+  planType   String?
+  planStatus String?  @default("deactived")
+  shopId     Int      @unique
+  shop       Shop     @relation(fields: [shopId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

@@ -8,15 +8,29 @@ export const loader = async ({ request }) => {
   if (request.method === 'GET') {
     const url = new URL(request.url);
     const id = url.searchParams.get('id') || "";
+
     const component = await db.component.findUnique({
       where: {
-        id: Number(id)
+        id: Number(id),
+        softDelete: false,
+        status: 'activate'
       },
       select: {
         title: true,
         description: true,
         status: true,
-        compHtml: true
+        compHtml: true,
+        shop: {
+          select: {
+            appDisabled: true,
+            shopifyDomain:true,
+            plan: {
+              select: {
+                planName: true
+              }
+            }
+          }
+        }
       },
     });
     if (!component?.id) {
@@ -27,7 +41,7 @@ export const loader = async ({ request }) => {
         status: 404
       }));
     }
-    if (component?.status === "activate") {
+    if (!component?.shop?.appDisabled && component?.status === 'activate') {
       jsonResponse = new Response(JSON.stringify({
         data: component,
         success: true,

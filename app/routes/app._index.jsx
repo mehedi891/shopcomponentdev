@@ -1,22 +1,22 @@
 import {
-  ActionList,
   Badge,
   BlockStack,
   Box,
   Button,
   Card,
-  EmptySearchResult,
   EmptyState,
   Icon,
   IndexTable,
   InlineStack,
   Layout,
+  Link,
   Page,
   Popover,
   Spinner,
   Text,
+  Tooltip,
 } from "@shopify/polaris";
-import { CheckCircleIcon, DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, MenuHorizontalIcon, StatusActiveIcon } from '@shopify/polaris-icons';
+import { DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, LockFilledIcon, MenuHorizontalIcon, StatusActiveIcon } from '@shopify/polaris-icons';
 import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
@@ -24,9 +24,13 @@ import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-ru
 import { useCallback, useEffect, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
+import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 
 export const loader = async ({ request }) => {
-  const { session, admin } = await authenticate.admin(request);
+
+  const { session, admin, billing, redirect } = await authenticate.admin(request);
+  const { hasActivePayment } = await billing.check();
+
   const shopResponse = await admin.graphql(
     `#graphql
             query shopInfo{
@@ -38,7 +42,7 @@ export const loader = async ({ request }) => {
   );
 
   const shop = await shopResponse.json();
-  const shopData = await db.shop.findUnique({
+  let shopData = await db.shop.findUnique({
     where: {
       shopifyDomain: session.shop
     },
@@ -47,9 +51,14 @@ export const loader = async ({ request }) => {
         orderBy: {
           id: 'desc',
         },
-      }
+      },
+      plan: true
     }
   });
+
+  if (!shopData?.plan) {
+    throw redirect('/app/plans');
+  }
 
   if (!shopData?.scAccessToken) {
     const createStorefrontAccessToken = await admin.graphql(
@@ -80,8 +89,8 @@ export const loader = async ({ request }) => {
     );
 
     const scToken = await createStorefrontAccessToken.json();
-    //console.log('Token:', scToken.data.storefrontAccessTokenCreate.storefrontAccessToken.accessToken);
-    await db.shop.upsert({
+    console.log('Token AppIndex:', scToken?.data?.storefrontAccessTokenCreate?.storefrontAccessToken?.accessToken);
+    shopData = await db.shop.upsert({
       where: {
         shopifyDomain: session.shop,
       },
@@ -89,32 +98,73 @@ export const loader = async ({ request }) => {
         installationCount: {
           increment: 1,
         },
-        scAccessToken: scToken.data.storefrontAccessTokenCreate.storefrontAccessToken.accessToken,
-        shopifyShopGid: shop.data.shop.id,
+        scAccessToken: scToken?.data?.storefrontAccessTokenCreate?.storefrontAccessToken?.accessToken,
+        shopifyShopGid: scToken?.data?.storefrontAccessTokenCreate?.shop?.id,
       },
       create: {
         shopifyDomain: session.shop,
-        scAccessToken: scToken.data.storefrontAccessTokenCreate.storefrontAccessToken.accessToken,
+        scAccessToken: scToken?.data?.storefrontAccessTokenCreate?.storefrontAccessToken?.accessToken,
         installationCount: 1,
-        shopifyShopGid: shop.data.shop.id,
+        shopifyShopGid: scToken?.data?.storefrontAccessTokenCreate?.shop?.id,
       },
+      include: {
+        components: {
+          orderBy: {
+            id: 'desc',
+          },
+        },
+        plan: true
+      }
+    });
+  }
+
+  const url = new URL(request.url);
+  const isFirstInstall = url.searchParams.get('isFirstInstall');
+
+
+  if (isFirstInstall) {
+    shopData = await db.shop.update({
+      where: {
+        shopifyDomain: session.shop,
+      },
+      data: {
+        isFirstInstall: isFirstInstall === 'true' ? false : true,
+      },
+      include: {
+        // components: {
+        //   orderBy: {
+        //     id: 'desc',
+        //   },
+        // },
+        plan: true
+      }
     });
   }
 
 
-
+  const components = await db.component.findMany({
+    where: {
+      shopId: shopData.id,
+      softDelete: false,
+    },
+    orderBy: {
+      id: 'desc',
+    }
+  });
 
 
   return {
     shopData: shopData,
+    components: components || [],
+    hasActivePayment,
     success: true
   };
 };
 
 export default function Index() {
   const shopify = useAppBridge();
-  const { shopData } = useLoaderData();
-  //console.log('shopData', shopData);
+  const { shopData, components } = useLoaderData();
+  console.log('shopData', shopData);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -125,6 +175,12 @@ export default function Index() {
     setActivePopoverId((prevId) => (prevId === id ? null : id));
   }, []);
 
+
+  // useEffect(()=>{
+  //   if(!shopData?.plan){
+  //     navigate('/app/plans');
+  //   }
+  // },[shopData]);
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);
@@ -155,7 +211,7 @@ export default function Index() {
       });
     }
   }, [fetcher?.data]);
-  const rowMarkup = shopData?.components?.length > 0 && shopData?.components?.map(
+  const rowMarkup = components?.length > 0 && components?.map(
     (
       { id, title, addToCartType, status, appliesTo },
       index,
@@ -227,24 +283,51 @@ export default function Index() {
                       }}
                     >{status === 'activate' ? 'Deactivate' : 'Activate'}</Button>
 
-                    <Button
-                      icon={DuplicateIcon}
-                      variant="tertiary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDuplicateComponent(id);
-                      }}
-                    >{'Duplicate'}</Button>
 
-                    <Button
-                      icon={DeleteIcon}
-                      tone="critical"
-                      variant="tertiary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteComponent(id);
-                      }}
-                    >Delete</Button>
+                    {shopData?.plan?.planName === 'Free' && components?.length > 0 ?
+                      <Button
+                        icon={LockFilledIcon}
+                        variant="tertiary"
+                        disabled
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          //handleDuplicateComponent(id);
+                        }}
+                      >{'Duplicate'}</Button>
+                      :
+                      <Button
+                        icon={DuplicateIcon}
+                        variant="tertiary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDuplicateComponent(id);
+                        }}
+                      >{'Duplicate'}</Button>
+                    }
+
+
+                    {shopData?.plan?.planName === 'Free' && components?.length > 0 ?
+                      <Button
+                        icon={LockFilledIcon}
+                        tone="critical"
+                        variant="tertiary"
+                        disabled
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          //handleDeleteComponent(id);
+                        }}
+                      >Delete</Button>
+                      :
+                      <Button
+                        icon={DeleteIcon}
+                        tone="critical"
+                        variant="tertiary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteComponent(id);
+                        }}
+                      >Delete</Button>
+                    }
                   </BlockStack>
                 </Card>
               </Box>
@@ -262,35 +345,58 @@ export default function Index() {
 
       <Page
         fullWidth
-        title={t("components")}
-        // backAction={{ onAction: () => navigate('/app') }}
+      // title={t("components")}
+      // backAction={{ onAction: () => navigate('/app') }}
       >
         <Layout>
           <Layout.Section>
             <Box>
               <Card>
-                {shopData && shopData?.components?.length > 0 ?
+                {components && components?.length > 0 ?
                   <Box>
-                    <Box paddingBlockEnd={'200'}>
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text variant="headingLg">
-                    {''}
-                  </Text>
-                  <InlineStack align="end" blockAlign="center">
-                    {isLoading &&
-                      <Spinner
-                        accessibilityLabel="Loading form field"
-                        hasFocusableParent={true}
-                        size="small"
-                      />
-                    }
-                  </InlineStack>
-                </InlineStack>
-              </Box>
+                    <Box paddingBlockEnd={'200'} paddingInlineEnd={'200'}>
+                      <InlineStack align="space-between" blockAlign="center">
+                        <Text variant="headingLg">
+                          {t("components")}
+                        </Text>
+                        <InlineStack align="end" blockAlign="center">
+                          {isLoading &&
+                            <Spinner
+                              accessibilityLabel="Loading form field"
+                              hasFocusableParent={true}
+                              size="small"
+                            />
+                          }
+
+                          {shopData?.plan.planName === 'Free' && components?.length > 0 ?
+                            <InlineStack blockAlign="center" gap={'150'}>
+                              <UpgradeTooltip />
+                              <Button
+                                disabled
+                                size="large"
+                                variant="primary"
+                                onClick={() => {
+                                  navigate('/app/createcomponent');
+                                }}
+                              >{t("create_componet")}</Button>
+                            </InlineStack>
+                            :
+                            <Button
+                              size="large"
+                              variant="primary"
+                              onClick={() => {
+                                navigate('/app/createcomponent');
+                              }}
+                            >{t("create_componet")}</Button>
+                          }
+                        </InlineStack>
+                      </InlineStack>
+                    </Box>
+
                     <IndexTable
                       selectable={false}
                       resourceName={{ singular: 'component', plural: 'components' }}
-                      itemCount={shopData?.components?.length}
+                      itemCount={components?.length}
                       headings={[
                         { title: 'Component Name' },
                         { title: 'Applies to' },
@@ -306,7 +412,7 @@ export default function Index() {
                   <Box>
 
                     <EmptyState
-                      heading="Create a component to get started"
+                      heading="Create an embeddable storefront widget"
                       action={{
                         content: t("create_componet"),
                         onAction: () => {
@@ -317,8 +423,7 @@ export default function Index() {
                       fullWidth
                     >
                       <Text>
-                        Create a shareable product component that you can embed on any website, blog, or landing page.
-                        Customize the layout, design, and behavior to match your brand — and start selling beyond your Shopify store.
+                        Create a component from products or a collection and embed it on any website, blog, or landing page.
                       </Text>
                     </EmptyState>
 

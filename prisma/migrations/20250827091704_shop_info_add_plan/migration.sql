@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Shop" ADD COLUMN "appPlan" TEXT DEFAULT 'Free';
+ALTER TABLE "Shop" ADD COLUMN "trialDays" INTEGER DEFAULT 7;

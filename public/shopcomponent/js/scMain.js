@@ -32,12 +32,28 @@ async function addToCartNcheckoutIndProduct(event, accessToken, shop, tracingCod
             });
             shoppingCart.dispatchEvent(evt);
             dispatchCartUpdate(data.cartData);
-           // shoppingCart.parentNode.replaceChild(shoppingCartClone, shoppingCart);
+
+            // console.log('cartFnc:', data);
+            // shoppingCart.parentNode.replaceChild(shoppingCartClone, shoppingCart);
+            // mostParentContainer.querySelector('shopify-cart').dispatchEvent(evt);
             setTimeout(() => {
               mostParentContainer.querySelector('shopify-cart').showModal();
             }, 1000);
           } else {
-            console.log('Someting went wrong to adding Existing cart');
+            const data = await cartCreateFnc(shop, accessToken, selectedVariant, tracingCode, customertackingCode);
+            if (data.success) {
+              const evt = new CustomEvent(CART_EVENT, {
+                detail: data.cartData,
+              });
+              shoppingCart.dispatchEvent(evt);
+
+              dispatchCartUpdate(data.cartData);
+              //shoppingCart.parentNode.replaceChild(shoppingCartClone, shoppingCart);
+              setTimeout(() => {
+                mostParentContainer.querySelector('shopify-cart').showModal();
+              }, 1000);
+            }
+            console.log('Someting went wrong to adding Existing cart yyy');
           }
         }
         catch (error) {
@@ -125,7 +141,18 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
               qtyFileds.forEach(item => item.value = 0);
             }, 1000);
           } else {
-            console.log('Someting went wrong to adding Existing cart');
+            const data = await cartCreateFnc(shop, accessToken, enableQtyVariants, tracingCode, customertackingCode);
+            if (data.success) {
+              const evt = new CustomEvent(CART_EVENT, {
+                detail: data.cartData,
+              });
+              shoppingCart.dispatchEvent(evt);
+              dispatchCartUpdate(data.cartData);
+              setTimeout(() => {
+                mostParentContainer.querySelector('shopify-cart').showModal();
+                qtyFileds.forEach(item => item.value = 0);
+              }, 1000);
+            }
           }
         }
         catch (error) {
@@ -139,7 +166,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
               detail: data.cartData,
             });
             shoppingCart.dispatchEvent(evt);
-           dispatchCartUpdate(data.cartData);
+            dispatchCartUpdate(data.cartData);
             setTimeout(() => {
               mostParentContainer.querySelector('shopify-cart').showModal();
               qtyFileds.forEach(item => item.value = 0);
@@ -182,12 +209,24 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
               });
               shoppingCart.dispatchEvent(evt);
 
-             dispatchCartUpdate(data.cartData);
+              dispatchCartUpdate(data.cartData);
               setTimeout(() => {
                 mostParentContainer.querySelector('shopify-cart').showModal();
               }, 1000);
             } else {
-              console.log('Someting went wrong to adding Existing cart');
+              const data = await cartCreateFnc(shop, accessToken, variants, tracingCode, customertackingCode);
+              if (data.success) {
+                const evt = new CustomEvent(CART_EVENT, {
+                  detail: data.cartData,
+                });
+                shoppingCart.dispatchEvent(evt);
+
+
+                dispatchCartUpdate(data.cartData);
+                setTimeout(() => {
+                  mostParentContainer.querySelector('shopify-cart').showModal();
+                }, 1000);
+              }
             }
           }
           catch (error) {
@@ -204,7 +243,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
               shoppingCart.dispatchEvent(evt);
 
 
-             dispatchCartUpdate(data.cartData);
+              dispatchCartUpdate(data.cartData);
               setTimeout(() => {
                 mostParentContainer.querySelector('shopify-cart').showModal();
               }, 1000);
@@ -438,83 +477,86 @@ function moveSliderPrevNext(btnType) {
 }
 
 
-  const originalFetch = window.fetch.bind(window);
+const originalFetch = window.fetch.bind(window);
 
-  window.fetch = async (...args) => {
-    const [resource, config] = args;
-    const response = await originalFetch(...args);
-    console.log('response', resource);
-    try {
-      if (config?.body) {
-        const body = JSON.parse(config.body);
+window.fetch = async (...args) => {
+  const [resource, config] = args;
+  const response = await originalFetch(...args);
+  console.log('response.....', resource);
+  try {
+    if (config?.body) {
+      const body = JSON.parse(config.body);
 
-        if (body.query) {
-          if (body.query.includes("mutation cartLinesUpdate") || body.query.includes("mutation cartLinesRemove")) {
-            const cloneResponse = response.clone();
-            const data = await cloneResponse.json();
-            // console.log('data', data.data);
-           
-            const cartCount = data?.data?.cartLinesUpdate ? data.data.cartLinesUpdate.cart.totalQuantity : data?.data?.cartLinesRemove.cart.totalQuantity;
-            //console.log('cartCount', cartCount);
+      if (body.query) {
+        if (body.query.includes("mutation cartLinesUpdate") || body.query.includes("mutation cartLinesRemove")) {
+          const cloneResponse = response.clone();
+          const data = await cloneResponse.json();
+          // console.log('data', data.data);
 
-            const shoppingCartCount = document.querySelectorAll('.shopcomponent_cart_count_qty');
-            if (shoppingCartCount) {
-              shoppingCartCount.forEach(shoppingCartCount => {
-                shoppingCartCount.innerHTML = cartCount;
-              })
-            }
-             shoppingCartOnlyUpdate();
+          const cartCount = data?.data?.cartLinesUpdate ? data.data.cartLinesUpdate.cart.totalQuantity : data?.data?.cartLinesRemove.cart.totalQuantity;
+          //console.log('cartCount', cartCount);
 
+          const shoppingCartCount = document.querySelectorAll('.shopcomponent_cart_count_qty');
+          if (shoppingCartCount) {
+            shoppingCartCount.forEach(shoppingCartCount => {
+              shoppingCartCount.innerHTML = cartCount;
+            })
           }
+
+
+          shoppingCartOnlyUpdate();
+
         }
       }
-    } catch (err) {
-      console.warn("Failed to parse fetch body", err);
     }
+  } catch (err) {
+    console.warn("Failed to parse fetch body", err);
+  }
 
-    // Call the real fetch
+  // Call the real fetch
 
-    return response;
-  };
+  return response;
+};
 
-
-
-
-
-
+setTimeout(() => {
+  initialCartCount();
+}, 1000);
 
 
-function shopComponentWaitForElement(selector, callback) {
-  const observer = new MutationObserver((mutations, observer) => {
-    if (document.querySelector(selector)) {
-      observer.disconnect();
-      callback(document.querySelector(selector));
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
+function initialCartCount() {
+  const cartCountAll = document.querySelectorAll('.shopcomponent_cart_count_qty');
+  if (cartCountAll?.length > 0) {
+    const shoppingCart = document.querySelectorAll('shopify-cart');
+    shoppingCart.forEach(shoppingCart => {
+      shoppingCart.addEventListener("shopify:cartData", (event) => {
+        console.log('response', event.detail);
+        cartCountAll.forEach(cartCount => {
+          // if text isn't a number, force to "0"
+          if (!Number(cartCount.innerText)) {
+            cartCount.innerText = event?.detail?.totalQuantity;
+          }
+        });
+      });
+    })
+
+  }
 }
 
 
-shopComponentWaitForElement('.shopcomponent_cart_count_qty', () => {
-  const cartCountAll = document.querySelectorAll('.shopcomponent_cart_count_qty');
-  console.log('cartCountAll', cartCountAll);
-  if (cartCountAll?.length > 0) {
-    cartCountAll.forEach(cartCount => {
-      // if text isn't a number, force to "0"
-      if (!Number(cartCount.innerText)) {
-        cartCount.innerText = "0";
-      }
-    });
-  }
-});
+
+
+
+
 
 function dispatchCartUpdate(cart) {
   const shoppingCart = document.querySelectorAll('shopify-cart');
   const qtyCount = document.querySelectorAll('.shopcomponent_cart_count_qty');
   const evt = new CustomEvent('shopify:cartData', {
-              detail: cart,
-            });
-  
+    detail: cart,
+  });
+
+  console.log('cart dispact');
+
   if (shoppingCart) {
     shoppingCart.forEach(shoppingCart => {
       shoppingCart.dispatchEvent(evt);
@@ -531,14 +573,66 @@ function dispatchCartUpdate(cart) {
 
 }
 
-function shoppingCartOnlyUpdate(){
-  const shoppingCart = document.querySelectorAll('shopify-cart');
-  if (shoppingCart) {
-    shoppingCart.forEach(shoppingCart => {
-      const cloneShoppingCart = shoppingCart.cloneNode(true);
-      shoppingCart.parentNode.replaceChild(cloneShoppingCart, shoppingCart);
+function shoppingCartOnlyUpdate() {
+  const shoppingCarts = document.querySelectorAll('shopify-cart.shopcomponent_cart');
+
+  if (shoppingCarts.length) {
+    shoppingCarts.forEach((cart) => {
+      cart.addEventListener('click', (e) => {
+        const mostParentContainer = e.target.closest('.shopcomponent_pd_container');
+
+        if (!mostParentContainer) return;
+
+        // the cart inside the clicked container
+        const currentShoppingCart = mostParentContainer.querySelector('shopify-cart.shopcomponent_cart');
+
+        // all other carts in the DOM
+        const otherShoppingCarts = document.querySelectorAll('shopify-cart.shopcomponent_cart');
+
+        otherShoppingCarts.forEach((otherCart) => {
+          if (otherCart !== currentShoppingCart) {
+            const clone = otherCart.cloneNode(true);
+            otherCart.parentNode.replaceChild(clone, otherCart);
+          }
+        });
+      });
     });
   }
+}
+
+
+//  const cartOri = document.querySelector('.shopcomponent_cart');
+
+// cartOri.addEventListener('click',(e)=>{
+//   console.log('cartOri',e.target);
+// });
+
+setTimeout(() => {
+  const localData = localStorage.getItem('shopcomponentData');
+  const parsedData = localData ? JSON.parse(localData) : {};
+  poweredByAddFnc(parsedData.plan, parsedData.shop);
+}, 1500)
+
+function poweredByAddFnc(planName = 'Free', shop) {
+  if (planName !== 'Free') {
+    return;
+  }
+
+  const urlPath = window.location.origin;
+
+  console.log('urlPath', urlPath);
+
+  const poweredBy = document.querySelectorAll('.shopcomponent_pd_container');
+  if (poweredBy) {
+    poweredBy.forEach(poweredBy => {
+      const poweredByDiv = document.createElement('div');
+      poweredByDiv.innerHTML = `
+          <div style="font-size: 12px;display:flex;justify-content:end;align-items:center;gap:5px;">Powered by <a style="font-size: 14px; font-weight: 600;text-decoration: none;color:#0000ee" href="https://shopcomponent.com/?utm_source=${window.location.host}&utm_medium=${shop}&utm_campaign=pby" target="_blank" rel="noopener noreferrer"> Shopcomponent</a></div>
+      `;
+      poweredBy.appendChild(poweredByDiv);
+    });
+  }
+
 }
 
 
