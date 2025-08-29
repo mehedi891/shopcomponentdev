@@ -78,6 +78,7 @@
     "browse_collection": "Browse collection",
     "custom_css": "Custom CSS",
     "custom_css_label": "Custom CSS",
+    "component_title_show":"Component title show",
     "custom_css_placeholder": "Enter your custom CSS here",
     "component_created_msg": "Component Created Successfully",
     "subscription_plan": "Subscription Plan",
