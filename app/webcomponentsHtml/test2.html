@@ -4,13 +4,21 @@
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
+<<<<<<< HEAD
       const isExistWebcomJs2 = document.querySelector('script[src="https://dimension-rescue-organization-lessons.trycloudflare.com/api/webcompjs"]');
+=======
+      const isExistWebcomJs2 = document.querySelector('script[src="https://shopcomponentdev.onrender.com/api/webcompjs"]');
+>>>>>>> render
 
       if (!isExistWebcomJs2) {
         const scriptTag2 = document.createElement('script');
         scriptTag2.type = 'text/javascript';
         scriptTag2.id = 'shopcomponents-js';
+<<<<<<< HEAD
         scriptTag2.src = 'https://dimension-rescue-organization-lessons.trycloudflare.com/api/webcompjs';
+=======
+        scriptTag2.src = 'https://shopcomponentdev.onrender.com/api/webcompjs';
+>>>>>>> render
         document.head.appendChild(scriptTag2);
       }
       if (!isExistWebcomJs) {
@@ -22,7 +30,11 @@
       }
       const holder = document.getElementById('shopcomponent-6-H2HRHTHB');
       if (holder) {
+<<<<<<< HEAD
         const response = await fetch('https://dimension-rescue-organization-lessons.trycloudflare.com/api/component?id=1');
+=======
+        const response = await fetch('https://shopcomponentdev.onrender.com/api/component?id=1');
+>>>>>>> render
         const data = await response.json();
         if (data?.data?.compHtml) {
           holder.innerHTML = data.data.compHtml;

@@ -75,7 +75,7 @@ model Shop {
   shopifyPlan          String?
   appPlan              String?     @default("Free")
   trialDays            Int?        @default(7)
-  planActivatedAt      String?
+  planActivatedAt      DateTime?   @default(now())
   shopifyPlus          Boolean?    @default(false)
   myshopifyDomain      String?
   appDisabled          Boolean?    @default(false)

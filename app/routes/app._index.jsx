@@ -5,16 +5,13 @@ import {
   Button,
   Card,
   EmptyState,
-  Icon,
   IndexTable,
   InlineStack,
   Layout,
-  Link,
   Page,
   Popover,
   Spinner,
   Text,
-  Tooltip,
 } from "@shopify/polaris";
 import { DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, LockFilledIcon, MenuHorizontalIcon, StatusActiveIcon } from '@shopify/polaris-icons';
 import { useTranslation } from "react-i18next";
