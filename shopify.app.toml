@@ -1,9 +1,9 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "9e44f2914f087425570039bfac125e53"
-name = "shopcomponentdev"
-handle = "shopcomponentdev"
-application_url = "https://plays-moderator-anonymous-learning.trycloudflare.com"
+client_id = "0ac116b91c73391637da3d654209487a"
+name = "ShopComponent - Sell anywhere"
+handle = "shop-component"
+application_url = "https://app.shopcomponent.com"
 embedded = true
 
 [build]
@@ -13,9 +13,7 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2025-07"
 
-  [[webhooks.subscriptions]]
-  topics = [ "orders/create" ]
-  uri = "/webhooks/app/orders"
+
 
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled" ]
