@@ -291,7 +291,7 @@ const CreateComponent = () => {
                 return selectedCollection
             });
 
-            console.log(selected);
+            //console.log(selected);
         }
     }
 
@@ -2597,6 +2597,16 @@ const CreateComponent = () => {
                                                     disclosure={toogleOpen.tranckingOpen ? 'up' : 'down'}
                                                 >
                                                     <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+
+                                                    {disabledContentByPlan ?
+                                                        <InlineStack blockAlign="center" gap={"150"}>
+                                                           <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                                                            <UpgradeTooltip />
+                                                        </InlineStack>
+                                                        :
+                                                       <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                                                    }
+
                                                 </Button>
                                             </div>
                                         </Box>
@@ -2606,7 +2616,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="customerTracking"

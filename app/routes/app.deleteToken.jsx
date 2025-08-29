@@ -37,8 +37,8 @@ export const loader = async ({ request }) => {
 }
 
 const DeleteToken = () => {
-  const { storefrontAccessToken } = useLoaderData();
-  console.log('storefrontAccessToken', storefrontAccessToken);
+  //const { storefrontAccessToken } = useLoaderData();
+  //console.log('storefrontAccessToken', storefrontAccessToken);
   const fetcher = useFetcher();
   const handleDeleteAll = () => {
     fetcher.submit(null, { method: 'delete' });

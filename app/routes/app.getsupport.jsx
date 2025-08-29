@@ -30,7 +30,7 @@ export const loader = async ({ request }) => {
 
 const Getsupport = () => {
   const { shopData } = useLoaderData();
-  console.log(shopData);
+  //console.log(shopData);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const { t } = useTranslation();

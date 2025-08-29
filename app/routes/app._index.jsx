@@ -86,7 +86,7 @@ export const loader = async ({ request }) => {
     );
 
     const scToken = await createStorefrontAccessToken.json();
-    console.log('Token AppIndex:', scToken?.data?.storefrontAccessTokenCreate?.storefrontAccessToken?.accessToken);
+    //console.log('Token AppIndex:', scToken?.data?.storefrontAccessTokenCreate?.storefrontAccessToken?.accessToken);
     shopData = await db.shop.upsert({
       where: {
         shopifyDomain: session.shop,

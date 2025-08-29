@@ -63,7 +63,7 @@ export const loader = async ({ request, params }) => {
 }
 const UpdateComponent = () => {
   const { component, shopData,appUrl } = useLoaderData();
-  console.log(component);
+  //console.log(component);
   const actionData = useActionData();
   const navigate = useNavigate();
   const location = useLocation();

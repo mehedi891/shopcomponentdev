@@ -94,7 +94,7 @@ export const loader = async ({ request }) => {
 
 const PlanPurchase = () => {
   const { shopData } = useLoaderData();
-  console.log("shopData", shopData);
+  //console.log("shopData", shopData);
   const { t } = useTranslation();
   const navigation = useNavigation();
   const navigate = useNavigate();

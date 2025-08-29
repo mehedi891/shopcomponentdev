@@ -45,7 +45,7 @@ export const loader = async ({ request }) => {
       }),
     });
 
-    console.log('monthlyPlan growth created');
+    //console.log('monthlyPlan growth created');
   } else if (planName === 'free') {
     
     await billing.require({
@@ -63,12 +63,12 @@ export const loader = async ({ request }) => {
       }),
     });
 
-        console.log('monthlyPlan free created');
+        //console.log('monthlyPlan free created');
   }
 
 
 
-  console.log('planName', planName, planType, shopId);
+ // console.log('planName', planName, planType, shopId);
   return null
 }
 
