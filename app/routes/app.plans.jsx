@@ -209,7 +209,7 @@ const Plans = () => {
                 </Box>
 
               }
-              <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button>
+              {/* <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button> */}
             </BlockStack>
           </Box>
         </Layout.Section>
