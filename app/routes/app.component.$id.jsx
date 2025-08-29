@@ -58,7 +58,7 @@ export const loader = async ({ request, params }) => {
   return {
     shopData: shopData.data.shop,
     component: component,
-    appUrl : process.env.VITE_APP_URL || ''
+    appUrl : process.env.SHOPIFY_APP_URL || ''
   }
 }
 const UpdateComponent = () => {
