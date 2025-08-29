@@ -1,9 +1,9 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "9e44f2914f087425570039bfac125e53"
-name = "shopcomponentdev"
-handle = "shopcomponentdev"
-application_url = "https://plays-moderator-anonymous-learning.trycloudflare.com"
+client_id = "0ac116b91c73391637da3d654209487a"
+name = "ShopComponent - Sell anywhere"
+handle = "shop-component"
+application_url = "https://app.shopcomponent.com"
 embedded = true
 
 [build]
@@ -28,7 +28,7 @@ api_version = "2025-07"
 scopes = "unauthenticated_read_checkouts,unauthenticated_read_product_inventory,unauthenticated_read_product_listings,unauthenticated_write_checkouts,write_products"
 
 [auth]
-redirect_urls = ["https://plays-moderator-anonymous-learning.trycloudflare.com/auth/callback", "https://plays-moderator-anonymous-learning.trycloudflare.com/auth/shopify/callback", "https://plays-moderator-anonymous-learning.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://app.shopcomponent.com/auth/callback", "https://app.shopcomponent.com/auth/shopify/callback", "https://app.shopcomponent.com/api/auth/callback"]
 
 [pos]
 embedded = false
