@@ -49,7 +49,7 @@ export const loader = async ({ request }) => {
   });
 
   if (!shopData?.scAccessToken) {
-    console.log('creating sc token');
+    //console.log('creating sc token');
     const createStorefrontAccessToken = await admin.graphql(
       `#graphql
             mutation StorefrontAccessTokenCreate($input: StorefrontAccessTokenInput!) {

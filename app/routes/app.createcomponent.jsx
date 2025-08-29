@@ -142,6 +142,7 @@ const CreateComponent = () => {
                 fullView: false,
                 cartBehavior: 'checkout',
                 customCss: '',
+                showComponentTitle:'yes'
             },
             shoppingCartSettings: {
                 heading: 'Shopping cart',
@@ -521,7 +522,8 @@ const CreateComponent = () => {
                 font-weight: 650;
                 line-height: 24px;
                 letter-spacing: -0.2px; 
-                margin-bottom: 10px;             
+                margin-bottom: 10px;
+                display: ${watchedValues.componentSettings.showComponentTitle === 'no' ? 'none' : 'block'}             
             }
             .shopcomponent_description{
                 font-family: Inter;
@@ -2393,6 +2395,36 @@ const CreateComponent = () => {
                                                                     </BlockStack>
                                                                 </Box>
 
+                                                                <Box>
+                                                                    <BlockStack gap={'100'}>
+                                                                        <Text variant="bodyMd" fontWeight="regular">{t("component_title_show")}</Text>
+                                                                        <Controller
+                                                                            name="componentSettings.showComponentTitle"
+                                                                            control={control}
+                                                                            defaultValue="active"
+                                                                            render={({ field }) => (
+                                                                                <InlineStack gap={'400'} blockAlign="center">
+                                                                                    <RadioButton
+                                                                                        name="componentSettings.showComponentTitle"
+                                                                                        label={t("yes")}
+                                                                                        checked={field.value === 'yes'}
+                                                                                        onChange={() => field.onChange('yes')}
+
+                                                                                    />
+                                                                                    <RadioButton
+                                                                                        name="componentSettings.showComponentTitle"
+                                                                                        label={t("no")}
+                                                                                        checked={field.value === 'no'}
+                                                                                        onChange={() => field.onChange('no')}
+
+                                                                                    />
+                                                                                </InlineStack>
+                                                                            )}
+                                                                        />
+
+                                                                    </BlockStack>
+                                                                </Box>
+
 
                                                             </BlockStack>
                                                         </Box>
@@ -2596,7 +2628,7 @@ const CreateComponent = () => {
                                                     fullWidth
                                                     disclosure={toogleOpen.tranckingOpen ? 'up' : 'down'}
                                                 >
-                                                    <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                                                    
 
                                                     {disabledContentByPlan ?
                                                         <InlineStack blockAlign="center" gap={"150"}>
@@ -2616,7 +2648,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'}>
+                                            <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="customerTracking"

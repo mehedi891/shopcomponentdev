@@ -58,11 +58,11 @@ export const loader = async ({ request, params }) => {
   return {
     shopData: shopData.data.shop,
     component: component,
-    appUrl : process.env.SHOPIFY_APP_URL || '',
+    appUrl: process.env.SHOPIFY_APP_URL || '',
   }
 }
 const UpdateComponent = () => {
-  const { component, shopData,appUrl } = useLoaderData();
+  const { component, shopData, appUrl } = useLoaderData();
   //console.log(component);
   const actionData = useActionData();
   const navigate = useNavigate();
@@ -139,6 +139,7 @@ const UpdateComponent = () => {
         fullView: component?.componentSettings?.fullView || false,
         cartBehavior: component?.componentSettings?.cartBehavior || 'cart',
         customCss: component?.componentSettings?.customCss || '',
+        showComponentTitle: component?.componentSettings?.showComponentTitle || 'yes'
       },
       shoppingCartSettings: {
         heading: component?.shoppingCartSettings?.heading || 'Shopping cart',
@@ -531,7 +532,8 @@ const UpdateComponent = () => {
                 font-weight: 650;
                 line-height: 24px;
                 letter-spacing: -0.2px; 
-                margin-bottom: 10px;             
+                margin-bottom: 10px;
+                display: ${watchedValues.componentSettings.showComponentTitle === 'no' ? 'none' : 'block'}             
             }
             .shopcomponent_description{
                 font-family: Inter;
@@ -1282,7 +1284,9 @@ const UpdateComponent = () => {
     `;
 
   const copyCode = `
-    <!-------------- Shopcomponent app code start -------------->
+    <!-------------- Shopcomponent app code start ---------->
+     <!------[visit:https://shopcomponent.com/] -------------->
+
   <div id="shopcomponent-${watchedValues.tracking}"></div>
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
@@ -2435,6 +2439,35 @@ const UpdateComponent = () => {
                                   </BlockStack>
                                 </Box>
 
+                                <Box>
+                                  <BlockStack gap={'100'}>
+                                    <Text variant="bodyMd" fontWeight="regular">{t("component_title_show")}</Text>
+                                    <Controller
+                                      name="componentSettings.showComponentTitle"
+                                      control={control}
+                                      defaultValue="active"
+                                      render={({ field }) => (
+                                        <InlineStack gap={'400'} blockAlign="center">
+                                          <RadioButton
+                                            name="componentSettings.showComponentTitle"
+                                            label={t("yes")}
+                                            checked={field.value === 'yes'}
+                                            onChange={() => field.onChange('yes')}
+
+                                          />
+                                          <RadioButton
+                                            name="componentSettings.showComponentTitle"
+                                            label={t("no")}
+                                            checked={field.value === 'no'}
+                                            onChange={() => field.onChange('no')}
+
+                                          />
+                                        </InlineStack>
+                                      )}
+                                    />
+
+                                  </BlockStack>
+                                </Box>
 
                               </BlockStack>
                             </Box>
