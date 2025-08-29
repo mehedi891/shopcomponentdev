@@ -23,7 +23,7 @@ export const loader = async ({ request }) => {
 };
 
 export const action = async ({ request }) => {
-  const errors = loginErrorMessage(await login(request));
+  const errors = loginErrorMessage(await login( request ));
 
   return {
     errors,
