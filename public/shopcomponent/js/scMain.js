@@ -636,6 +636,6 @@ function poweredByAddFnc(planName = 'Free', shop) {
 }
 
 
-console.log('Shopcomponent loaded');
+console.log('Shopcomponent loaded..');
 
 

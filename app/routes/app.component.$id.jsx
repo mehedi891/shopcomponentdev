@@ -57,11 +57,12 @@ export const loader = async ({ request, params }) => {
 
   return {
     shopData: shopData.data.shop,
-    component: component
+    component: component,
+    appUrl : process.env.VITE_APP_URL || ''
   }
 }
 const UpdateComponent = () => {
-  const { component, shopData } = useLoaderData();
+  const { component, shopData,appUrl } = useLoaderData();
   console.log(component);
   const actionData = useActionData();
   const navigate = useNavigate();
@@ -1286,13 +1287,13 @@ const UpdateComponent = () => {
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
-      const isExistWebcomJs2 = document.querySelector('script[src="${import.meta.env.VITE_APP_URL}/api/webcompjs"]');
+      const isExistWebcomJs2 = document.querySelector('script[src="${appUrl}/api/webcompjs"]');
 
       if (!isExistWebcomJs2) {
         const scriptTag2 = document.createElement('script');
         scriptTag2.type = 'text/javascript';
         scriptTag2.id = 'shopcomponents-js';
-        scriptTag2.src = '${import.meta.env.VITE_APP_URL}/api/webcompjs';
+        scriptTag2.src = '${appUrl}/api/webcompjs';
         document.head.appendChild(scriptTag2);
       }
       if (!isExistWebcomJs) {
@@ -1304,7 +1305,7 @@ const UpdateComponent = () => {
       }
       const holder = document.getElementById('shopcomponent-${watchedValues.tracking}');
       if (holder) {
-        const response = await fetch('${import.meta.env.VITE_APP_URL}/api/component?id=${component?.id}');
+        const response = await fetch('${appUrl}/api/component?id=${component?.id}');
         const data = await response.json();
         if (data?.data?.compHtml) {
           holder.innerHTML = data.data.compHtml;
