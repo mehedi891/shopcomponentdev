@@ -37,8 +37,8 @@
     "prisma": "^6.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "remix-utils": "7.5",
     "react-hook-form": "^7.56.1",
+    "remix-utils": "7.5",
     "vite-tsconfig-paths": "^5.0.1"
   },
   "devDependencies": {
@@ -51,13 +51,13 @@
     "@types/react-dom": "^18.2.14",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^10.0.1",
-    "prettier": "^3.2.4",
-    "typescript": "^5.2.2",
-    "i18next": "^23.11.3",
+    "i18next": "^23.16.8",
     "i18next-browser-languagedetector": "^7.2.1",
     "i18next-fs-backend": "^2.3.1",
     "i18next-http-backend": "^2.5.1",
+    "prettier": "^3.2.4",
     "remix-i18next": "^6.1.0",
+    "typescript": "^5.2.2",
     "vite": "^6.2.2"
   },
   "workspaces": [
