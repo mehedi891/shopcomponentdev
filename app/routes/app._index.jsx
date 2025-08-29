@@ -164,7 +164,7 @@ export const loader = async ({ request }) => {
 export default function Index() {
   const shopify = useAppBridge();
   const { shopData, components } = useLoaderData();
-  console.log('shopData', shopData);
+  //console.log('shopData', shopData);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();

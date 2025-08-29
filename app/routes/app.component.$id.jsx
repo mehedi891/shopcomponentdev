@@ -938,7 +938,7 @@ const UpdateComponent = () => {
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media layout="fixed" width="200" height="200" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
             </div>
           </div>
           <div class="product-card__details">
@@ -1037,7 +1037,7 @@ const UpdateComponent = () => {
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media layout="fixed" width="200" height="200" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
             </div>
           </div>
           <div class="product-card__details">
@@ -1167,7 +1167,7 @@ const UpdateComponent = () => {
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media layout="fixed" width="200" height="200" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
             </div>
           </div>
           <div class="product-card__details shopcomponent_product_card__details">

@@ -44,6 +44,7 @@ const stylesPdT1 = `
     opacity: 0.8;
   }
   .product-card__image-small img {
+    max-width: 200px;
     width: 100%;
     height: auto;
     border-radius: 4px;

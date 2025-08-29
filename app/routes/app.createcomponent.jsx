@@ -597,7 +597,7 @@ const CreateComponent = () => {
                 flex-flow: nowrap;
                 justify-content: start;
                 overflow-x: scroll;
-                   scroll-behavior: smooth;
+                scroll-behavior: smooth;
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
@@ -929,7 +929,7 @@ const CreateComponent = () => {
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media layout="fixed" width="200" height="200" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
             </div>
           </div>
           <div class="product-card__details">
@@ -1029,7 +1029,7 @@ const CreateComponent = () => {
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media layout="fixed" width="200" height="200" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
             </div>
           </div>
           <div class="product-card__details">
@@ -1160,7 +1160,7 @@ const CreateComponent = () => {
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media layout="fixed" width="316" height="316" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media layout="fixed" width="200" height="200" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
             </div>
           </div>
           <div class="product-card__details shopcomponent_product_card__details">
@@ -1286,7 +1286,7 @@ const CreateComponent = () => {
         }
     }, [actionData, navigation.state]);
 
-    console.log('Cart behave:', watchedValues.componentSettings.cartBehavior);
+   // console.log('Cart behave:', watchedValues.componentSettings.cartBehavior);
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
