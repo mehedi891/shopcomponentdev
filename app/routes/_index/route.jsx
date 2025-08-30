@@ -19,7 +19,7 @@ export default function App() {
   return (
     <div className={styles.index}>
       <div className={styles.content}>
-        <h1 className={styles.heading}>A short heading about [your app]</h1>
+        <h1 className={styles.heading}>A short heading about [your app mm]</h1>
         <p className={styles.text}>
           A tagline about [your app] that describes your value proposition.
         </p>
@@ -31,7 +31,7 @@ export default function App() {
               <span>e.g: my-shop-domain.myshopify.com</span>
             </label>
             <button className={styles.button} type="submit">
-              Log in
+              Log inn
             </button>
           </Form>
         )}
