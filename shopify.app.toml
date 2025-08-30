@@ -3,7 +3,7 @@
 client_id = "9e44f2914f087425570039bfac125e53"
 name = "shopcomponentdev"
 handle = "shopcomponentdev"
-application_url = "https://meyer-whether-police-if.trycloudflare.com"
+application_url = "https://removing-nu-chen-programs.trycloudflare.com"
 embedded = true
 
 [build]
@@ -30,7 +30,7 @@ api_version = "2025-07"
 scopes = "read_orders,unauthenticated_read_checkouts,unauthenticated_read_product_inventory,unauthenticated_read_product_listings,unauthenticated_write_checkouts,write_products"
 
 [auth]
-redirect_urls = ["https://meyer-whether-police-if.trycloudflare.com/auth/callback", "https://meyer-whether-police-if.trycloudflare.com/auth/shopify/callback", "https://meyer-whether-police-if.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://removing-nu-chen-programs.trycloudflare.com/auth/callback", "https://removing-nu-chen-programs.trycloudflare.com/auth/shopify/callback", "https://removing-nu-chen-programs.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

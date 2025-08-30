@@ -17,7 +17,7 @@ import { DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, LockFilledIcon, Menu
 import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
-import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { useCallback, useEffect, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -26,7 +26,7 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 export const loader = async ({ request }) => {
 
   const { session, admin, billing, redirect } = await authenticate.admin(request);
-  const { hasActivePayment } = await billing.check();
+  const { hasActivePayment, appSubscriptions } = await billing.check();
 
   const shopResponse = await admin.graphql(
     `#graphql
@@ -53,9 +53,7 @@ export const loader = async ({ request }) => {
     }
   });
 
-  if (!shopData?.plan) {
-    throw redirect('/app/plans');
-  }
+
 
   if (!shopData?.scAccessToken) {
     const createStorefrontAccessToken = await admin.graphql(
@@ -119,20 +117,33 @@ export const loader = async ({ request }) => {
   const isFirstInstall = url.searchParams.get('isFirstInstall');
 
 
-  if (isFirstInstall) {
+  if (isFirstInstall && appSubscriptions?.length > 0) {
     shopData = await db.shop.update({
       where: {
         shopifyDomain: session.shop,
       },
       data: {
         isFirstInstall: isFirstInstall === 'true' ? false : true,
+        maxAllowedComponents: 10,
+        appPlan: appSubscriptions[0].name,
+        trialDays: appSubscriptions[0].trialDays,
+        plan: {
+          upsert: {
+            create: {
+              planId: appSubscriptions[0].id,
+              planName: appSubscriptions[0].name,
+              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+              planStatus: 'active',
+            },
+            update: {
+              planId: appSubscriptions[0].id,
+              planName: appSubscriptions[0].name,
+              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+            },
+          },
+        },
       },
       include: {
-        // components: {
-        //   orderBy: {
-        //     id: 'desc',
-        //   },
-        // },
         plan: true
       }
     });
@@ -149,7 +160,9 @@ export const loader = async ({ request }) => {
     }
   });
 
-
+  if (!shopData?.plan) {
+    throw redirect('/app/plans');
+  }
   return {
     shopData: shopData,
     components: components || [],
@@ -168,16 +181,17 @@ export default function Index() {
   const fetcher = useFetcher();
   const [activePopoverId, setActivePopoverId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+    const [searchParams] = useSearchParams();
   const togglePopoverActive = useCallback((id) => {
     setActivePopoverId((prevId) => (prevId === id ? null : id));
   }, []);
 
 
-  // useEffect(()=>{
-  //   if(!shopData?.plan){
-  //     navigate('/app/plans');
-  //   }
-  // },[shopData]);
+  useEffect(() => {
+    if (searchParams.toString()) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);

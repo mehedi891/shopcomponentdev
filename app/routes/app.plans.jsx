@@ -162,7 +162,7 @@ const Plans = () => {
       planName: planName,
       planType: planType,
       shopId: shopData?.id,
-      isFirstInstall: shopData?.isFirstInstall,
+      isFirstInstall: `${shopData?.isFirstInstall}`,
       partnerDevelopment: shopInfo?.plan?.partnerDevelopment || false,
       remaingTrialDays: getRemainingTrialDays(shopData?.planActivatedAt, trialDaysOffer),
     }
@@ -343,7 +343,7 @@ const Plans = () => {
                       />
                     </Box>
                     <Box maxWidth="90%">
-                      <Text variant="bodyLg">10 component with max 12 product variant limit per component.</Text>
+                      <Text variant="bodyLg">10 component with max 10 product variant limit per component.</Text>
                     </Box>
                   </InlineStack>
 
@@ -443,13 +443,15 @@ export const action = async ({ request }) => {
 
 
   if (data.planName === 'Growth') {
-    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/plans`;
+    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/plan-purchase/?upgrade=true`;
 
     if (data?.isFirstInstall === 'false') {
       returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/plan-purchase/?upgrade=true`;
     } else if (data?.isFirstInstall === 'true') {
       returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/?isFirstInstall=true`;
     }
+
+    console.log('returnURL:',returnURL);
 
 
 
@@ -528,6 +530,7 @@ export const action = async ({ request }) => {
       data: {
         appPlan: data.planName,
         maxAllowedComponents: 1,
+        isFirstInstall: data?.isFirstInstall === 'true' ? false : true,
         plan: {
           upsert: {
             create: {
@@ -549,7 +552,7 @@ export const action = async ({ request }) => {
 
     if (data?.isFirstInstall === 'true' && shopData?.plan?.planName === 'Free') {
       //console.log('from ifBlock');
-      throw redirect('/app/?isFirstInstall=true');
+      throw redirect('/app');
     } else if (data?.isFirstInstall === 'false' && shopData?.plan?.planName === 'Free') {
       throw redirect('/app/plan-purchase?downgrade=true');
     }
