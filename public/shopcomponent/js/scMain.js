@@ -618,16 +618,13 @@ function poweredByAddFnc(planName = 'Free', shop) {
     return;
   }
 
-  const urlPath = window.location.origin;
-
-  console.log('urlPath', urlPath);
 
   const poweredBy = document.querySelectorAll('.shopcomponent_pd_container');
   if (poweredBy) {
     poweredBy.forEach(poweredBy => {
       const poweredByDiv = document.createElement('div');
       poweredByDiv.innerHTML = `
-          <div style="font-size: 12px;display:flex;justify-content:end;align-items:center;gap:5px;">Powered by <a style="font-size: 14px; font-weight: 600;text-decoration: none;color:#0000ee" href="https://shopcomponent.com/?utm_source=${window.location.host}&utm_medium=${shop}&utm_campaign=pby" target="_blank" rel="noopener noreferrer"> Shopcomponent</a></div>
+          <div style="font-size: 12px;display:flex;justify-content:end;align-items:center;gap:5px;">Powered by <a style="font-size: 14px; font-weight: 600;text-decoration: none;color:#0000ee" href="https://shopcomponent.com/?utm_source=${window.location.host}&utm_medium=${shop}&utm_campaign=pby" target="_blank" rel="noopener noreferrer"> ShopComponent</a></div>
       `;
       poweredBy.appendChild(poweredByDiv);
     });
