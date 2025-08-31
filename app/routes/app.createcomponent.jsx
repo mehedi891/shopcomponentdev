@@ -1292,11 +1292,15 @@ const CreateComponent = () => {
     // console.log('Cart behave:', watchedValues.componentSettings.cartBehavior);
 
 
-     window.addEventListener('popstate', function(event) {
-       reset(getValues());
-    });
+    useEffect(() => {
+    if (window) {
+      window.addEventListener('popstate', function (event) {
+        reset(getValues());
+      });
+    }
+  }, []);
 
-    
+
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >

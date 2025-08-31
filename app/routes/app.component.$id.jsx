@@ -1330,9 +1330,13 @@ const UpdateComponent = () => {
     });
   }
 
- window.addEventListener('popstate', function(event) {
-       reset(getValues());
-    });
+  useEffect(() => {
+    if (window) {
+      window.addEventListener('popstate', function (event) {
+        reset(getValues());
+      });
+    }
+  }, []);
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
       <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1350,8 +1354,8 @@ const UpdateComponent = () => {
         </SaveBar>
         <Page
           fullWidth
-          //title={t("updated_componet")+" " +component?.title}
-          //backAction={{ onAction: () => { navigate('/app'); reset(getValues()); } }}
+        //title={t("updated_componet")+" " +component?.title}
+        //backAction={{ onAction: () => { navigate('/app'); reset(getValues()); } }}
         >
 
           {/* <Box paddingBlockEnd={'400'}>
@@ -1368,7 +1372,7 @@ const UpdateComponent = () => {
 
           <PageTitle
             btnDisabled={isDirty}
-            title={t("updated_componet")+" " +component?.title}
+            title={t("updated_componet") + " " + component?.title}
           />
           <Layout>
             {showNewCreatedBanner &&
