@@ -144,10 +144,11 @@ export const loader = async ({ request }) => {
     shopInfo: shop?.data?.shop || {},
     paidRedirectInfo: { isFirstInstall, upgrade },
     trialDaysOffer: process.env.TRIAL_DAYS ? parseInt(process.env.TRIAL_DAYS) : 5,
+    node_env: process.env.NODE_ENV || '',
   }
 }
 const Plans = () => {
-  const { shopData, shopInfo, appSubscriptions, trialDaysOffer } = useLoaderData();
+  const { shopData, shopInfo, appSubscriptions, trialDaysOffer,node_env } = useLoaderData();
   const fetcher = useFetcher();
   console.log('appSubscriptions:', appSubscriptions);
   const navigation = useNavigation();
@@ -213,7 +214,9 @@ const Plans = () => {
                 </Box>
 
               }
+              { node_env === 'development' &&
               <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button>
+              }
             </BlockStack>
           </Box>
         </Layout.Section>

@@ -10,7 +10,7 @@ node_modules
 /prisma/dev.sqlite
 /prisma/dev.sqlite-journal
 database.sqlite
-/shopify.app.toml
+shopify.app.toml
 _delete
 
 .env
