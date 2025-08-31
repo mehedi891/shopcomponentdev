@@ -67,7 +67,7 @@ const Getsupport = () => {
                             <Box minHeight="6rem">
                               <Text variant="bodyLg" as="p">{t("live_chat_description")}</Text>
                             </Box>
-                            <Button size="large" onClick={() => { }}>{t("start_chat")}</Button>
+                            <Button size="large" onClick={() => {javascript:void(Tawk_API.toggle())}}>{t("start_chat")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>

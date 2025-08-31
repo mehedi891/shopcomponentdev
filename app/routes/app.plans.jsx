@@ -7,7 +7,6 @@ import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { useEffect, useState } from "react";
-import { useAppBridge } from "@shopify/app-bridge-react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
@@ -153,7 +152,6 @@ const Plans = () => {
   console.log('appSubscriptions:', appSubscriptions);
   const navigation = useNavigation();
   const navigate = useNavigate();
-  const shopify = useAppBridge();
   const [remainTrialDays,setRemainTrialDays]  = useState(0);
   const [isLoading, setIsLoading] = useState(null);
 

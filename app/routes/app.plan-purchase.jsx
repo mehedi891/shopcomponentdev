@@ -5,6 +5,7 @@ import { BlockStack, Box, Button, Card, InlineStack, Layout, Page, Text } from '
 import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
+import PageTitle from '../components/PageTitle/PageTitle';
 
 export const loader = async ({ request }) => {
 
@@ -113,6 +114,11 @@ const PlanPurchase = () => {
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
     <Page>
+      <PageTitle
+      
+      title='ShopComponent - Subscription Confirmed'
+      
+      />
       <Layout>
         <Layout.Section>
           <Card>

@@ -7,6 +7,7 @@ import { authenticate } from "../shopify.server";
 import { useTranslation } from "react-i18next";
 import SpcFooter from "../components/SpcFooter/SpcFooter";
 import db from "../db.server";
+import { useEffect } from "react";
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }) => {
@@ -23,13 +24,39 @@ export const loader = async ({ request }) => {
 
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
-    shopData: shopData || {}
+    shopData: shopData || {},
+    TAWK_TO_URL: process.env.TAWK_TO_URL || ''
   };
 };
 
 export default function App() {
-  const { apiKey, shopData } = useLoaderData();
+  const { apiKey, shopData, TAWK_TO_URL } = useLoaderData();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (TAWK_TO_URL) {
+      var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+      (function () {
+        var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+        s1.async = true;
+        s1.src = TAWK_TO_URL;
+        s1.charset = 'UTF-8';
+        s1.setAttribute('crossorigin', '*');
+        s0.parentNode.insertBefore(s1, s0);
+      })();
+    }
+
+  }, []);
+
+
+  // useEffect(() => {
+  //   (function (c, l, a, r, i, t, y) {
+  //     c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+  //     t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+  //     y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+  //   })(window, document, "clarity", "script", "t2ssobpnf1");
+  // }, []);
+
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
