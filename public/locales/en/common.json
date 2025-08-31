@@ -1,7 +1,7 @@
 {
     "welcome": "Hello world",
     "create_componet": "Create component",
-    "updated_componet": "Update component",
+    "updated_componet": "Update:",
     "components": "Components",
     "settings": "Settings",
     "titleAndDesc": "Title & Description*",
@@ -45,7 +45,7 @@
     "no": "No",
     "cart_behavior": "Cart behavior",
     "open_to_cart": "Add to cart (Open cart drawer)",
-    "checkout": "Checkout",
+    "checkout": "Buy Now (Checkout)",
     "Product_title_font_weight": "Product title font weight",
     "Product_title_font_size": "Product title font size",
     "prouct_price_font_weight": "Product price font weight",

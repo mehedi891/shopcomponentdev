@@ -1,6 +1,7 @@
 import { useActionData, useLoaderData, useLocation, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
 import {
+  ArrowLeftIcon,
   DeleteIcon,
   DesktopIcon,
   MobileIcon,
@@ -23,6 +24,7 @@ import { floatingCartCountBuble } from "../webcomponentsHtml/generalHTML";
 import db from "../db.server";
 import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
+import PageTitle from "../components/PageTitle/PageTitle";
 
 export const loader = async ({ request, params }) => {
   const { id } = params;
@@ -1284,8 +1286,7 @@ const UpdateComponent = () => {
     `;
 
   const copyCode = `
-    <!-------------- Shopcomponent app code start ---------->
-     <!------[visit:https://shopcomponent.com/] -------------->
+    <!-------------- ShopComponent [https://shopcomponent.com/] app code start ---------->
 
   <div id="shopcomponent-${watchedValues.tracking}"></div>
   <script type="module">
@@ -1319,7 +1320,7 @@ const UpdateComponent = () => {
      
     })
   </script>
-  <!-------------- Shopcomponent app code end -------------->
+  <!-------------- ShopComponent app code end -------------->
     `;
 
   const handleCopyHtmlCode = () => {
@@ -1329,7 +1330,9 @@ const UpdateComponent = () => {
     });
   }
 
-
+ window.addEventListener('popstate', function(event) {
+       reset(getValues());
+    });
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
       <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1347,9 +1350,26 @@ const UpdateComponent = () => {
         </SaveBar>
         <Page
           fullWidth
-          title={t("updated_componet")}
-          backAction={{ onAction: () => { navigate('/app'); reset(getValues()); } }}
+          //title={t("updated_componet")+" " +component?.title}
+          //backAction={{ onAction: () => { navigate('/app'); reset(getValues()); } }}
         >
+
+          {/* <Box paddingBlockEnd={'400'}>
+              <InlineStack align="start" blockAlign="center" gap={'200'}>
+                <Button
+                  icon={ArrowLeftIcon}
+                  disabled={isDirty}
+                  variant="tertiary"
+                  onClick={()=>{navigate('/app'); reset(getValues());}}
+                />
+                  <Text variant="headingLg">{t("updated_componet")+" " +component?.title}</Text>
+              </InlineStack>
+          </Box> */}
+
+          <PageTitle
+            btnDisabled={isDirty}
+            title={t("updated_componet")+" " +component?.title}
+          />
           <Layout>
             {showNewCreatedBanner &&
               <Layout.Section variant="fullWidth">
@@ -1364,9 +1384,9 @@ const UpdateComponent = () => {
                   <InlineStack gap={'300'}>
                     <Button variant="plain" onClick={() => navigate(`/app/createcomponent`)}><Link>Create another component</Link>
                     </Button>
-                    <Button variant="plain" onClick={() => navigate(`/app`)}><Link>Go to Home</Link>
+                    <Button variant="plain" onClick={() => navigate(`/app`)}><Link>Component list</Link>
                     </Button>
-                    <Button variant="plain" disabled={isDirty} onClick={handleCopyHtmlCode}><Link>Copy Code</Link>
+                    <Button variant="plain" disabled={isDirty || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
                     </Button>
 
                   </InlineStack>
@@ -2753,7 +2773,7 @@ const UpdateComponent = () => {
                       </Box>
                     </Box>
                     <Box paddingBlockStart={'300'} paddingInlineEnd={'300'}>
-                      <Button disabled={isDirty} size="large" onClick={handleCopyHtmlCode}>Copy Code</Button>
+                      <Button disabled={isDirty || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </Box>
 
                   </InlineStack>
@@ -2778,7 +2798,7 @@ const UpdateComponent = () => {
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                     <InlineStack align="end">
-                      <Button disabled={isDirty} size="large" onClick={handleCopyHtmlCode}>Copy Code</Button>
+                      <Button variant="primary" disabled={isDirty || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </InlineStack>
                   </Box>
                 </Card>

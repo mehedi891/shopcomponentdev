@@ -24,6 +24,7 @@ import { floatingCartCountBuble } from "../webcomponentsHtml/generalHTML";
 import db from "../db.server";
 import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
+import PageTitle from "../components/PageTitle/PageTitle";
 
 
 
@@ -142,7 +143,7 @@ const CreateComponent = () => {
                 fullView: false,
                 cartBehavior: 'checkout',
                 customCss: '',
-                showComponentTitle:'yes'
+                showComponentTitle: 'yes'
             },
             shoppingCartSettings: {
                 heading: 'Shopping cart',
@@ -164,7 +165,7 @@ const CreateComponent = () => {
             },
             buttonStyleSettings: {
                 addToCartBtnTxt: 'Add to cart',
-                checkoutBtnTxt: 'Checkout',
+                checkoutBtnTxt: 'Buy now',
                 viewBtnTxt: 'View product',
                 buttonFontWeight: '600',
                 buttonFontSize: '14px',
@@ -1288,7 +1289,14 @@ const CreateComponent = () => {
         }
     }, [actionData, navigation.state]);
 
-   // console.log('Cart behave:', watchedValues.componentSettings.cartBehavior);
+    // console.log('Cart behave:', watchedValues.componentSettings.cartBehavior);
+
+
+     window.addEventListener('popstate', function(event) {
+       reset(getValues());
+    });
+
+    
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1306,9 +1314,12 @@ const CreateComponent = () => {
                 </SaveBar>
                 <Page
                     fullWidth
-                    title={t("create_componet")}
-                    backAction={{ onAction: () => { navigate('/app'); reset(getValues()); } }}
                 >
+
+                    <PageTitle
+                        btnDisabled={isDirty}
+                        title={t("create_componet")}
+                    />
                     <Layout>
                         {disabledContentByPlan && shopData?.components?.length > 0 &&
                             <Layout.Section variant="fullWidth">
@@ -2628,15 +2639,15 @@ const CreateComponent = () => {
                                                     fullWidth
                                                     disclosure={toogleOpen.tranckingOpen ? 'up' : 'down'}
                                                 >
-                                                    
+
 
                                                     {disabledContentByPlan ?
                                                         <InlineStack blockAlign="center" gap={"150"}>
-                                                           <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                                                            <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
                                                             <UpgradeTooltip />
                                                         </InlineStack>
                                                         :
-                                                       <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                                                        <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
                                                     }
 
                                                 </Button>
@@ -2736,7 +2747,7 @@ const CreateComponent = () => {
                                             </Box>
                                         </Box>
                                         <Box paddingBlockStart={'300'} paddingInlineEnd={'300'}>
-                                            <Button disabled onClick={handleCopyHtmlCode}>Copy Code</Button>
+                                            <Button variant="primary" disabled onClick={handleCopyHtmlCode}>Copy code</Button>
                                         </Box>
 
                                     </InlineStack>
@@ -2761,7 +2772,7 @@ const CreateComponent = () => {
                                     </Modal>
                                     <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                                         <InlineStack align="end">
-                                            <Button disabled onClick={handleCopyHtmlCode}>Copy Code</Button>
+                                            <Button variant="primary" disabled onClick={handleCopyHtmlCode}>Copy code</Button>
                                         </InlineStack>
                                     </Box>
                                 </Card>

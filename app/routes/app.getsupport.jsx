@@ -145,7 +145,7 @@ const Getsupport = () => {
                             <Box minHeight="6rem">
                               <Text variant="bodyLg" as="p">{t("discover_our_wide_range_of_video_tutorials")}</Text>
                             </Box>
-                            <Button size="large">{t("watch_videos")}</Button>
+                            <Button url="https://www.youtube.com/@ShopComponent" target="_blank" size="large">{t("watch_videos")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>
@@ -163,7 +163,7 @@ const Getsupport = () => {
                             <Box minHeight="6rem">
                               <Text variant="bodyLg" as="p">{t("explore_our_in_depth_help_documentation")}</Text>
                             </Box>
-                            <Button size="large">{t("browse_docs")}</Button>
+                            <Button url="https://shopcomponent.com/academy/" target="_blank" size="large">{t("browse_docs")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useFetcher } from 'react-router-dom';
 
-const HeadlessVerify = ({ showBanner = true,defaultToken='' }) => {
+const HeadlessVerify = ({ showBanner = true, defaultToken = '' }) => {
   const { t } = useTranslation();
   const fetcher = useFetcher();
   const shopify = useAppBridge();
@@ -124,23 +124,25 @@ const HeadlessVerify = ({ showBanner = true,defaultToken='' }) => {
                 }
               </InlineStack>
             </Box>
-            <Box paddingInlineStart={'200'} paddingInlineEnd={'200'} paddingBlockStart={'300'}>
-              <Box paddingBlockEnd={'150'} paddingBlockStart={'400'}>
-                <Text fontWeight="medium">{t("installation_instructions")}:</Text>
+            { defaultToken === '' &&
+              <Box paddingInlineStart={'200'} paddingInlineEnd={'200'} paddingBlockStart={'300'}>
+                <Box paddingBlockEnd={'150'} paddingBlockStart={'400'}>
+                  <Text fontWeight="medium">{t("installation_instructions")}:</Text>
+                </Box>
+                <List type="number">
+                  <List.Item><Text>Get started with headless. <Link target="_blank" url="https://apps.shopify.com/headless?utm_source=shopcomponent" removeUnderline>Click Here</Link> to Install</Text></List.Item>
+                  <List.Item>
+                    <Text>After installation click <Text as='span' fontWeight="medium"> Create Storefront</Text> </Text>
+                  </List.Item>
+                  <List.Item>
+                    <Text>Then click<Text as='span' fontWeight="medium"> Manage </Text> storefront API</Text>
+                  </List.Item>
+                  <List.Item>
+                    <Text>Then<Text as='span' fontWeight="medium"> Copy </Text>'Public access token' and enter above for verify</Text>
+                  </List.Item>
+                </List>
               </Box>
-              <List type="number">
-                <List.Item><Text>Get started with headless. <Link target="_blank" url="https://apps.shopify.com/headless?utm_source=shopcomponent" removeUnderline>Click Here</Link> to Install</Text></List.Item>
-                <List.Item>
-                  <Text>After installation click <Text as='span' fontWeight="medium"> Create Storefront</Text> </Text>
-                </List.Item>
-                <List.Item>
-                  <Text>Then click<Text as='span' fontWeight="medium"> Manage </Text> storefront API</Text>
-                </List.Item>
-                <List.Item>
-                  <Text>Then<Text as='span' fontWeight="medium"> Copy </Text>'Public access token' and enter above for verify</Text>
-                </List.Item>
-              </List>
-            </Box>
+            }
           </Box>
         </Box>
       </Box>

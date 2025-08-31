@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
+import PageTitle from "../components/PageTitle/PageTitle";
 
 export const loader = async ({ request }) => {
 
@@ -181,7 +182,7 @@ export default function Index() {
   const fetcher = useFetcher();
   const [activePopoverId, setActivePopoverId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-    const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const togglePopoverActive = useCallback((id) => {
     setActivePopoverId((prevId) => (prevId === id ? null : id));
   }, []);
@@ -356,9 +357,17 @@ export default function Index() {
 
       <Page
         fullWidth
-      // title={t("components")}
-      // backAction={{ onAction: () => navigate('/app') }}
+      //   title="Bring your products to where your audience already is"
+      //   subtitle="Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront."
+       // backAction={{ onAction: () => navigate('/app') }}
       >
+
+        <PageTitle
+          title="Bring your products to where your audience already is"
+          subtitle="Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront."
+          btnDisabled={false}
+          backBtnShow={false}
+        />
         <Layout>
           <Layout.Section>
             <Box>

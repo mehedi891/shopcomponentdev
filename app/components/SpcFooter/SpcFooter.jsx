@@ -1,4 +1,4 @@
-import { Box, Button, InlineStack, Layout, Link, Text } from "@shopify/polaris"
+import { Box, Button, InlineStack, Text } from "@shopify/polaris"
 
 const SpcFooter = ({planName}) => {
   return (
@@ -12,7 +12,7 @@ const SpcFooter = ({planName}) => {
               <img className="spc-footer-img" src="/images/spcLogo.png" alt="Shopcomponent" />
             </Button>
             <Text>|</Text>
-            <Button variant="tertiary">Get support</Button>
+            <Button  url="/app/getsupport/" variant="tertiary">Get support</Button>
           </InlineStack>
         </Box>
 

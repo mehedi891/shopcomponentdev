@@ -158,6 +158,14 @@ const stylesPdT1 = `
     padding: 0.5rem 0.875rem;
     font-size: 0.875rem;
   }
+
+  @media(max-width:600px){
+  .shopcomponent_product_layout_list .product-card__container {
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+  }
+  }
 </style>
 `
 

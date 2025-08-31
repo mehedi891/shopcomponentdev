@@ -327,7 +327,7 @@ const Plans = () => {
                   loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
                   disabled={shopData?.plan?.planName === 'Growth'}
                 >
-                  <Box padding={'150'}><Text> {shopData?.plan?.planName === 'Growth' ? 'Subscribed' : 'Start 7-day Free Trial'}</Text></Box>
+                  <Box padding={'150'}><Text> {shopData?.plan?.planName === 'Growth' ? 'Subscribed' : 'Start 5-day Free Trial'}</Text></Box>
                 </Button>
               </Box>
 

@@ -115,15 +115,22 @@ const PlanPurchase = () => {
           <Card>
             <Box paddingBlock={1200} width="100%">
               <BlockStack inlineAlign="center">
-                <img src="/images/subscription_success.svg" alt='Subscribed Successful' />
+                <img width={'250px'} height={'250px'} src="/images/subscription_success.svg" alt='Subscribed Successful' />
                 <Box paddingBlockEnd={800} paddingInline={{ sm: 200, lg: 1600, xl: 2400 }}>
                   <BlockStack inlineAlign="center">
                     <Box paddingBlockEnd={150}>
-                      <Text variant="headingMd" as="h6" alignment="center">{t('Thanks', { plan: 'Free' })}</Text>
+                      {/* <Text variant="headingMd" as="h6" alignment="center">{t('Thanks', { plan: 'Free' })}</Text> */}
+                      <Text  variant="headingLg" as="h2" alignment="center">{"Congratulations! Your ShopComponent subscription is now activated."}</Text>
                     </Box>
-                    <Box maxWidth="24rem">
+                    {/* <Box maxWidth="24rem">
                       <Text variant="bodySm" as="p" alignment="center">{t("enjoy_app_message")}</Text>
-                    </Box>
+                      
+                    </Box> */}
+
+                    <BlockStack gap={'100'}>
+                        <Text alignment='center' variant='bodyLg'>Start selling beyond your store.</Text>
+                        <Text alignment='center' variant='bodyLg'>Create component &gt; Copy & embed anywhere &gt; Boost sales.</Text>
+                      </BlockStack>
                   </BlockStack>
                 </Box>
                 <InlineStack gap={200} align="center">
