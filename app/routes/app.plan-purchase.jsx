@@ -74,7 +74,10 @@ export const loader = async ({ request }) => {
     });
   }
 
+   console.log('from upgrade true outside','upgrade:',upgrade);
+
   if (upgrade === 'true') {
+    console.log('from upgrade true if block');
     await db.component.updateMany({
       where: {
         shopId: shopData.id,
@@ -99,13 +102,13 @@ const PlanPurchase = () => {
   const navigation = useNavigation();
   const navigate = useNavigate();
 
-   const [searchParams] = useSearchParams();
+  //  const [searchParams] = useSearchParams();
 
-  useEffect(() => {
-    if (searchParams.toString()) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [searchParams]);
+  // useEffect(() => {
+  //   if (searchParams.toString()) {
+  //     window.history.replaceState({}, document.title, window.location.pathname);
+  //   }
+  // }, [searchParams]);
 
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :

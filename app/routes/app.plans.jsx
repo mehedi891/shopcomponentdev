@@ -153,9 +153,13 @@ const Plans = () => {
   const navigation = useNavigation();
   const navigate = useNavigate();
   const shopify = useAppBridge();
+  const [remainTrialDays,setRemainTrialDays]  = useState(0);
   const [isLoading, setIsLoading] = useState(null);
 
- 
+  useEffect(()=>{
+    setRemainTrialDays(getRemainingTrialDays(shopData?.planActivatedAt,trialDaysOffer))
+  },[shopData,trialDaysOffer]);
+
 
   const handleSubscriptionPlan = (planName, planType) => {
     const data = {
@@ -164,7 +168,7 @@ const Plans = () => {
       shopId: shopData?.id,
       isFirstInstall: `${shopData?.isFirstInstall}`,
       partnerDevelopment: shopInfo?.plan?.partnerDevelopment || false,
-      remaingTrialDays: getRemainingTrialDays(shopData?.planActivatedAt, trialDaysOffer),
+      remaingTrialDays: remainTrialDays,
     }
 
    // console.log('data:', data);
@@ -203,13 +207,13 @@ const Plans = () => {
             <BlockStack gap={"200"}>
               <Text alignment="center" fontWeight="bold" variant="headingLg">Ready to start with ShopComponent?</Text>
               <Text alignment="center" variant="headingLg" tone="subdued" fontWeight="regular">Choose the package that best suits your Business Needs</Text>
-              {shopData?.plan?.planName === 'Growth' &&
+              {remainTrialDays > 0 &&
                 <Box>
-                  <Text variant="headingMd" alignment="center">You have {getRemainingTrialDays(appSubscriptions?.createdAt, appSubscriptions?.trialDays)} Days Free Trial</Text>
+                  <Text variant="headingMd" alignment="center">You have {remainTrialDays} Days Free Trial</Text>
                 </Box>
 
               }
-              {/* <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button> */}
+              <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button>
             </BlockStack>
           </Box>
         </Layout.Section>
@@ -327,7 +331,7 @@ const Plans = () => {
                   loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
                   disabled={shopData?.plan?.planName === 'Growth'}
                 >
-                  <Box padding={'150'}><Text> {shopData?.plan?.planName === 'Growth' ? 'Subscribed' : 'Start 5-day Free Trial'}</Text></Box>
+                  <Box padding={'150'}><Text> {shopData?.plan?.planName === 'Growth' ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Subscribe'}</Text></Box>
                 </Button>
               </Box>
 
@@ -530,7 +534,7 @@ export const action = async ({ request }) => {
       data: {
         appPlan: data.planName,
         maxAllowedComponents: 1,
-        isFirstInstall: data?.isFirstInstall === 'true' ? false : true,
+        isFirstInstall: data?.isFirstInstall === 'true' ? false : JSON.parse(data?.isFirstInstall),
         plan: {
           upsert: {
             create: {
