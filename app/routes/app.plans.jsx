@@ -583,12 +583,16 @@ export const action = async ({ request }) => {
   } else if (data.planName === 'Free') {
     const { appSubscriptions } = await billing.check();
     if (appSubscriptions?.length > 0) {
-      const subscription = appSubscriptions[0];
-      await billing.cancel({
-        subscriptionId: subscription.id,
-        isTest: data.partnerDevelopment === 'true' ? true : false,
-        prorate: true,
-      });
+
+      for (let i = 0; i < appSubscriptions.length; i++) {
+        const subscription = appSubscriptions[i];
+        await billing.cancel({
+          subscriptionId: subscription.id,
+          isTest: data.partnerDevelopment === 'true',
+          prorate: true,
+        });
+      }
+
     }
 
     const shopData = await db.shop.update({

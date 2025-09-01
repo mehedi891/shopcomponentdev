@@ -9,12 +9,26 @@ import PageTitle from '../components/PageTitle/PageTitle';
 
 export const loader = async ({ request }) => {
 
-  const { session, billing } = await authenticate.admin(request);
+  const { session, billing, admin } = await authenticate.admin(request);
   const { appSubscriptions } = await billing.check();
 
 
   let shopData = {};
 
+  const subscriptionQuery = `#graphql
+                query subscriptions {
+                    app {
+                        installation {
+                            activeSubscriptions {
+                                id
+                                status
+                            }
+                        }
+                    }
+                }
+            `;
+  const subscriptionResponse = await admin.graphql(subscriptionQuery);
+  const subscriptionResponseJson = await subscriptionResponse.json();
 
   shopData = await db.shop.findUnique({
     where: {
@@ -63,21 +77,10 @@ export const loader = async ({ request }) => {
 
   }
 
-  // if (downgrade === 'true') {
-  //   await db.component.updateMany({
-  //     where: {
-  //       shopId: shopData.id,
-  //       id: { not: shopData.components[0]?.id }
-  //     },
-  //     data: {
-  //       softDelete: true
-  //     }
-  //   });
-  // }
 
-   console.log('from upgrade true outside','upgrade:',upgrade);
+  console.log('from upgrade true outside', 'upgrade:', upgrade);
 
-  if (upgrade === 'true') {
+  if (upgrade === 'true' && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions?.length > 0 && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions[0]?.status === 'ACTIVE') {
     console.log('from upgrade true if block');
     await db.component.updateMany({
       where: {
@@ -93,17 +96,18 @@ export const loader = async ({ request }) => {
     success: true,
     shopData: shopData || {},
     upgrade: upgrade ? true : false,
+    subscriptionResponseJson
   }
 }
 
 const PlanPurchase = () => {
-  const { shopData } = useLoaderData();
-  //console.log("shopData", shopData);
+  const { shopData, subscriptionResponseJson } = useLoaderData();
+  console.log("subscriptionResponseJson:", subscriptionResponseJson);
   const { t } = useTranslation();
   const navigation = useNavigation();
   const navigate = useNavigate();
 
-   const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (searchParams.toString()) {
@@ -115,8 +119,8 @@ const PlanPurchase = () => {
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
     <Page>
       <PageTitle
-      
-      title='ShopComponent - Subscription Confirmed'
+
+        title='ShopComponent - Subscription Confirmed'
 
       />
       <Layout>
@@ -129,7 +133,7 @@ const PlanPurchase = () => {
                   <BlockStack inlineAlign="center">
                     <Box paddingBlockEnd={150}>
                       {/* <Text variant="headingMd" as="h6" alignment="center">{t('Thanks', { plan: 'Free' })}</Text> */}
-                      <Text  variant="headingLg" as="h2" alignment="center">{"Congratulations! Your ShopComponent subscription is now activated."}</Text>
+                      <Text variant="headingLg" as="h2" alignment="center">{"Congratulations! Your ShopComponent subscription is now activated."}</Text>
                     </Box>
                     {/* <Box maxWidth="24rem">
                       <Text variant="bodySm" as="p" alignment="center">{t("enjoy_app_message")}</Text>
@@ -137,9 +141,9 @@ const PlanPurchase = () => {
                     </Box> */}
 
                     <BlockStack gap={'100'}>
-                        <Text alignment='center' variant='bodyLg'>Start selling beyond your store.</Text>
-                        <Text alignment='center' variant='bodyLg'>Create component &gt; Copy & embed anywhere &gt; Boost sales.</Text>
-                      </BlockStack>
+                      <Text alignment='center' variant='bodyLg'>Start selling beyond your store.</Text>
+                      <Text alignment='center' variant='bodyLg'>Create component &gt; Copy & embed anywhere &gt; Boost sales.</Text>
+                    </BlockStack>
                   </BlockStack>
                 </Box>
                 <InlineStack gap={200} align="center">
