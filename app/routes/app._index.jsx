@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Card,
-  EmptyState,
   IndexTable,
   InlineStack,
   Layout,
@@ -20,7 +19,7 @@ import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { useCallback, useEffect, useState } from "react";
 import db from "../db.server";
-import { useAppBridge } from "@shopify/app-bridge-react";
+import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 
@@ -207,7 +206,9 @@ export default function Index() {
     setActivePopoverId(null);
     const updatedData = { id };
     fetcher.submit(updatedData, { method: 'delete', action: `/app/component/${id}` });
+    shopify.modal.show('delete-confirmation-modal');
   }
+
 
   const handleDuplicateComponent = async (id) => {
     setIsLoading(true);
@@ -223,6 +224,9 @@ export default function Index() {
       });
     }
   }, [fetcher?.data]);
+
+
+
   const rowMarkup = components?.length > 0 && components?.map(
     (
       { id, title, addToCartType, status, appliesTo },
@@ -330,15 +334,50 @@ export default function Index() {
                         }}
                       >Delete</Button>
                       :
-                      <Button
-                        icon={DeleteIcon}
-                        tone="critical"
-                        variant="tertiary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteComponent(id);
-                        }}
-                      >Delete</Button>
+                      <Box>
+                        <Button
+                          icon={DeleteIcon}
+                          tone="critical"
+                          variant="tertiary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            //handleDeleteComponent(id);
+                            
+                            shopify.modal.show(`delete-confirmation-modal_${id}`);
+                           
+                          }}
+                        >Delete</Button>
+                        <Modal id={`delete-confirmation-modal_${id}`}>
+                          <Box paddingInline={'300'} paddingBlock={'200'}>
+                            <Text tone="caution" variant="bodyLg" fontWeight="medium">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
+                            <Box paddingBlockStart={'400'} paddingBlockEnd={'400'}>
+                              <InlineStack gap={'200'}>
+                                <Button tone={"critical"}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteComponent(id);
+                                  }}
+                                  variant="primary">Delete component</Button>
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDisableStatus(id, status);
+                                  }}
+                                  variant="secondary">Disable instead</Button>
+                                <Button variant="tertiary" onClick={(e) => {
+                                  e.stopPropagation();
+                                  shopify.modal.hide(`delete-confirmation-modal_${id}`);
+                                }}>Cancel</Button>
+                              </InlineStack>
+                            </Box>
+                          </Box>
+
+                          <TitleBar title="Delete component? Embeds may break" />
+
+
+
+                        </Modal>
+                      </Box>
                     }
                   </BlockStack>
                 </Card>
@@ -368,6 +407,9 @@ export default function Index() {
           btnDisabled={false}
           backBtnShow={false}
         />
+
+
+
         <Layout>
           <Layout.Section>
             <Box>
@@ -430,8 +472,6 @@ export default function Index() {
                   </Box>
                   :
                   <Box>
-
-
                     <BlockStack align="center" gap={'100'} inlineAlign="center">
                       <img src="/images/emptyState.png" alt="No Components Found" width={'250'} height={'250'} />
 
@@ -443,8 +483,6 @@ export default function Index() {
                         <Button variant="primary" url="/app/createcomponent">{t("create_componet")}</Button>
                       </Box>
                     </BlockStack>
-
-
                   </Box>
                 }
               </Card>
