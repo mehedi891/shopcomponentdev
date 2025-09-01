@@ -359,7 +359,7 @@ export default function Index() {
         fullWidth
       //   title="Bring your products to where your audience already is"
       //   subtitle="Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront."
-       // backAction={{ onAction: () => navigate('/app') }}
+      // backAction={{ onAction: () => navigate('/app') }}
       >
 
         <PageTitle
@@ -431,21 +431,19 @@ export default function Index() {
                   :
                   <Box>
 
-                    <EmptyState
-                      heading="Create an embeddable storefront widget"
-                      action={{
-                        content: t("create_componet"),
-                        onAction: () => {
-                          navigate('/app/createcomponent');
-                        }
-                      }}
-                      image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-                      fullWidth
-                    >
+
+                    <BlockStack align="center" gap={'100'} inlineAlign="center">
+                      <img src="/images/emptyState.png" alt="No Components Found" width={'250'} height={'250'} />
+
                       <Text>
                         Create a component from products or a collection and embed it on any website, blog, or landing page.
                       </Text>
-                    </EmptyState>
+
+                      <Box paddingBlockStart={'400'} paddingBlockEnd={'500'}>
+                        <Button variant="primary" url="/app/createcomponent">{t("create_componet")}</Button>
+                      </Box>
+                    </BlockStack>
+
 
                   </Box>
                 }

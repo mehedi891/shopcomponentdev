@@ -124,7 +124,7 @@ const HeadlessVerify = ({ showBanner = true, defaultToken = '' }) => {
                 }
               </InlineStack>
             </Box>
-            { defaultToken === '' &&
+            { defaultToken === '' || fetcher.data?.error  &&
               <Box paddingInlineStart={'200'} paddingInlineEnd={'200'} paddingBlockStart={'300'}>
                 <Box paddingBlockEnd={'150'} paddingBlockStart={'400'}>
                   <Text fontWeight="medium">{t("installation_instructions")}:</Text>

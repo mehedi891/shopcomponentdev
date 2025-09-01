@@ -115,6 +115,7 @@ const UpdateComponent = () => {
   });
   const [embedPHtmlCode, setEmbedPHtmlCode] = useState('');
   const [disabledContentByPlan, setDisabledContentByPlan] = useState(false);
+  const [delayedSrcDoc, setDelayedSrcDoc] = useState("");
   const [checkMaxSelectedVariants, setCheckMaxSelectedVariants] = useState(false);
   const params = new URLSearchParams(location.search);
   const [showNewCreatedBanner, setShowNewCreatedBanner] = useState(params.get("new_created") === "true");
@@ -1337,6 +1338,48 @@ const UpdateComponent = () => {
       });
     }
   }, []);
+
+  const loadingHtml = `
+    <html>
+      <head>
+        <style>
+          body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            background: #f9f9f9;
+          }
+          .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #555;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="spinner"></div>
+      </body>
+    </html>
+  `;
+
+  useEffect(() => {
+    setDelayedSrcDoc(loadingHtml);
+    const timer = setTimeout(() => {
+      setDelayedSrcDoc(scriptsAll + embedPHtmlCode);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [scriptsAll, embedPHtmlCode]);
+
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
       <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1526,7 +1569,8 @@ const UpdateComponent = () => {
                               <BlockStack gap={'200'}>
                                 <RadioButton
                                   name="componentSettings.cartBehavior"
-                                  label={t("checkout")}
+                                  // label={t("checkout")}
+                                  label="Buy Now (Checkout)"
                                   checked={field.value === 'checkout'}
                                   onChange={() => field.onChange('checkout')}
 
@@ -2783,7 +2827,7 @@ const UpdateComponent = () => {
                   </InlineStack>
                   <iframe
                     title="spc-iframe"
-                    srcDoc={scriptsAll + embedPHtmlCode}
+                    srcDoc={delayedSrcDoc}
                     style={{ width: '100%', height: '100vh', border: 'none' }}
                     sandbox="allow-scripts allow-same-origin allow-popups"
                     className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
@@ -2794,7 +2838,7 @@ const UpdateComponent = () => {
                   }}>
                     <iframe
                       title="spc-iframe"
-                      srcDoc={scriptsAll + embedPHtmlCode}
+                      srcDoc={delayedSrcDoc}
                       style={{ width: '100%', height: "100vh", border: 'none' }}
                       sandbox="allow-scripts allow-same-origin allow-popups"
                       className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
@@ -2806,6 +2850,9 @@ const UpdateComponent = () => {
                     </InlineStack>
                   </Box>
                 </Card>
+                <Box paddingBlockStart={'200'}>
+                  <Text alignment="center" fontWeight="medium" variant="bodyLg">Done configuring? Copy code → Paste into an HTML/Custom Code block → Publish. Your component is live.</Text>
+                </Box>
               </Box>
 
             </div>
