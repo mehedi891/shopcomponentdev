@@ -147,17 +147,17 @@ export const loader = async ({ request }) => {
   }
 }
 const Plans = () => {
-  const { shopData, shopInfo, appSubscriptions, trialDaysOffer,node_env } = useLoaderData();
+  const { shopData, shopInfo, appSubscriptions, trialDaysOffer, node_env } = useLoaderData();
   const fetcher = useFetcher();
   console.log('appSubscriptions:', appSubscriptions);
   const navigation = useNavigation();
   const navigate = useNavigate();
-  const [remainTrialDays,setRemainTrialDays]  = useState(0);
+  const [remainTrialDays, setRemainTrialDays] = useState(0);
   const [isLoading, setIsLoading] = useState(null);
 
-  useEffect(()=>{
-    setRemainTrialDays(getRemainingTrialDays(shopData?.planActivatedAt,trialDaysOffer))
-  },[shopData,trialDaysOffer]);
+  useEffect(() => {
+    setRemainTrialDays(getRemainingTrialDays(shopData?.planActivatedAt, trialDaysOffer))
+  }, [shopData, trialDaysOffer]);
 
 
   const handleSubscriptionPlan = (planName, planType) => {
@@ -171,7 +171,7 @@ const Plans = () => {
       discountPercent: 0
     }
 
-   // console.log('data:', data);
+    // console.log('data:', data);
 
     fetcher.submit(data, { method: 'post' });
 
@@ -213,8 +213,8 @@ const Plans = () => {
                 </Box>
 
               }
-              { node_env === 'development' &&
-              <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button>
+              {node_env === 'development' &&
+                <Button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</Button>
               }
             </BlockStack>
           </Box>
@@ -442,7 +442,7 @@ const Plans = () => {
 export default Plans
 
 export const action = async ({ request }) => {
-  const { session, admin, billing ,redirect } = await authenticate.admin(request);
+  const { session, admin, billing, redirect } = await authenticate.admin(request);
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
@@ -457,90 +457,90 @@ export const action = async ({ request }) => {
       returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/?isFirstInstall=true`;
     }
 
-    console.log('returnURL:',returnURL);
+    console.log('returnURL:', returnURL);
 
 
 
-  //   const response = await admin.graphql(
-  //     `#graphql
-  // mutation AppSubscriptionCreate($name: String!,$test: Boolean!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!,$trialDays: Int) {
-  //   appSubscriptionCreate(name: $name,test: $test, returnUrl: $returnUrl, lineItems: $lineItems,trialDays: $trialDays) {
-  //     userErrors {
-  //       field
-  //       message
-  //     }
-  //     appSubscription {
-  //       id
-  //     }
-  //     confirmationUrl
-  //   }
-  // }`,
-  //     {
-  //       variables: {
-  //         "name": data.planName,
-  //         "returnUrl": returnURL,
-  //         "trialDays": data?.remaingTrialDays ? parseInt(data?.remaingTrialDays) : parseInt(process.env.TRIAL_DAYS) || 5,
-  //         "test": data.partnerDevelopment === 'true' ? true : false,
-  //         "lineItems": [
-  //           {
-  //             "plan": {
-  //               "appRecurringPricingDetails": {
-  //                 "price": {
-  //                   "amount": 29.00,
-  //                   "currencyCode": "USD"
-  //                 },
-  //                 "discount": {
-  //                   "value": {
-  //                     "percentage": 0
-  //                   },
-  //                   "durationLimitInIntervals": 1
-  //                 },
-  //                 "interval": "EVERY_30_DAYS"
-  //               }
-  //             }
-  //           }
-  //         ]
-  //       },
-  //     },
-  //   );
+    //   const response = await admin.graphql(
+    //     `#graphql
+    // mutation AppSubscriptionCreate($name: String!,$test: Boolean!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!,$trialDays: Int) {
+    //   appSubscriptionCreate(name: $name,test: $test, returnUrl: $returnUrl, lineItems: $lineItems,trialDays: $trialDays) {
+    //     userErrors {
+    //       field
+    //       message
+    //     }
+    //     appSubscription {
+    //       id
+    //     }
+    //     confirmationUrl
+    //   }
+    // }`,
+    //     {
+    //       variables: {
+    //         "name": data.planName,
+    //         "returnUrl": returnURL,
+    //         "trialDays": data?.remaingTrialDays ? parseInt(data?.remaingTrialDays) : parseInt(process.env.TRIAL_DAYS) || 5,
+    //         "test": data.partnerDevelopment === 'true' ? true : false,
+    //         "lineItems": [
+    //           {
+    //             "plan": {
+    //               "appRecurringPricingDetails": {
+    //                 "price": {
+    //                   "amount": 29.00,
+    //                   "currencyCode": "USD"
+    //                 },
+    //                 "discount": {
+    //                   "value": {
+    //                     "percentage": 0
+    //                   },
+    //                   "durationLimitInIntervals": 1
+    //                 },
+    //                 "interval": "EVERY_30_DAYS"
+    //               }
+    //             }
+    //           }
+    //         ]
+    //       },
+    //     },
+    //   );
 
-const priceAmount = 29.0;
-const currencyCode = "USD";
-
-
-const discountPercent = Number(data?.discountPercent ?? 0);
-
-const appRecurringPricingDetails = {
-  price: { amount: priceAmount, currencyCode },
-  interval: "EVERY_30_DAYS",
-  ...(discountPercent > 0 && {
-    discount: {
-      value: { percentage: discountPercent }, 
-      durationLimitInIntervals: 1,               
-    },
-  }),
-};
-
-const variables = {
-  name: data.planName,
-  returnUrl: returnURL,
-  trialDays:
-    data?.remaingTrialDays
-      ? parseInt(data.remaingTrialDays, 10)
-      : parseInt(process.env.TRIAL_DAYS ?? "5", 10),
-  test: data.partnerDevelopment === "true",
-  lineItems: [
-    {
-      plan: {
-        appRecurringPricingDetails,
-      },
-    },
-  ],
-};
+    const priceAmount = 29.0;
+    const currencyCode = "USD";
 
 
-const response = await admin.graphql(
-  `#graphql
+    const discountPercent = Number(data?.discountPercent ?? 0);
+
+    const appRecurringPricingDetails = {
+      price: { amount: priceAmount, currencyCode },
+      interval: "EVERY_30_DAYS",
+      ...(discountPercent > 0 && {
+        discount: {
+          value: { percentage: discountPercent },
+          durationLimitInIntervals: 1,
+        },
+      }),
+    };
+
+    const variables = {
+      name: data.planName,
+      returnUrl: returnURL,
+      trialDays:
+        data?.remaingTrialDays
+          ? parseInt(data.remaingTrialDays, 10)
+          : parseInt(process.env.TRIAL_DAYS ?? "5", 10),
+      test: data.partnerDevelopment === "true",
+      lineItems: [
+        {
+          plan: {
+            appRecurringPricingDetails,
+          },
+        },
+      ],
+    };
+
+
+    const response = await admin.graphql(
+      `#graphql
   mutation AppSubscriptionCreate(
     $name: String!,
     $test: Boolean!,
@@ -560,11 +560,11 @@ const response = await admin.graphql(
       confirmationUrl
     }
   }`,
-  { variables }
-);
-  
-  
-  const plan = await response.json();
+      { variables }
+    );
+
+
+    const plan = await response.json();
 
 
     if (plan?.data?.userErrors?.length > 0) {
@@ -613,8 +613,20 @@ const response = await admin.graphql(
           },
         },
       },
-      include:{plan:true}
+      include: { plan: true, components: true }
     });
+
+    if (shopData?.components?.length > 0) {
+      await db.component.updateMany({
+        where: {
+          shopId: shopData.id,
+          id: { not: shopData?.components[0]?.id }
+        },
+        data: {
+          softDelete: true
+        }
+      });
+    }
 
     if (data?.isFirstInstall === 'true' && shopData?.plan?.planName === 'Free') {
       //console.log('from ifBlock');

@@ -30,7 +30,7 @@ import PageTitle from "../components/PageTitle/PageTitle";
 
 
 export const loader = async ({ request }) => {
-    const { session, admin, redirect } = await authenticate.admin(request);
+    const { session, redirect } = await authenticate.admin(request);
     // const shopResponse = await admin.graphql(
     //     `#graphql
     //             query shopInfo{
@@ -534,23 +534,23 @@ const CreateComponent = () => {
                 font-weight: 450;
                 line-height: 20px;
             }
-            .product-card{
+            .spcProductCard_${watchedValues.tracking}{
                 border-radius: 8px;
                 max-width: 350px;
                 border: 1.5px solid ${watchedValues.productLayoutSettings.productCardBorderColor};
                 background-color: ${watchedValues.productLayoutSettings.productCardBgColor};
             }
-            .product-card__title{
+            .spcProductCardTitle_${watchedValues.tracking}{
                 font-size: ${watchedValues.productLayoutSettings.productTitleSize};
                 font-weight: ${watchedValues.productLayoutSettings.productTitleWeight};
                 color: ${watchedValues.productLayoutSettings.productTitleColor};
             }
-            .product-card__price{
+            .spcProductCardPrice_${watchedValues.tracking}{
                 font-size: ${watchedValues.productLayoutSettings.productPriceSize};
                 font-weight: ${watchedValues.productLayoutSettings.productPriceWeight};
                 color: ${watchedValues.productLayoutSettings.productPriceColor};
             }
-            .product-card__add-button{
+            .spcProductCardBtn_${watchedValues.tracking}{
                 font-weight: ${watchedValues.buttonStyleSettings.buttonFontWeight};
                 font-size: ${watchedValues.buttonStyleSettings.buttonFontSize};
                 color: ${watchedValues.buttonStyleSettings.buttonTextColor};
@@ -720,7 +720,7 @@ const CreateComponent = () => {
 
     const pdAddToCartHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
              <button
-                class="product-card__add-button product-card__add-to-cart-button"
+                class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -729,7 +729,7 @@ const CreateComponent = () => {
     ` :
         `
              <button
-                class="product-card__add-button product-card__add-to-cart-button"
+                class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutIndProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -739,7 +739,7 @@ const CreateComponent = () => {
 
     const pdCheckoutBtnHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
              <button
-                class="product-card__add-button product-card__checkout-button"
+                class="product-card__add-button product-card__checkout-button spcProductCardBtn_${watchedValues.tracking}"
                  onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -748,7 +748,7 @@ const CreateComponent = () => {
     ` :
         `
              <button
-                class="product-card__add-button product-card__checkout-button"
+                class="product-card__add-button product-card__checkout-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutIndProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -912,7 +912,7 @@ const CreateComponent = () => {
 
     const pdViewBtnHtml = `
              <button
-                class="product-card__add-button product-card__view-button"
+                class="product-card__add-button product-card__view-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
               >
                ${watchedValues.buttonStyleSettings.viewBtnTxt}
@@ -926,7 +926,7 @@ const CreateComponent = () => {
 
     const productLayoutIndCardHtml = selectedProductsInd?.length > 0 ? selectedProductsInd.map((product) => (
         `
-            <div class="product-card" id="shopcomponent-${watchedValues.tracking}">
+            <div class="product-card spcProductCard_${watchedValues.tracking}" id="shopcomponent-${watchedValues.tracking}">
     <!-- Set product you want to display -->
     <shopify-context type="product" handle="${product.handle}">
       <template>
@@ -938,10 +938,10 @@ const CreateComponent = () => {
           </div>
           <div class="product-card__details">
             <div class="product-card__info">
-              <h1 class="product-card__title">
+              <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
-              </h1>
-              <div class="product-card__price">
+              </h2>
+              <div class="product-card__price spcProductCardPrice_${watchedValues.tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -1026,7 +1026,7 @@ const CreateComponent = () => {
     `;
     const productLayoutBulkCardHtml = selectedProductsBulk?.length > 0 ? selectedProductsBulk.map((product) => (
         `
-            <div class="product-card">
+            <div class="product-card spcProductCard_${watchedValues.tracking}">
     <!-- Set product you want to display -->
     <shopify-context type="product" handle="${product.handle}">
       <template>
@@ -1038,9 +1038,9 @@ const CreateComponent = () => {
           </div>
           <div class="product-card__details">
             <div class="product-card__info">
-              <h1 class="product-card__title">
+              <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
-              </h1>
+              </h2>
               <div class="product-card__price">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money

@@ -1739,7 +1739,7 @@ const UpdateComponent = () => {
                                 label={t("add_to_cart_type")}
                                 options={[
                                   { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("individual_add_to_cart") : 'Individual Checkout', value: 'individual' },
-                                  { label:  watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}
+                                  { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}
                                 selected={field.value}
                                 onChange={field.onChange}
                                 value={field.value}
@@ -2480,7 +2480,7 @@ const UpdateComponent = () => {
                                 <Box visuallyHidden={watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk"}>
                                   <BlockStack gap={'100'}>
                                     {/* <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text> */}
-                                     <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text>
+                                    <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text>
                                     <Controller
                                       name="componentSettings.fullView"
                                       control={control}
@@ -2740,7 +2740,15 @@ const UpdateComponent = () => {
                           fullWidth
                           disclosure={toogleOpen.tranckingOpen ? 'up' : 'down'}
                         >
-                          <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                          {disabledContentByPlan ?
+                            <InlineStack blockAlign="center" gap={"150"}>
+                              <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                              <UpgradeTooltip />
+                            </InlineStack>
+                            :
+                            <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                          }
+
                         </Button>
                       </div>
                     </Box>
@@ -2750,7 +2758,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                       <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="customerTracking"

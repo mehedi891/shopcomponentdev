@@ -63,17 +63,17 @@ export const loader = async ({ request }) => {
 
   }
 
-  if (downgrade === 'true') {
-    await db.component.updateMany({
-      where: {
-        shopId: shopData.id,
-        id: { not: shopData.components[0]?.id }
-      },
-      data: {
-        softDelete: true
-      }
-    });
-  }
+  // if (downgrade === 'true') {
+  //   await db.component.updateMany({
+  //     where: {
+  //       shopId: shopData.id,
+  //       id: { not: shopData.components[0]?.id }
+  //     },
+  //     data: {
+  //       softDelete: true
+  //     }
+  //   });
+  // }
 
    console.log('from upgrade true outside','upgrade:',upgrade);
 
@@ -103,13 +103,13 @@ const PlanPurchase = () => {
   const navigation = useNavigation();
   const navigate = useNavigate();
 
-  //  const [searchParams] = useSearchParams();
+   const [searchParams] = useSearchParams();
 
-  // useEffect(() => {
-  //   if (searchParams.toString()) {
-  //     window.history.replaceState({}, document.title, window.location.pathname);
-  //   }
-  // }, [searchParams]);
+  useEffect(() => {
+    if (searchParams.toString()) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
 
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -117,7 +117,7 @@ const PlanPurchase = () => {
       <PageTitle
       
       title='ShopComponent - Subscription Confirmed'
-      
+
       />
       <Layout>
         <Layout.Section>
