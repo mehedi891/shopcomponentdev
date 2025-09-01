@@ -1738,8 +1738,8 @@ const UpdateComponent = () => {
                               <Select
                                 label={t("add_to_cart_type")}
                                 options={[
-                                  { label: t("individual_add_to_cart"), value: 'individual' },
-                                  { label: t("bulk_add_to_cart"), value: 'bulk', disabled: disabledContentByPlan }]}
+                                  { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("individual_add_to_cart") : 'Individual Checkout', value: 'individual' },
+                                  { label:  watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}
                                 selected={field.value}
                                 onChange={field.onChange}
                                 value={field.value}
@@ -2479,7 +2479,8 @@ const UpdateComponent = () => {
                               <BlockStack gap={'300'}>
                                 <Box visuallyHidden={watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk"}>
                                   <BlockStack gap={'100'}>
-                                    <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text>
+                                    {/* <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text> */}
+                                     <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text>
                                     <Controller
                                       name="componentSettings.fullView"
                                       control={control}

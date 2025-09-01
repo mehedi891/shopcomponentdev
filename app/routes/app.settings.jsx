@@ -61,6 +61,7 @@ const Settings = () => {
                                 <HeadlessVerify
                                     showBanner={shopData?.headlessAccessToken ? false : true}
                                     defaultToken={shopData?.headlessAccessToken ? shopData?.headlessAccessToken : ''}
+                                    pageName = {'settings'}
                                 />
                             </Card>
                         </Box>
