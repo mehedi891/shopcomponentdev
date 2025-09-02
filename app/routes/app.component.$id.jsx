@@ -2870,6 +2870,7 @@ const UpdateComponent = () => {
                   <Modal id="spc-modal" variant="max" onHide={() => {
                     setSelectedViewMDF({ id: 2, view: 'desktop' })
                   }}>
+                    
                     <iframe
                       title="spc-iframe"
                       srcDoc={
@@ -2889,6 +2890,7 @@ const UpdateComponent = () => {
                       sandbox="allow-scripts allow-same-origin allow-popups"
                       className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe spc-iframeModal`}
                     ></iframe>
+
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                     <InlineStack align="end">
