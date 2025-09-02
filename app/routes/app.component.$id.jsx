@@ -430,7 +430,7 @@ const UpdateComponent = () => {
       shopify.saveBar.show('spc-save-bar');
     } else {
       shopify.saveBar.hide('spc-save-bar');
-      
+
     }
   }, [isDirty]);
 
@@ -1874,31 +1874,33 @@ const UpdateComponent = () => {
                               />
                             </Box>
                           )}
+                          {selectedProductsBulk?.length > 0 &&
+                            <Box paddingInline={'300'} paddingBlockStart={'200'}>
+                              <Box borderRadius="100" padding={'400'} background="bg-surface-secondary">
+                                <Controller
+                                  name="enableQtyField"
+                                  control={control}
 
-                          <Box paddingInline={'300'} paddingBlockStart={'200'}>
-                            <Box borderRadius="100" padding={'400'} background="bg-surface-secondary">
-                              <Controller
-                                name="enableQtyField"
-                                control={control}
+                                  render={({ field }) => (
+                                    <BlockStack gap="200">
+                                      <Checkbox
+                                        label={t("fixed_qty")}
+                                        checked={field.value === false}
+                                        onChange={() => field.onChange(false)}
+                                      />
+                                      <Checkbox
+                                        label={t("enable_qty_field")}
+                                        checked={field.value === true}
+                                        onChange={() => field.onChange(true)}
+                                      />
+                                    </BlockStack>
+                                  )}
+                                />
 
-                                render={({ field }) => (
-                                  <BlockStack gap="200">
-                                    <Checkbox
-                                      label={t("fixed_qty")}
-                                      checked={field.value === false}
-                                      onChange={() => field.onChange(false)}
-                                    />
-                                    <Checkbox
-                                      label={t("enable_qty_field")}
-                                      checked={field.value === true}
-                                      onChange={() => field.onChange(true)}
-                                    />
-                                  </BlockStack>
-                                )}
-                              />
-
+                              </Box>
                             </Box>
-                          </Box>
+                          }
+
 
                           <Box paddingBlock={'400'} paddingInline={'300'}>
                             <BlockStack gap={'400'}>
