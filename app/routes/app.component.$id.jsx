@@ -2898,7 +2898,7 @@ const UpdateComponent = () => {
                     </InlineStack>
                   </Box>
                 </Card>
-                <Box paddingBlockStart={'600'}>
+                <Box paddingBlockStart={'1200'}>
                   <Text alignment="center" fontWeight="medium" variant="bodyLg">Done configuring? Copy code → Paste into an HTML/Custom Code block → Publish. Your component is live.</Text>
                 </Box>
               </Box>
