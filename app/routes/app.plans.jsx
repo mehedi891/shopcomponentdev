@@ -621,6 +621,19 @@ export const action = async ({ request }) => {
     });
 
     if (shopData?.components?.length > 0) {
+      if (shopData?.components[0]?.addToCartType?.type === 'bulk') {
+        await db.component.update({
+          where: {
+            id: shopData?.components[0]?.id
+          },
+          data: {
+            addToCartType: {
+              type: 'individual',
+              products: shopData?.components[0]?.addToCartType?.products
+            }
+          }
+        });
+      }
       await db.component.updateMany({
         where: {
           shopId: shopData.id,

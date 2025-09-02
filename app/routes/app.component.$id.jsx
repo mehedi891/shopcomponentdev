@@ -198,11 +198,14 @@ const UpdateComponent = () => {
   }, [actionData]);
 
   useEffect(() => {
+    const limitedProducts = component?.shop?.plan?.planName === "Free" ? component?.addToCartType?.products?.slice(0, 3) : component?.addToCartType?.products;
     if (component?.appliesTo === 'product') {
       if (component?.addToCartType?.type === 'individual') {
-        setSelectedProductsInd(component?.addToCartType?.products);
+
+        setSelectedProductsInd(limitedProducts);
+
       } else if (component?.addToCartType?.type === 'bulk') {
-        setSelectedProductsBulk(component?.addToCartType?.products);
+        setSelectedProductsBulk(limitedProducts);
       }
     } else if (component?.appliesTo === 'collection') {
       setSelectedCollection(component?.addToCartType?.products);
@@ -255,7 +258,7 @@ const UpdateComponent = () => {
     if (selected) {
       setSelectedProductsInd(() => {
         const selectedProducts = selected.map(product => {
-          return { id: product.id, title: product.title, handle: product.handle, image: product.images[0].originalSrc };
+          return { id: product.id, title: product.title, handle: product.handle, image: product?.images[0]?.originalSrc ? product?.images[0]?.originalSrc : null };
         })
         return selectedProducts
       });
@@ -309,7 +312,7 @@ const UpdateComponent = () => {
     if (selected) {
       setSelectedCollection(() => {
         const selectedCollection = selected?.map(item => {
-          return { id: item.id, title: item.title, handle: item.handle, image: item?.image?.originalSrc ? item.image.originalSrc : null };
+          return { id: item.id, title: item.title, handle: item.handle, image: item?.image?.originalSrc ? item?.image?.originalSrc : null };
         })
         return selectedCollection
       });
@@ -427,6 +430,7 @@ const UpdateComponent = () => {
       shopify.saveBar.show('spc-save-bar');
     } else {
       shopify.saveBar.hide('spc-save-bar');
+      
     }
   }, [isDirty]);
 
@@ -500,7 +504,7 @@ const UpdateComponent = () => {
     setSelectedViewMDF({ id, view: veiw });
   }
 
-   const globalStyles = `
+  const globalStyles = `
         <style>
          @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
         .shopcomponent_pd_container *{
@@ -1375,10 +1379,10 @@ const UpdateComponent = () => {
   useEffect(() => {
     setDelayedSrcDoc(loadingHtml);
     const timer = setTimeout(() => {
-      setDelayedSrcDoc( embedPHtmlCode);
+      setDelayedSrcDoc(embedPHtmlCode);
     }, 600);
     return () => clearTimeout(timer);
-  }, [ embedPHtmlCode]);
+  }, [embedPHtmlCode]);
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -1803,7 +1807,7 @@ const UpdateComponent = () => {
                                 return <InlineStack key={product.id} blockAlign="center" align="space-between">
                                   <InlineStack blockAlign="center" gap={'200'}>
                                     <Thumbnail
-                                      source={product.image}
+                                      source={product?.image ? product?.image : '/images/noImage.png'}
                                       alt={product.handle}
                                       size="small"
                                     />
@@ -1871,9 +1875,28 @@ const UpdateComponent = () => {
                             </Box>
                           )}
 
-                          <Box paddingBlockStart={'200'} paddingInline={'300'}>
-                            <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
-                              <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
+                          <Box paddingInline={'300'} paddingBlockStart={'200'}>
+                            <Box borderRadius="100" padding={'400'} background="bg-surface-secondary">
+                              <Controller
+                                name="enableQtyField"
+                                control={control}
+
+                                render={({ field }) => (
+                                  <BlockStack gap="200">
+                                    <Checkbox
+                                      label={t("fixed_qty")}
+                                      checked={field.value === false}
+                                      onChange={() => field.onChange(false)}
+                                    />
+                                    <Checkbox
+                                      label={t("enable_qty_field")}
+                                      checked={field.value === true}
+                                      onChange={() => field.onChange(true)}
+                                    />
+                                  </BlockStack>
+                                )}
+                              />
+
                             </Box>
                           </Box>
 
@@ -1884,7 +1907,7 @@ const UpdateComponent = () => {
                                 <Box key={product.id} >
                                   <InlineStack align="space-between" blockAlign="center">
                                     <InlineStack gap={'200'} blockAlign="center">
-                                      <Thumbnail size="small" source={product?.image ? product?.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
+                                      <Thumbnail size="small" source={product?.image ? product?.image : '/images/noImage.png'}
                                         alt={product.handle} />
                                       <Text variant="bodyMd" fontWeight="medium">{product.title}</Text>
                                     </InlineStack>
@@ -1897,7 +1920,7 @@ const UpdateComponent = () => {
                                     <Box key={variant.id} paddingBlockStart={'200'} paddingBlockEnd={'200'} paddingInlineStart={'400'} >
 
                                       <InlineStack align="start" blockAlign="center" gap={'200'}>
-                                        <Thumbnail size="small" source={variant?.image ? variant.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
+                                        <Thumbnail size="small" source={variant?.image ? variant.image : '/images/noImage.png'}
                                           alt={variant.title} />
 
                                         <BlockStack gap={'100'}>
@@ -1946,28 +1969,13 @@ const UpdateComponent = () => {
 
 
                               }
-                              <Box borderRadius="100" padding={'400'} background="bg-surface-secondary">
-                                <Controller
-                                  name="enableQtyField"
-                                  control={control}
-
-                                  render={({ field }) => (
-                                    <BlockStack gap="200">
-                                      <Checkbox
-                                        label={t("fixed_qty")}
-                                        checked={field.value === false}
-                                        onChange={() => field.onChange(false)}
-                                      />
-                                      <Checkbox
-                                        label={t("enable_qty_field")}
-                                        checked={field.value === true}
-                                        onChange={() => field.onChange(true)}
-                                      />
-                                    </BlockStack>
-                                  )}
-                                />
-
+                              <Box paddingBlockStart={'200'}>
+                                <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
+                                  <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
+                                </Box>
                               </Box>
+
+
                             </BlockStack>
                           </Box>
                         </Box>
@@ -2863,7 +2871,7 @@ const UpdateComponent = () => {
                     <iframe
                       title="spc-iframe"
                       srcDoc={
-                      `
+                        `
                                           <!DOCTYPE html>
                                               <html>
                                               <head>
@@ -2874,7 +2882,7 @@ const UpdateComponent = () => {
                                               </body>
                                               </html>
                                         `
-                    }
+                      }
                       style={{ width: '100%', height: "100vh", border: 'none' }}
                       sandbox="allow-scripts allow-same-origin allow-popups"
                       className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe spc-iframeModal`}
@@ -2886,7 +2894,7 @@ const UpdateComponent = () => {
                     </InlineStack>
                   </Box>
                 </Card>
-                <Box paddingBlockStart={'400'}>
+                <Box paddingBlockStart={'600'}>
                   <Text alignment="center" fontWeight="medium" variant="bodyLg">Done configuring? Copy code → Paste into an HTML/Custom Code block → Publish. Your component is live.</Text>
                 </Box>
               </Box>

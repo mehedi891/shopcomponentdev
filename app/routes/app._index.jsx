@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Card,
+  Divider,
   IndexTable,
   InlineStack,
   Layout,
@@ -322,56 +323,62 @@ export default function Index() {
                     }
 
 
-                 
-                      <Box>
-                        <Button
-                          icon={DeleteIcon}
-                          tone="critical"
-                          variant="tertiary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            //handleDeleteComponent(id);
 
-                            shopify.modal.show(`delete-confirmation-modal_${id}`);
+                    <Box>
+                      <Button
+                        icon={DeleteIcon}
+                        tone="critical"
+                        variant="tertiary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          //handleDeleteComponent(id);
 
-                          }}
-                        >Delete</Button>
-                        <Modal  id={`delete-confirmation-modal_${id}`}>
-                          <Box paddingInline={'300'} paddingBlock={'200'} onClick={(e)=>{e.stopPropagation()}}>
-                            <Text tone="caution" variant="bodyLg">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
-                            <Box paddingBlockStart={'400'} paddingBlockEnd={'400'}>
-                              <InlineStack gap={'200'} align="space-between">
-                                <Button variant="tertiary" onClick={(e) => {
+                          shopify.modal.show(`delete-confirmation-modal_${id}`);
+
+                        }}
+                      >Delete</Button>
+                      <Modal id={`delete-confirmation-modal_${id}`}>
+                        <Box paddingInline={'300'} paddingBlock={'500'} onClick={(e) => { e.stopPropagation() }}>
+                          <Text variant="bodyLg">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
+
+                        </Box>
+
+                        <Divider />
+
+                        <Box paddingInline={'300'} paddingBlock={'300'}>
+                          <InlineStack gap={'200'} align="end">
+                            <Button variant="tertiary" onClick={(e) => {
+                              e.stopPropagation();
+                              shopify.modal.hide(`delete-confirmation-modal_${id}`);
+                            }}>Cancel</Button>
+
+                            {status === 'activate' &&
+                              <Button
+                                size="slim"
+                                onClick={(e) => {
                                   e.stopPropagation();
-                                  shopify.modal.hide(`delete-confirmation-modal_${id}`);
-                                }}>Cancel</Button>
-                                <InlineStack gap={'150'} blockAlign="center">
-                                  {status === 'activate' &&
-                                  <Button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDisableStatus(id, status);
-                                    }}
-                                    variant="secondary">Disable instead</Button>
-                                  }
-                                  <Button tone={"critical"}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteComponent(id);
-                                    }}
-                                    variant="primary">Delete component</Button>
-                                </InlineStack>
-                              </InlineStack>
-                            </Box>
-                          </Box>
+                                  handleDisableStatus(id, status);
+                                }}
+                                variant="secondary">Disable instead</Button>
+                            }
+                            <Button tone={"critical"}
+                              size="slim"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteComponent(id);
+                              }}
+                              variant="primary">Delete component</Button>
 
-                          <TitleBar title="Delete component? Embeds may break" />
+                          </InlineStack>
+                        </Box>
+
+                        <TitleBar title="Delete component? Embeds may break" />
 
 
 
-                        </Modal>
-                      </Box>
-                    
+                      </Modal>
+                    </Box>
+
                   </BlockStack>
                 </Card>
               </Box>
