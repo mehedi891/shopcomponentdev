@@ -78,10 +78,8 @@ export const loader = async ({ request }) => {
   }
 
 
-  console.log('from upgrade true outside', 'upgrade:', upgrade);
-
   if (upgrade === 'true' && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions?.length > 0 && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions[0]?.status === 'ACTIVE') {
-    console.log('from upgrade true if block');
+   
     await db.component.updateMany({
       where: {
         shopId: shopData.id,
@@ -101,8 +99,8 @@ export const loader = async ({ request }) => {
 }
 
 const PlanPurchase = () => {
-  const { shopData, subscriptionResponseJson } = useLoaderData();
-  console.log("subscriptionResponseJson:", subscriptionResponseJson);
+  const { shopData } = useLoaderData();
+ 
   const { t } = useTranslation();
   const navigation = useNavigation();
   const navigate = useNavigate();

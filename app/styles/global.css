@@ -41,11 +41,16 @@
 }
 
 .spc_iframe {
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+    box-shadow: 
+  rgba(0, 0, 0, 0.1) 0px 1px 2px 0px,
+  rgba(0, 0, 0, 0.1) 0px -1px 2px 0px; 
     margin: 0 auto;
     display: flex;
     margin-top: 10px;
     transition: all 0.5s ease-in-out;
+}
+.spc-iframeModal{
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
 }
 
 .spc_iframe_view_desktop {

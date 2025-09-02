@@ -182,7 +182,7 @@ const UpdateComponent = () => {
     }
   });
   const watchedValues = watch();
-  console.log('component:', component);
+  //console.log('component:', component);
 
   useEffect(() => {
     setDisabledContentByPlan(component?.shop?.plan?.planName === 'Free' ? true : false)
@@ -500,7 +500,7 @@ const UpdateComponent = () => {
     setSelectedViewMDF({ id, view: veiw });
   }
 
-  const globalStyles = `
+   const globalStyles = `
         <style>
          @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
         .shopcomponent_pd_container *{
@@ -545,23 +545,23 @@ const UpdateComponent = () => {
                 font-weight: 450;
                 line-height: 20px;
             }
-            .product-card{
+            .spcProductCard_${watchedValues.tracking}{
                 border-radius: 8px;
                 max-width: 350px;
                 border: 1.5px solid ${watchedValues.productLayoutSettings.productCardBorderColor};
                 background-color: ${watchedValues.productLayoutSettings.productCardBgColor};
             }
-            .product-card__title{
+            .spcProductCardTitle_${watchedValues.tracking}{
                 font-size: ${watchedValues.productLayoutSettings.productTitleSize};
                 font-weight: ${watchedValues.productLayoutSettings.productTitleWeight};
                 color: ${watchedValues.productLayoutSettings.productTitleColor};
             }
-            .product-card__price{
+            .spcProductCardPrice_${watchedValues.tracking}{
                 font-size: ${watchedValues.productLayoutSettings.productPriceSize};
                 font-weight: ${watchedValues.productLayoutSettings.productPriceWeight};
                 color: ${watchedValues.productLayoutSettings.productPriceColor};
             }
-            .product-card__add-button{
+            .spcProductCardBtn_${watchedValues.tracking}{
                 font-weight: ${watchedValues.buttonStyleSettings.buttonFontWeight};
                 font-size: ${watchedValues.buttonStyleSettings.buttonFontSize};
                 color: ${watchedValues.buttonStyleSettings.buttonTextColor};
@@ -612,7 +612,7 @@ const UpdateComponent = () => {
                 flex-flow: nowrap;
                 justify-content: start;
                 overflow-x: scroll;
-                   scroll-behavior: smooth;
+                scroll-behavior: smooth;
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
@@ -731,7 +731,7 @@ const UpdateComponent = () => {
 
   const pdAddToCartHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
              <button
-                class="product-card__add-button product-card__add-to-cart-button"
+                class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutBulkProduct(event,'${component.shop.scAccessToken}','${shopData.myshopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -740,7 +740,7 @@ const UpdateComponent = () => {
     ` :
     `
              <button
-                class="product-card__add-button product-card__add-to-cart-button"
+                class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutIndProduct(event,'${component.shop.scAccessToken}','${shopData.myshopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -750,7 +750,7 @@ const UpdateComponent = () => {
 
   const pdCheckoutBtnHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
              <button
-                class="product-card__add-button product-card__checkout-button"
+                class="product-card__add-button product-card__checkout-button spcProductCardBtn_${watchedValues.tracking}"
                  onclick="addToCartNcheckoutBulkProduct(event,'${component.shop.scAccessToken}','${shopData.myshopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -759,7 +759,7 @@ const UpdateComponent = () => {
     ` :
     `
              <button
-                class="product-card__add-button product-card__checkout-button"
+                class="product-card__add-button product-card__checkout-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutIndProduct(event,'${component.shop.scAccessToken}','${shopData.myshopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -923,7 +923,7 @@ const UpdateComponent = () => {
 
   const pdViewBtnHtml = `
              <button
-                class="product-card__add-button product-card__view-button"
+                class="product-card__add-button product-card__view-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
               >
                 ${watchedValues.buttonStyleSettings.viewBtnTxt}
@@ -937,7 +937,7 @@ const UpdateComponent = () => {
 
   const productLayoutIndCardHtml = selectedProductsInd?.length > 0 ? selectedProductsInd?.map((product) => (
     `
-            <div class="product-card" id="shopcomponent-${watchedValues.tracking}">
+            <div class="product-card spcProductCard_${watchedValues.tracking}" id="shopcomponent-${watchedValues.tracking}">
     <!-- Set product you want to display -->
     <shopify-context type="product" handle="${product.handle}">
       <template>
@@ -949,10 +949,10 @@ const UpdateComponent = () => {
           </div>
           <div class="product-card__details">
             <div class="product-card__info">
-              <h1 class="product-card__title">
+              <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
-              </h1>
-              <div class="product-card__price">
+              </h2>
+              <div class="product-card__price spcProductCardPrice_${watchedValues.tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -1036,7 +1036,7 @@ const UpdateComponent = () => {
     `;
   const productLayoutBulkCardHtml = selectedProductsBulk?.length > 0 ? selectedProductsBulk?.map((product) => (
     `
-            <div class="product-card">
+            <div class="product-card spcProductCard_${watchedValues.tracking}">
     <!-- Set product you want to display -->
     <shopify-context type="product" handle="${product.handle}">
       <template>
@@ -1048,10 +1048,10 @@ const UpdateComponent = () => {
           </div>
           <div class="product-card__details">
             <div class="product-card__info">
-              <h1 class="product-card__title">
+              <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
-              </h1>
-              <div class="product-card__price">
+              </h2>
+              <div class="product-card__price spcProductCardPrice_${watchedValues.tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -1155,7 +1155,7 @@ const UpdateComponent = () => {
     `;
   const pdQuickViewBtnCollectionHtml = `
         <button
-                class="product-card__add-button product-card__view-button"
+                class="product-card__add-button product-card__view-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
               >
                 View product
@@ -1167,9 +1167,9 @@ const UpdateComponent = () => {
       <template>
            
     
-       <shopify-list-context type="product" query="collection.products" first="12">
+       <shopify-list-context type="product" query="collection.products" first="${component?.shop?.plan?.planName === 'Free' ? 3 : 50}">
        <template>
-        <div class="product-card">
+        <div class="product-card spcProductCard_${watchedValues.tracking}">
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
@@ -1178,10 +1178,10 @@ const UpdateComponent = () => {
           </div>
           <div class="product-card__details shopcomponent_product_card__details">
             <div class="product-card__info">
-              <h1 class="product-card__title">
+              <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
-              </h1>
-              <div class="product-card__price">
+              </h2>
+              <div class="product-card__price spcProductCardPrice_${watchedValues.tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -1375,10 +1375,10 @@ const UpdateComponent = () => {
   useEffect(() => {
     setDelayedSrcDoc(loadingHtml);
     const timer = setTimeout(() => {
-      setDelayedSrcDoc(scriptsAll + embedPHtmlCode);
-    }, 500);
+      setDelayedSrcDoc( embedPHtmlCode);
+    }, 600);
     return () => clearTimeout(timer);
-  }, [scriptsAll, embedPHtmlCode]);
+  }, [ embedPHtmlCode]);
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -2758,7 +2758,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                       <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
+                      <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="customerTracking"
@@ -2836,10 +2836,25 @@ const UpdateComponent = () => {
                   </InlineStack>
                   <iframe
                     title="spc-iframe"
-                    srcDoc={delayedSrcDoc}
+                    srcDoc={
+                      `
+                                          <!DOCTYPE html>
+                                              <html>
+                                              <head>
+                                                
+                                                  ${scriptsAll}
+                                              </head>
+                                              <body>
+                                                ${delayedSrcDoc}
+                                              </body>
+                                              </html>
+                                        `
+                    }
                     style={{ width: '100%', height: '100vh', border: 'none' }}
                     sandbox="allow-scripts allow-same-origin allow-popups"
                     className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
+
+
                   ></iframe>
 
                   <Modal id="spc-modal" variant="max" onHide={() => {
@@ -2847,10 +2862,22 @@ const UpdateComponent = () => {
                   }}>
                     <iframe
                       title="spc-iframe"
-                      srcDoc={delayedSrcDoc}
+                      srcDoc={
+                      `
+                                          <!DOCTYPE html>
+                                              <html>
+                                              <head>
+                                                  ${scriptsAll}
+                                              </head>
+                                              <body>
+                                                ${delayedSrcDoc}
+                                              </body>
+                                              </html>
+                                        `
+                    }
                       style={{ width: '100%', height: "100vh", border: 'none' }}
                       sandbox="allow-scripts allow-same-origin allow-popups"
-                      className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
+                      className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe spc-iframeModal`}
                     ></iframe>
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>

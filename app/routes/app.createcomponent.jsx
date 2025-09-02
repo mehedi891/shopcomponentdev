@@ -1041,7 +1041,7 @@ const CreateComponent = () => {
               <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
               </h2>
-              <div class="product-card__price">
+              <div class="product-card__price spcProductCardPrice_${watchedValues.tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -1146,7 +1146,7 @@ const CreateComponent = () => {
     `;
     const pdQuickViewBtnCollectionHtml = `
         <button
-                class="product-card__add-button product-card__view-button"
+                class="product-card__add-button product-card__view-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
               >
                 View product
@@ -1158,9 +1158,9 @@ const CreateComponent = () => {
       <template>
            
     
-       <shopify-list-context type="product" query="collection.products" first="12">
+       <shopify-list-context type="product" query="collection.products" first="${shopData?.plan?.planName === 'Free' ? 3 : 50}">
        <template>
-        <div class="product-card">
+        <div class="product-card spcProductCard_${watchedValues.tracking}">
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
@@ -1169,10 +1169,10 @@ const CreateComponent = () => {
           </div>
           <div class="product-card__details shopcomponent_product_card__details">
             <div class="product-card__info">
-              <h1 class="product-card__title">
+              <h2 class="product-card__title spcProductCardTitle_${watchedValues.tracking}">
                 <shopify-data query="product.title"></shopify-data>
-              </h1>
-              <div class="product-card__price">
+              </h2>
+              <div class="product-card__price spcProductCardPrice_${watchedValues.tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -1294,14 +1294,14 @@ const CreateComponent = () => {
 
 
     useEffect(() => {
-    if (window) {
-      window.addEventListener('popstate', function (event) {
-        reset(getValues());
-      });
-    }
-  }, []);
+        if (window) {
+            window.addEventListener('popstate', function (event) {
+                reset(getValues());
+            });
+        }
+    }, []);
 
-const loadingHtml = `
+    const loadingHtml = `
     <html>
       <head>
         <style>
@@ -1334,13 +1334,13 @@ const loadingHtml = `
     </html>
   `;
 
-  useEffect(() => {
-    setDelayedSrcDoc(loadingHtml);
-    const timer = setTimeout(() => {
-      setDelayedSrcDoc(scriptsAll + embedPHtmlCode);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [scriptsAll, embedPHtmlCode]);
+    useEffect(() => {
+        setDelayedSrcDoc(loadingHtml);
+        const timer = setTimeout(() => {
+            setDelayedSrcDoc(embedPHtmlCode);
+        }, 600);
+        return () => clearTimeout(timer);
+    }, [embedPHtmlCode]);
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -2426,7 +2426,7 @@ const loadingHtml = `
                                                                 <Box visuallyHidden={watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk"}>
                                                                     <BlockStack gap={'100'}>
                                                                         {/* <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text> */}
-                                                                        <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text> 
+                                                                        <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text>
                                                                         <Controller
                                                                             name="componentSettings.fullView"
                                                                             control={control}
@@ -2801,10 +2801,26 @@ const loadingHtml = `
                                     </InlineStack>
                                     <iframe
                                         title="spc-iframe"
-                                        srcDoc={delayedSrcDoc}
+                                        srcDoc={
+                                            `
+                                        <!DOCTYPE html>
+                                            <html>
+                                            <head>
+                                               
+                                                <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+         <script src="/shopcomponent/js/shopcomponent.js"></script>
+                                            </head>
+                                            <body>
+                                               ${delayedSrcDoc}
+                                            </body>
+                                            </html>
+                                        `
+                                        }
                                         style={{ width: '100%', height: '100vh', border: 'none' }}
                                         sandbox="allow-scripts allow-same-origin allow-popups"
                                         className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
+
+
                                     ></iframe>
 
                                     <Modal id="spc-modal" variant="max" onHide={() => {
@@ -2812,10 +2828,22 @@ const loadingHtml = `
                                     }}>
                                         <iframe
                                             title="spc-iframe"
-                                            srcDoc={delayedSrcDoc}
+                                            srcDoc={
+                                            `
+                                        <!DOCTYPE html>
+                                            <html>
+                                            <head>
+                                            ${scriptsAll}
+                                            </head>
+                                            <body>
+                                               ${delayedSrcDoc}
+                                            </body>
+                                            </html>
+                                        `
+                                        }
                                             style={{ width: '100%', height: "100vh", border: 'none' }}
                                             sandbox="allow-scripts allow-same-origin allow-popups"
-                                            className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe`}
+                                            className={`spc_iframe_view_${selectedViewMDF.view} spc_iframe spc-iframeModal`}
                                         ></iframe>
                                     </Modal>
                                     <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
