@@ -1379,7 +1379,7 @@ const UpdateComponent = () => {
     }, 600);
     return () => clearTimeout(timer);
   }, [ embedPHtmlCode]);
-
+console.log('component:',component);
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
       <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1750,7 +1750,7 @@ const UpdateComponent = () => {
 
                       }
                       {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "individual" &&
-                        <Box>
+                        <Box className="Polaris-Box Individual">
                           <Box padding={'300'}>
                             <InlineStack blockAlign="center" align="space-between">
                               <Controller
@@ -1823,7 +1823,7 @@ const UpdateComponent = () => {
 
                       }
                       {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk" &&
-                        <Box>
+                        <Box className="Polaris-Box Bulk">
                           <Box padding={'300'}>
                             <InlineStack blockAlign="center" align="space-between">
                               <Controller
@@ -1881,7 +1881,7 @@ const UpdateComponent = () => {
                             <BlockStack gap={'400'}>
 
                               {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
-                                <Box key={product.id}>
+                                <Box key={product.id} >
                                   <InlineStack align="space-between" blockAlign="center">
                                     <InlineStack gap={'200'} blockAlign="center">
                                       <Thumbnail size="small" source={product?.image ? product?.image : 'https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'}
