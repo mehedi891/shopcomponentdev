@@ -1656,12 +1656,12 @@ const CreateComponent = () => {
 
                                                     <Box paddingBlock={'400'} paddingInline={'300'}>
                                                         <BlockStack gap={'300'}>
-                                                            {selectedCollection?.length > 0 && selectedCollection.map((item) => {
+                                                            {selectedCollection?.length > 0 && selectedCollection?.map((item) => {
                                                                 return <InlineStack key={item.id} blockAlign="center" align="space-between">
                                                                     <InlineStack blockAlign="center" gap={'200'}>
                                                                         <Thumbnail
-                                                                            source={item.image ? item.image : ''}
-                                                                            alt={item.handle}
+                                                                            source={item?.image ? item?.image : '/images/noImage.png'}
+                                                                            alt={item?.handle+'kkk'}
                                                                             size="small"
                                                                         />
                                                                         <Text fontWeight="medium">{item.title}</Text>
@@ -2806,9 +2806,7 @@ const CreateComponent = () => {
                                         <!DOCTYPE html>
                                             <html>
                                             <head>
-                                               
-                                                <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
-         <script src="/shopcomponent/js/shopcomponent.js"></script>
+                                               ${scriptsAll}
                                             </head>
                                             <body>
                                                ${delayedSrcDoc}
@@ -2852,7 +2850,7 @@ const CreateComponent = () => {
                                         </InlineStack>
                                     </Box>
                                 </Card>
-                                <Box paddingBlockStart={'200'}>
+                                <Box paddingBlockStart={'400'}>
                                     <Text alignment="center" fontWeight="medium" variant="bodyLg">Done configuring? Copy code → Paste into an HTML/Custom Code block → Publish. Your component is live.</Text>
                                 </Box>
                             </Box>

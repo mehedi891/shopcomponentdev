@@ -1379,7 +1379,7 @@ const UpdateComponent = () => {
     }, 600);
     return () => clearTimeout(timer);
   }, [ embedPHtmlCode]);
-console.log('component:',component);
+
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
       <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1708,7 +1708,7 @@ console.log('component:',component);
                                 return <InlineStack key={item.id} blockAlign="center" align="space-between">
                                   <InlineStack blockAlign="center" gap={'200'}>
                                     <Thumbnail
-                                      source={item.image ? item.image : ''}
+                                      source={item.image ? item.image : '/images/noImage.png'}
                                       alt={item.handle}
                                       size="small"
                                     />
@@ -2886,7 +2886,7 @@ console.log('component:',component);
                     </InlineStack>
                   </Box>
                 </Card>
-                <Box paddingBlockStart={'200'}>
+                <Box paddingBlockStart={'400'}>
                   <Text alignment="center" fontWeight="medium" variant="bodyLg">Done configuring? Copy code → Paste into an HTML/Custom Code block → Publish. Your component is live.</Text>
                 </Box>
               </Box>

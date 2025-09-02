@@ -322,18 +322,7 @@ export default function Index() {
                     }
 
 
-                    {shopData?.plan?.planName === 'Free' && components?.length > 0 ?
-                      <Button
-                        icon={LockFilledIcon}
-                        tone="critical"
-                        variant="tertiary"
-                        disabled
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          //handleDeleteComponent(id);
-                        }}
-                      >Delete</Button>
-                      :
+                 
                       <Box>
                         <Button
                           icon={DeleteIcon}
@@ -342,32 +331,36 @@ export default function Index() {
                           onClick={(e) => {
                             e.stopPropagation();
                             //handleDeleteComponent(id);
-                            
+
                             shopify.modal.show(`delete-confirmation-modal_${id}`);
-                           
+
                           }}
                         >Delete</Button>
-                        <Modal id={`delete-confirmation-modal_${id}`}>
-                          <Box paddingInline={'300'} paddingBlock={'200'}>
-                            <Text tone="caution" variant="bodyLg" fontWeight="medium">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
+                        <Modal  id={`delete-confirmation-modal_${id}`}>
+                          <Box paddingInline={'300'} paddingBlock={'200'} onClick={(e)=>{e.stopPropagation()}}>
+                            <Text tone="caution" variant="bodyLg">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
                             <Box paddingBlockStart={'400'} paddingBlockEnd={'400'}>
-                              <InlineStack gap={'200'}>
-                                <Button tone={"critical"}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteComponent(id);
-                                  }}
-                                  variant="primary">Delete component</Button>
-                                <Button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDisableStatus(id, status);
-                                  }}
-                                  variant="secondary">Disable instead</Button>
+                              <InlineStack gap={'200'} align="space-between">
                                 <Button variant="tertiary" onClick={(e) => {
                                   e.stopPropagation();
                                   shopify.modal.hide(`delete-confirmation-modal_${id}`);
                                 }}>Cancel</Button>
+                                <InlineStack gap={'150'} blockAlign="center">
+                                  {status === 'activate' &&
+                                  <Button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDisableStatus(id, status);
+                                    }}
+                                    variant="secondary">Disable instead</Button>
+                                  }
+                                  <Button tone={"critical"}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteComponent(id);
+                                    }}
+                                    variant="primary">Delete component</Button>
+                                </InlineStack>
                               </InlineStack>
                             </Box>
                           </Box>
@@ -378,7 +371,7 @@ export default function Index() {
 
                         </Modal>
                       </Box>
-                    }
+                    
                   </BlockStack>
                 </Card>
               </Box>

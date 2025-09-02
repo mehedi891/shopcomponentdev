@@ -52,7 +52,7 @@ export const loader = async ({ request }) => {
       jsonResponse = new Response(JSON.stringify({
         data: {},
         success: false,
-        message: "Something went wrong",
+        message: "ShopComponent is disabled",
         status: 401
       }));
     }
