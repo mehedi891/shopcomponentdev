@@ -102,7 +102,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
         : [];
 
 
-    console.log(enableQtyVariants);
+    //console.log(enableQtyVariants);
 
 
     if (cartBehavior === 'cart') {
@@ -295,7 +295,7 @@ async function cartLineAddFnc(existCartId, shop, accessToken, variants) {
     });
 
     const data = await res.json();
-    console.log(data);
+    //console.log(data);
     if (data.data.cartLinesAdd.userErrors.length) {
       console.log("error", data.data.cartLinesAdd.userErrors);
       return {
@@ -303,7 +303,7 @@ async function cartLineAddFnc(existCartId, shop, accessToken, variants) {
         success: false
       }
     } else {
-      console.log('Cart updated:', data.data.cartLinesAdd.cart);
+      //console.log('Cart updated:', data.data.cartLinesAdd.cart);
       // Store the cart ID and checkout URL in localStorage
       localStorage.setItem('__shopify:cartId', data.data.cartLinesAdd.cart.id);
       localStorage.setItem('shopcomponent_cartId', data.data.cartLinesAdd.cart.id);
@@ -492,7 +492,7 @@ function waitForElement(selector, callback) {
 window.addEventListener('DOMContentLoaded', () => {
   waitForElement('.shopcomponent_cart_count_qty', () => {
     const cartCountAll = document.querySelectorAll('.shopcomponent_cart_count_qty');
-    console.log('cartCountAll', cartCountAll);
+    //console.log('cartCountAll', cartCountAll);
     if (cartCountAll?.length > 0) {
       cartCountAll.forEach(cartCount => {
         // if text isn't a number, force to "0"
@@ -509,6 +509,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-console.log('loaded shopcomponent iooi');
+//console.log('loaded shopcomponent iooi');
 
 
