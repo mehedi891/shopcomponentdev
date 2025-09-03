@@ -1,8 +1,9 @@
-import { useActionData, useLoaderData, useLocation, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
-import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
+import { useActionData, useLoaderData, useLocation, useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react";
+import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail, Tooltip } from "@shopify/polaris"
 import {
   DeleteIcon,
   DesktopIcon,
+  InfoIcon,
   MobileIcon,
   SearchIcon,
   ViewportWideIcon,
@@ -68,6 +69,7 @@ const UpdateComponent = () => {
   const actionData = useActionData();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [toogleBtnDisabled, setToogleBtnDisabled] = useState(false);
   const [toogleOpen, setToogleOpen] = useState({
     titleAndDescToggleOpen: true,
@@ -118,6 +120,7 @@ const UpdateComponent = () => {
   const [checkMaxSelectedVariants, setCheckMaxSelectedVariants] = useState(false);
   const params = new URLSearchParams(location.search);
   const [showNewCreatedBanner, setShowNewCreatedBanner] = useState(params.get("new_created") === "true");
+  const [showCopyCodeBanner, setShowCopyCodeBanner] = useState(false);
   const navigation = useNavigation();
   const shopify = useAppBridge();
 
@@ -471,6 +474,16 @@ const UpdateComponent = () => {
       setToogleBtnDisabled(false);
     }
   }, [watchedValues, component]);
+
+
+  useEffect(() => {
+    const isLocalStorage = localStorage.getItem('scpCopyBannerShow') || '';
+    if (isLocalStorage === 'false') {
+      setShowCopyCodeBanner(false);
+    } else {
+      setShowCopyCodeBanner(true);
+    }
+  }, []);
 
   //Start webcomponents 
 
@@ -1388,6 +1401,14 @@ const UpdateComponent = () => {
     return () => clearTimeout(timer);
   }, [embedPHtmlCode]);
 
+
+
+  useEffect(() => {
+    if (searchParams.toString()) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
+
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
       <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -1446,6 +1467,7 @@ const UpdateComponent = () => {
 
                   </InlineStack>
                 </Banner>
+
               </Layout.Section>
             }
 
@@ -2822,6 +2844,26 @@ const UpdateComponent = () => {
             </Layout.Section>
 
             <div className="Polaris-Layout__Section previewSectionSticky">
+              {showCopyCodeBanner &&
+                <Box paddingBlockEnd={'300'}>
+                  <Banner
+
+                    onDismiss={() => {
+                      setShowCopyCodeBanner(false);
+                      localStorage.setItem('scpCopyBannerShow', 'false')
+                    }}
+                    hideIcon
+                  >
+                    <Box>
+
+                      <Text>Done configuring? Copy code → Paste into an HTML/Custom Code block (where you want to show the component) → Publish. Your component is live.
+                        <Text as="span" tone='magic'><Link removeUnderline> <span style={{ paddingLeft: '10px' }}>Learn more</span></Link></Text> </Text>
+
+                    </Box>
+
+                  </Banner>
+                </Box>
+              }
               <Box>
                 <Card padding={'0'} roundedAbove="xs">
                   <InlineStack align="space-between" blockAlign="center">
@@ -2844,8 +2886,18 @@ const UpdateComponent = () => {
                       </Box>
                     </Box>
                     <Box paddingBlockStart={'300'} paddingInlineEnd={'300'}>
-                      <Button disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      <InlineStack blockAlign="center" gap={'200'}>
+                        <Tooltip dismissOnMouseOut  padding="400" content="Done configuring? Copy code → Paste into an HTML/Custom Code block (where you want to show the component) → Publish. Your component is live.">
+                          <Box maxWidth="30px">
+                            <Icon
+                              source={InfoIcon}
+                            />
+                          </Box>
+                        </Tooltip>
+                        <Button disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      </InlineStack>
                     </Box>
+
 
                   </InlineStack>
                   <iframe
@@ -2874,7 +2926,7 @@ const UpdateComponent = () => {
                   <Modal id="spc-modal" variant="max" onHide={() => {
                     setSelectedViewMDF({ id: 2, view: 'desktop' })
                   }}>
-                    
+
                     <iframe
                       title="spc-iframe"
                       srcDoc={
@@ -2898,7 +2950,7 @@ const UpdateComponent = () => {
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                     <InlineStack align="end">
-                      <Button variant="primary" disabled={isDirty || watchedValues.status === 'deactivate'|| (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      <Button variant="primary" disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </InlineStack>
                   </Box>
                 </Card>
