@@ -149,7 +149,7 @@ export const loader = async ({ request }) => {
 const Plans = () => {
   const { shopData, shopInfo, appSubscriptions, trialDaysOffer, node_env } = useLoaderData();
   const fetcher = useFetcher();
-  console.log('appSubscriptions:', appSubscriptions);
+  //console.log('appSubscriptions:', appSubscriptions);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const [remainTrialDays, setRemainTrialDays] = useState(0);
@@ -457,7 +457,7 @@ export const action = async ({ request }) => {
       returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/?isFirstInstall=true`;
     }
 
-    console.log('returnURL:', returnURL);
+    //console.log('returnURL:', returnURL);
 
 
 

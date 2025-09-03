@@ -8,7 +8,7 @@ export const action = async ({ request }) => {
 
   switch (topic) {
     case "CUSTOMERS_DATA_REQUEST":
-      console.log('CUSTOMERS_DATA_REQUEST');
+      console.log('CUSTOMERS_DATA_REQUEST',shop);
       return new Response("Request received to view stored customer data", { status: 200 });
 
     case "CUSTOMERS_REDACT":

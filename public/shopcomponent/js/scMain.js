@@ -12,6 +12,10 @@ async function addToCartNcheckoutIndProduct(event, accessToken, shop, tracingCod
   const shoppingCartClone = shoppingCart.cloneNode(true);
   const CART_EVENT = 'shopify:cartData';
 
+  showLoading(event.target, true);
+
+  
+
   const selectedVariant = [
     {
       merchandiseId: variantId,
@@ -58,6 +62,8 @@ async function addToCartNcheckoutIndProduct(event, accessToken, shop, tracingCod
         }
         catch (error) {
           console.log('Someting went wrong to adding Existing cart');
+        }finally {
+          showLoading(event.target, false);
         }
 
       } else {
@@ -77,6 +83,8 @@ async function addToCartNcheckoutIndProduct(event, accessToken, shop, tracingCod
           }
         } catch (error) {
           console.log('Someting went wrong to add to cart');
+        }finally {
+          showLoading(event.target, false);
         }
       }
 
@@ -85,7 +93,7 @@ async function addToCartNcheckoutIndProduct(event, accessToken, shop, tracingCod
     const variantIdNum = variantId.replace('gid://shopify/ProductVariant/', '');
     const checkoutUrl = `https://${shop}/cart/${variantIdNum}:1?access_token=${accessToken}&attributes[SC_custom_tracking]=${customertackingCode}&attributes[shopcomponent_tracking]=${tracingCode}&ref=shopcomponent`;
     window.location.href = checkoutUrl;
-    //console.log(variantIdNum);
+    showLoading(event.target, false);
   } else {
     console.log('Method not found');
   }
@@ -106,6 +114,8 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
   const shoppingCartClone = shoppingCart.cloneNode(true);
   const CART_EVENT = 'shopify:cartData';
 
+  showLoading(event.target, true);
+
   if (isQtyEnaled) {
     const qtyFileds = mostParentContainer.querySelectorAll('.shopcomponent_variants_bulk_enable_quantity_input');
     const enableQtyVariants =
@@ -119,11 +129,12 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
         : [];
 
 
-    console.log(enableQtyVariants);
+    //console.log(enableQtyVariants);
 
 
     if (cartBehavior === 'cart') {
       if (enableQtyVariants.length === 0) {
+        showLoading(event.target, false);
         return alert('Please select at least one quantity');
       };
       if (isExistCart) {
@@ -157,6 +168,8 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
         }
         catch (error) {
           console.log('Someting went wrong to adding Existing cart');
+        }finally {
+          showLoading(event.target, false);
         }
       } else {
         try {
@@ -174,6 +187,8 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
           }
         } catch (error) {
           console.log('Someting went wrong to add to cart');
+        }finally {
+          showLoading(event.target, false);
         }
       }
     } else {
@@ -186,6 +201,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
       });
       const checkoutUrl = `https://${shop}/cart/${checkoutVariants.join(',')}?access_token=${accessToken}&attributes[SC_custom_tracking]=${customertackingCode}&attributes[shopcomponent_tracking]=${tracingCode}&ref=shopcomponent`;
       window.location.href = checkoutUrl;
+      showLoading(event.target, false);
     }
 
   } else {
@@ -231,6 +247,8 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
           }
           catch (error) {
             console.log('Someting went wrong to adding Existing cart');
+          }finally {
+            showLoading(event.target, false);
           }
         } else {
 
@@ -250,6 +268,8 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
             }
           } catch (error) {
             console.log('Someting went wrong to add to cart');
+          }finally {
+            showLoading(event.target, false);
           }
         }
       } else {
@@ -261,6 +281,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
         //console.log(checkoutVariants.join(','));
         const checkoutUrl = `https://${shop}/cart/${checkoutVariants.join(',')}?access_token=${accessToken}&attributes[SC_custom_tracking]=${customertackingCode}&attributes[shopcomponent_tracking]=${tracingCode}&ref=shopcomponent`;
         window.location.href = checkoutUrl;
+        showLoading(event.target, false);
       }
 
     }
@@ -335,7 +356,7 @@ async function cartLineAddFnc(existCartId, shop, accessToken, variants) {
     });
 
     const data = await res.json();
-    console.log(data);
+    //console.log(data);
     if (data.data.cartLinesAdd.userErrors.length) {
       console.log("error", data.data.cartLinesAdd.userErrors);
       return {
@@ -343,7 +364,7 @@ async function cartLineAddFnc(existCartId, shop, accessToken, variants) {
         success: false
       }
     } else {
-      console.log('Cart updated:', data.data.cartLinesAdd.cart);
+      //console.log('Cart updated:', data.data.cartLinesAdd.cart);
       // Store the cart ID and checkout URL in localStorage
       localStorage.setItem('__shopify:cartId', data.data.cartLinesAdd.cart.id);
       localStorage.setItem('shopcomponent_cartId', data.data.cartLinesAdd.cart.id);
@@ -437,7 +458,7 @@ async function cartCreateFnc(shop, accessToken, variants, tracingCode, customert
     if (data.data.cartCreate.userErrors.length) {
       console.error('Errors:', data.data.cartCreate.userErrors);
     } else {
-      console.log('Cart created:', data.data.cartCreate.cart);
+     // console.log('Cart created:', data.data.cartCreate.cart);
 
       // Store the cart ID and checkout URL in localStorage
       localStorage.setItem('__shopify:cartId', data.data.cartCreate.cart.id);
@@ -482,7 +503,7 @@ const originalFetch = window.fetch.bind(window);
 window.fetch = async (...args) => {
   const [resource, config] = args;
   const response = await originalFetch(...args);
-  console.log('response.....', resource);
+  //console.log('response.....', resource);
   try {
     if (config?.body) {
       const body = JSON.parse(config.body);
@@ -529,18 +550,27 @@ function initialCartCount() {
     const shoppingCart = document.querySelectorAll('shopify-cart');
     shoppingCart.forEach(shoppingCart => {
       shoppingCart.addEventListener("shopify:cartData", (event) => {
-        console.log('response', event.detail);
+        //console.log('response', event.detail);
         cartCountAll.forEach(cartCount => {
           // if text isn't a number, force to "0"
-          if (!Number(cartCount.innerText)) {
-            cartCount.innerText = event?.detail?.totalQuantity;
+          // if (!Number(cartCount.innerText)) {
+          //   cartCount.innerText = event?.detail?.totalQuantity;
+          // }
+
+          cartCount.innerText = event?.detail?.totalQuantity;
+          if(event?.detail?.totalQuantity === 0){
+            cartCount.closest('.shopcomponent_cart_count').style.display = 'none';
+          }else{
+            cartCount.closest('.shopcomponent_cart_count').style.display = 'flex';
           }
+
         });
       });
     })
 
   }
 }
+
 
 
 
@@ -555,7 +585,7 @@ function dispatchCartUpdate(cart) {
     detail: cart,
   });
 
-  console.log('cart dispact');
+  //console.log('cart dispact');
 
   if (shoppingCart) {
     shoppingCart.forEach(shoppingCart => {
@@ -632,7 +662,23 @@ function poweredByAddFnc(planName = 'Free', shop) {
 
 }
 
+function showLoading (btn,isLoading) {
+    if (isLoading) {
+      btn.classList.add('loading');
+    } else {
+      setTimeout(() => {
+        btn.classList.remove('loading');
+      },500)
+    }
+}
 
-console.log('Shopcomponent loaded..');
+
+console.log(
+  "%c  ShopComponent app loaded.. ",
+  "background: linear-gradient(90deg, #4facfe, #00f2fe); color: white; font-weight: bold; font-size: 16px; padding: 6px 14px 6px 12px; border-radius: 6px; display: inline-block;"
+);
+
+
+
 
 

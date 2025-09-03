@@ -29,17 +29,17 @@ export const loader = async ({ request }) => {
   const { session, admin, billing, redirect } = await authenticate.admin(request);
   const { hasActivePayment, appSubscriptions } = await billing.check();
 
-  const shopResponse = await admin.graphql(
-    `#graphql
-            query shopInfo{
-                shop{
-                  id
-                }
-        }`,
+  // const shopResponse = await admin.graphql(
+  //   `#graphql
+  //           query shopInfo{
+  //               shop{
+  //                 id
+  //               }
+  //       }`,
 
-  );
+  // );
 
-  const shop = await shopResponse.json();
+  // const shop = await shopResponse.json();
   let shopData = await db.shop.findUnique({
     where: {
       shopifyDomain: session.shop

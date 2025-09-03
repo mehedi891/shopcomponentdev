@@ -59,6 +59,7 @@ export async function loader({ request }) {
     locale = handle.lng;
     ns = handle.i18n;
   }
+  console.log('from loaderrrrrrrrr');
   return { locale: locale, ns: ns };
 }
 

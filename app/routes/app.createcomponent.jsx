@@ -1,5 +1,5 @@
 import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
-import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
+import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
 import {
     DeleteIcon,
     DesktopIcon,
@@ -1710,7 +1710,7 @@ const CreateComponent = () => {
                                                         control={control}
                                                         render={({ field }) => (
                                                             <Select
-                                                                label={t("add_to_cart_type")}
+                                                                label={watchedValues.componentSettings.cartBehavior === 'cart' ? t("add_to_cart_type") : 'Checkout type'}
                                                                 options={[
                                                                     { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("individual_add_to_cart") : 'Individual Checkout', value: 'individual' },
                                                                     { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}

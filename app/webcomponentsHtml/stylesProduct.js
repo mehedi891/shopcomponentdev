@@ -166,6 +166,35 @@ const stylesPdT1 = `
     justify-content: center;
   }
   }
+
+
+.product-card__add-button.loading {
+  position: relative;
+  color: transparent;    
+  pointer-events: none;       
+}
+
+.product-card__add-button.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;  
+  border: 2px solid #fff;
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
 </style>
 `
 

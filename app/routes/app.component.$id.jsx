@@ -1,7 +1,6 @@
 import { useActionData, useLoaderData, useLocation, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail } from "@shopify/polaris"
 import {
-  ArrowLeftIcon,
   DeleteIcon,
   DesktopIcon,
   MobileIcon,
@@ -126,7 +125,7 @@ const UpdateComponent = () => {
   const { t } = useTranslation();
 
 
-  const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
+  const { setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
     defaultValues: {
       title: component?.title || '',
       description: component?.description || '',
@@ -237,7 +236,7 @@ const UpdateComponent = () => {
       return;
     }
     const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings), compHtml: embedPHtmlCode };
-    console.log(updatedData);
+    //console.log(updatedData);
     submit(updatedData, { method: 'patch' });
     setShowNewCreatedBanner(false);
   };
@@ -1437,7 +1436,7 @@ const UpdateComponent = () => {
                     </Button>
                     <Button variant="plain" onClick={() => navigate(`/app`)}><Link>Component list</Link>
                     </Button>
-                    <Button variant="plain" disabled={isDirty || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
+                    <Button variant="plain" disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
                     </Button>
 
                   </InlineStack>
@@ -1740,7 +1739,7 @@ const UpdateComponent = () => {
                             control={control}
                             render={({ field }) => (
                               <Select
-                                label={t("add_to_cart_type")}
+                                label={watchedValues.componentSettings.cartBehavior === 'cart' ? t("add_to_cart_type") : 'Checkout type'}
                                 options={[
                                   { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("individual_add_to_cart") : 'Individual Checkout', value: 'individual' },
                                   { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}
@@ -2840,7 +2839,7 @@ const UpdateComponent = () => {
                       </Box>
                     </Box>
                     <Box paddingBlockStart={'300'} paddingInlineEnd={'300'}>
-                      <Button disabled={isDirty || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      <Button disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </Box>
 
                   </InlineStack>
@@ -2894,7 +2893,7 @@ const UpdateComponent = () => {
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                     <InlineStack align="end">
-                      <Button variant="primary" disabled={isDirty || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      <Button variant="primary" disabled={isDirty || watchedValues.status === 'deactivate'|| (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </InlineStack>
                   </Box>
                 </Card>

@@ -29,7 +29,7 @@ export const loader = async ({ request }) => {
 }
 
 const Getsupport = () => {
-  const { shopData } = useLoaderData();
+  //const { shopData } = useLoaderData();
   //console.log(shopData);
   const navigation = useNavigation();
   const navigate = useNavigate();

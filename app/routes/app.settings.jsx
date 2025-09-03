@@ -1,4 +1,4 @@
-import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigation } from "@remix-run/react";
 import { BlockStack, Box, Card, InlineStack, Layout, Page, RadioButton, Text } from "@shopify/polaris"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 
@@ -30,7 +30,6 @@ export const loader = async ({ request }) => {
 const Settings = () => {
     const { shopData } = useLoaderData();
     const shopify = useAppBridge();
-    const navigate = useNavigate();
     const navigation = useNavigation();
     const fetcher = useFetcher();
     const [disableApp, setDisableApp] = useState(

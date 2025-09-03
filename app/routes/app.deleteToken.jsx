@@ -1,4 +1,4 @@
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Button, Card, Layout, Page } from "@shopify/polaris"
 import { authenticate } from "../shopify.server";
 export const loader = async ({ request }) => {
