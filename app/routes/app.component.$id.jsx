@@ -1286,7 +1286,7 @@ const UpdateComponent = () => {
 
   const scriptsAll = `
          <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
-         <script src="/shopcomponent/js/shopcomponent.js"></script>
+         <script src="/shopcomponent/js/shopcomponent.js?v2.11"></script>
     `;
 
   const copyCode = `

@@ -397,7 +397,7 @@ async function cartCreateFnc(shop, accessToken, variants, tracingCode,customerta
     if (data.data.cartCreate.userErrors.length) {
       console.error('Errors:', data.data.cartCreate.userErrors);
     } else {
-      console.log('Cart created:', data.data.cartCreate.cart);
+      //console.log('Cart created:', data.data.cartCreate.cart);
 
       // Store the cart ID and checkout URL in localStorage
       localStorage.setItem('__shopify:cartId', data.data.cartCreate.cart.id);

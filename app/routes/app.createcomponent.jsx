@@ -1279,27 +1279,11 @@ const CreateComponent = () => {
     }
 
 
-    const scriptsAll = `
-  <script>
-    (function injectOnce(src) {
-      if (!document.querySelector('script[src="' + src + '"]')) {
-        var s = document.createElement("script");
-        s.src = src;
-        s.async = false; // keep execution order
-        document.head.appendChild(s);
-      }
-    })("https://cdn.shopify.com/storefront/web-components.js");
-
-    (function injectOnce(src) {
-      if (!document.querySelector('script[src="' + src + '"]')) {
-        var s = document.createElement("script");
-        s.src = src;
-        s.async = false;
-        document.head.appendChild(s);
-      }
-    })("/shopcomponent/js/shopcomponent.js");
-  </script>
-`;
+  
+  const scriptsAll = `
+         <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+         <script src="/shopcomponent/js/shopcomponent.js?v2.11"></script>
+    `;
 
 
 
