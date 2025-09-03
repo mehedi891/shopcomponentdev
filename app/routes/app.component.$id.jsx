@@ -2857,7 +2857,8 @@ const UpdateComponent = () => {
                     <Box>
 
                       <Text>Done configuring? Copy code → Paste into an HTML/Custom Code block (where you want to show the component) → Publish. Your component is live.
-                        <Text as="span" tone='magic'><Link removeUnderline> <span style={{ paddingLeft: '10px' }}>Learn more</span></Link></Text> </Text>
+                        {/* <Text as="span" tone='magic'><Link removeUnderline> <span style={{ paddingLeft: '10px' }}>Learn more</span></Link></Text>  */}
+                        </Text>
 
                     </Box>
 
