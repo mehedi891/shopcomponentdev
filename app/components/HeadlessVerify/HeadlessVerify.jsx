@@ -79,7 +79,7 @@ const HeadlessVerify = ({ showBanner = true, defaultToken = '',pageName='others'
                       </TitleBar>
                       <Box>
                         <InlineStack>
-                          <iframe width="100%" height="400px" src="https://www.youtube.com/embed/YcgdmX0iWVk?si=7_HS2qDgbBzXuvKR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                          <iframe width="100%" height="400px" src="https://www.youtube.com/embed/0T44_gFo0TI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         </InlineStack>
                       </Box>
                     </Modal>
