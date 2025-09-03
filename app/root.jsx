@@ -59,7 +59,7 @@ export async function loader({ request }) {
     locale = handle.lng;
     ns = handle.i18n;
   }
-  console.log('from loaderrrrrrrrr');
+  //console.log('from loaderrrrrrrrr');
   return { locale: locale, ns: ns };
 }
 
@@ -104,7 +104,6 @@ export default function App() {
       <body>
         <Outlet />
         <ScrollRestoration />
-     
         <Scripts />
       </body>
     </html>

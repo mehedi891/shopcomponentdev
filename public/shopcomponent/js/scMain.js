@@ -663,20 +663,34 @@ function poweredByAddFnc(planName = 'Free', shop) {
 }
 
 function showLoading (btn,isLoading) {
+  const btnToLoad = btn.closest('.product-card__add-button');
     if (isLoading) {
-      btn.classList.add('loading');
+      btnToLoad.classList.add('loading');
     } else {
       setTimeout(() => {
-        btn.classList.remove('loading');
+        btnToLoad.classList.remove('loading');
       },500)
     }
 }
 
 
 console.log(
-  "%c  ShopComponent app loaded.. ",
-  "background: linear-gradient(90deg, #4facfe, #00f2fe); color: white; font-weight: bold; font-size: 16px; padding: 6px 14px 6px 12px; border-radius: 6px; display: inline-block;"
+  "%c ShopComponent app loaded.. ",
+  `background: linear-gradient(
+    135deg,
+    #FDDDE6 0%,
+    #F4B7FF 25%,
+    #B499FF 50%,
+    #9AC5FF 75%,
+    #FFE4B5 100%
+  ); 
+  color: white; 
+  font-weight: bold; 
+  font-size: 16px; 
+  padding: 6px 14px; 
+  border-radius: 6px;`
 );
+
 
 
 
