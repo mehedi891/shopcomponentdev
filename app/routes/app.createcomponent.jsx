@@ -724,7 +724,9 @@ const CreateComponent = () => {
                 onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                ${watchedValues.buttonStyleSettings.addToCartBtnTxt}
+               
+                <span class="spcBtn_txt">${watchedValues.buttonStyleSettings.addToCartBtnTxt}</span>
+                 <span class="spcBtn_outOfStock">Out of stock</span>
               </button>
     ` :
         `
@@ -733,7 +735,8 @@ const CreateComponent = () => {
                 onclick="addToCartNcheckoutIndProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                ${watchedValues.buttonStyleSettings.addToCartBtnTxt}
+                <span class="spcBtn_txt">${watchedValues.buttonStyleSettings.addToCartBtnTxt}</span>
+                 <span class="spcBtn_outOfStock">Out of stock</span>
               </button>
     ` ;
 
@@ -743,7 +746,9 @@ const CreateComponent = () => {
                  onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                ${watchedValues.buttonStyleSettings.checkoutBtnTxt}
+                
+                <span class="spcBtn_txt">${watchedValues.buttonStyleSettings.checkoutBtnTxt}</span>
+                 <span class="spcBtn_outOfStock">Out of stock</span>
               </button>
     ` :
         `
@@ -752,7 +757,8 @@ const CreateComponent = () => {
                 onclick="addToCartNcheckoutIndProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                 ${watchedValues.buttonStyleSettings.checkoutBtnTxt}
+                  <span class="spcBtn_txt">${watchedValues.buttonStyleSettings.checkoutBtnTxt}</span>
+                 <span class="spcBtn_outOfStock">Out of stock</span>
               </button>
     `;
 

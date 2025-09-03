@@ -194,7 +194,15 @@ const stylesPdT1 = `
   }
 }
 
-
+.product-card__add-button:disabled .spcBtn_txt,
+.product-card__add-button .spcBtn_outOfStock {
+  display:none;
+}
+.product-card__add-button:disabled .spcBtn_outOfStock {
+  display:block;
+  color: red;
+  font-weight: bold;
+}
 </style>
 `
 

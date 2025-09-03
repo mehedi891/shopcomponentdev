@@ -1,17 +1,57 @@
 
     <!-------------- ShopComponent [https://shopcomponent.com/] app code start ---------->
 
-  <div id="shopcomponent-FOFFGJ1MSD"></div>
+  <div id="shopcomponent-AWAZGAMBYU"></div>
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
-      const isExistWebcomJs2 = document.querySelector('script[src="http://localhost:3000//api/webcompjs"]');
+      const isExistWebcomJs2 = document.querySelector('script[src="http://localhost:3000/api/webcompjs"]');
 
       if (!isExistWebcomJs2) {
         const scriptTag2 = document.createElement('script');
         scriptTag2.type = 'text/javascript';
         scriptTag2.id = 'shopcomponents-js';
-        scriptTag2.src = 'http://localhost:3000//api/webcompjs';
+        scriptTag2.src = 'http://localhost:3000/api/webcompjs';
+        document.head.appendChild(scriptTag2);
+      }
+      if (!isExistWebcomJs) {
+        const scriptTag = document.createElement('script');
+        scriptTag.type = 'module';
+        scriptTag.id = 'shopcomponents-webcomJs';
+        scriptTag.src = 'https://cdn.shopify.com/storefront/web-components.js';
+        document.body.appendChild(scriptTag);
+      }
+      const holder = document.getElementById('shopcomponent-AWAZGAMBYU');
+      if (holder) {
+        const response = await fetch('http://localhost:3000/api/component?id=18');
+        const data = await response.json();
+        if (data?.data?.compHtml) {
+          holder.innerHTML = data.data.compHtml;
+          localStorage.setItem('shopcomponentData', JSON.stringify({ plan: data?.data?.shop?.plan?.planName, shop: data?.data?.shop?.shopifyDomain }));
+        }
+      }
+     
+    })
+  </script>
+  <!-------------- ShopComponent app code end -------------->
+    
+
+
+
+
+    <!-------------- ShopComponent [https://shopcomponent.com/] app code start ---------->
+
+  <div id="shopcomponent-FOFFGJ1MSD"></div>
+  <script type="module">
+    window.addEventListener('DOMContentLoaded', async () => {
+      const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
+      const isExistWebcomJs2 = document.querySelector('script[src="http://localhost:3000/api/webcompjs"]');
+
+      if (!isExistWebcomJs2) {
+        const scriptTag2 = document.createElement('script');
+        scriptTag2.type = 'text/javascript';
+        scriptTag2.id = 'shopcomponents-js';
+        scriptTag2.src = 'http://localhost:3000/api/webcompjs';
         document.head.appendChild(scriptTag2);
       }
       if (!isExistWebcomJs) {
@@ -23,7 +63,7 @@
       }
       const holder = document.getElementById('shopcomponent-FOFFGJ1MSD');
       if (holder) {
-        const response = await fetch('http://localhost:3000//api/component?id=17');
+        const response = await fetch('http://localhost:3000/api/component?id=17');
         const data = await response.json();
         if (data?.data?.compHtml) {
           holder.innerHTML = data.data.compHtml;
