@@ -1,6 +1,7 @@
 import { useFetcher } from "@remix-run/react";
 import { Button, Card, Layout, Page } from "@shopify/polaris"
 import { authenticate } from "../shopify.server";
+//import db from '../db.server'
 export const loader = async ({ request }) => {
   const {admin} =await authenticate.admin(request);
 
@@ -30,6 +31,8 @@ export const loader = async ({ request }) => {
   const shop = await shopResponse.json();
 
   const storefrontAccessToken = shop.data.shop.storefrontAccessTokens.edges;
+
+
 
   return {
     storefrontAccessToken
