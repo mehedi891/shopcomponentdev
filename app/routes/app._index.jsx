@@ -258,133 +258,135 @@ export default function Index() {
 
           }
         </IndexTable.Cell>
-        <IndexTable.Cell flush>
-          <Popover
-            active={activePopoverId === id}
-            activator={
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePopoverActive(id);
-                }}
-                variant="tertiary"
-                size="large"
-                icon={MenuHorizontalIcon}
-              >
+        <IndexTable.Cell>
+          <BlockStack inlineAlign="center">
+            <Popover
+              active={activePopoverId === id}
+              activator={
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePopoverActive(id);
+                  }}
+                  variant="tertiary"
+                  size="large"
+                  icon={MenuHorizontalIcon}
+                >
 
-              </Button>
-            }
-            autofocusTarget="first-node"
-            onClose={togglePopoverActive}
-          >
-            <Popover.Pane>
-              <Box paddingBlockEnd={'0'}>
-                <Card padding={'300'}>
-                  <BlockStack align="start" inlineAlign="start" gap={'100'}>
-                    <Button
-                      icon={EditIcon}
-                      tone="success"
-                      variant="tertiary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/app/component/${id}`);
-                      }}
-                    >View/Edit</Button>
-
-                    <Button
-                      icon={status === 'activate' ? DisabledIcon : StatusActiveIcon}
-                      variant="tertiary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDisableStatus(id, status);
-                      }}
-                    >{status === 'activate' ? 'Deactivate' : 'Activate'}</Button>
-
-
-                    {shopData?.plan?.planName === 'Free' && components?.length > 0 ?
+                </Button>
+              }
+              autofocusTarget="first-node"
+              onClose={togglePopoverActive}
+            >
+              <Popover.Pane>
+                <Box paddingBlockEnd={'0'}>
+                  <Card padding={'300'}>
+                    <BlockStack align="start" inlineAlign="start" gap={'100'}>
                       <Button
-                        icon={LockFilledIcon}
-                        variant="tertiary"
-                        disabled
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          //handleDuplicateComponent(id);
-                        }}
-                      >{'Duplicate'}</Button>
-                      :
-                      <Button
-                        icon={DuplicateIcon}
+                        icon={EditIcon}
+                        tone="success"
                         variant="tertiary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDuplicateComponent(id);
+                          navigate(`/app/component/${id}`);
                         }}
-                      >{'Duplicate'}</Button>
-                    }
+                      >View/Edit</Button>
 
-
-
-                    <Box>
                       <Button
-                        icon={DeleteIcon}
-                        tone="critical"
+                        icon={status === 'activate' ? DisabledIcon : StatusActiveIcon}
                         variant="tertiary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          //handleDeleteComponent(id);
-
-                          shopify.modal.show(`delete-confirmation-modal_${id}`);
-
+                          handleDisableStatus(id, status);
                         }}
-                      >Delete</Button>
-                      <Modal id={`delete-confirmation-modal_${id}`}>
-                        <Box paddingInline={'300'} paddingBlock={'500'} onClick={(e) => { e.stopPropagation() }}>
-                          <Text variant="bodyLg">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
+                      >{status === 'activate' ? 'Deactivate' : 'Activate'}</Button>
 
-                        </Box>
 
-                        <Divider />
+                      {shopData?.plan?.planName === 'Free' && components?.length > 0 ?
+                        <Button
+                          icon={LockFilledIcon}
+                          variant="tertiary"
+                          disabled
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            //handleDuplicateComponent(id);
+                          }}
+                        >{'Duplicate'}</Button>
+                        :
+                        <Button
+                          icon={DuplicateIcon}
+                          variant="tertiary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicateComponent(id);
+                          }}
+                        >{'Duplicate'}</Button>
+                      }
 
-                        <Box paddingInline={'300'} paddingBlock={'300'}>
-                          <InlineStack gap={'200'} align="end">
-                            <Button variant="tertiary" onClick={(e) => {
-                              e.stopPropagation();
-                              shopify.modal.hide(`delete-confirmation-modal_${id}`);
-                            }}>Cancel</Button>
 
-                            {status === 'activate' &&
-                              <Button
+
+                      <Box>
+                        <Button
+                          icon={DeleteIcon}
+                          tone="critical"
+                          variant="tertiary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            //handleDeleteComponent(id);
+
+                            shopify.modal.show(`delete-confirmation-modal_${id}`);
+
+                          }}
+                        >Delete</Button>
+                        <Modal id={`delete-confirmation-modal_${id}`}>
+                          <Box paddingInline={'300'} paddingBlock={'500'} onClick={(e) => { e.stopPropagation() }}>
+                            <Text variant="bodyLg">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
+
+                          </Box>
+
+                          <Divider />
+
+                          <Box paddingInline={'300'} paddingBlock={'300'}>
+                            <InlineStack gap={'200'} align="end">
+                              <Button variant="tertiary" onClick={(e) => {
+                                e.stopPropagation();
+                                shopify.modal.hide(`delete-confirmation-modal_${id}`);
+                              }}>Cancel</Button>
+
+                              {status === 'activate' &&
+                                <Button
+                                  size="slim"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDisableStatus(id, status);
+                                  }}
+                                  variant="secondary">Disable instead</Button>
+                              }
+                              <Button tone={"critical"}
                                 size="slim"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDisableStatus(id, status);
+                                  handleDeleteComponent(id);
                                 }}
-                                variant="secondary">Disable instead</Button>
-                            }
-                            <Button tone={"critical"}
-                              size="slim"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteComponent(id);
-                              }}
-                              variant="primary">Delete component</Button>
+                                variant="primary">Delete component</Button>
 
-                          </InlineStack>
-                        </Box>
+                            </InlineStack>
+                          </Box>
 
-                        <TitleBar title="Delete component? Embeds may break" />
+                          <TitleBar title="Delete component? Embeds may break" />
 
 
 
-                      </Modal>
-                    </Box>
+                        </Modal>
+                      </Box>
 
-                  </BlockStack>
-                </Card>
-              </Box>
+                    </BlockStack>
+                  </Card>
+                </Box>
 
-            </Popover.Pane>
-          </Popover>
+              </Popover.Pane>
+            </Popover>
+          </BlockStack>
         </IndexTable.Cell>
       </IndexTable.Row>
     ),
@@ -464,7 +466,7 @@ export default function Index() {
                         { title: 'Applies to' },
                         { title: 'Add to cart type' },
                         { title: 'Status' },
-                        { title: '' },
+                        { title: 'Actions', alignment: 'center' },
                       ]}
                     >
                       {rowMarkup}
