@@ -175,7 +175,7 @@ export const loader = async ({ request }) => {
 export default function Index() {
   const shopify = useAppBridge();
   const { shopData, components } = useLoaderData();
-  //console.log('shopData', shopData);
+  //console.log('components', components);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -230,7 +230,7 @@ export default function Index() {
 
   const rowMarkup = components?.length > 0 && components?.map(
     (
-      { id, title, addToCartType, status, appliesTo },
+      { id, title, addToCartType, status, appliesTo, componentSettings,totalOrderCount,totalOrderValue },
       index,
     ) => (
       <IndexTable.Row
@@ -250,7 +250,33 @@ export default function Index() {
         </IndexTable.Cell>
 
         <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="semibold"> {addToCartType?.type === 'individual' ? t("individual_add_to_cart") : t("bulk_add_to_cart")}</Text>
+          <Text variant="bodyMd" fontWeight="semibold"> {addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? t("individual_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? t("bulk_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</Text>
+        </IndexTable.Cell>
+
+
+        <IndexTable.Cell className="sc-addToCartType">
+          <Box paddingInlineStart={'400'}><Text>{totalOrderCount}</Text></Box>
+        </IndexTable.Cell>
+
+        <IndexTable.Cell className="sc-addToCartType">
+          <Box paddingInlineStart={'300'}><Text>
+            {shopData?.currencyCode + ' ' 
+
+            }
+            {
+              // orders?.reduce((sum, r) => {
+              //   try {
+              //     const v = Number(JSON.parse(r.orderObj)?.current_total_price ?? 0);
+              //     return sum + (Number.isFinite(v) ? v : 0);
+              //   } catch {
+              //     return sum;
+              //   }
+              // }, 0)
+              //   .toFixed(2)
+
+              totalOrderValue
+            }
+          </Text></Box>
         </IndexTable.Cell>
 
         <IndexTable.Cell className="sc-addToCartType">
@@ -258,6 +284,7 @@ export default function Index() {
 
           }
         </IndexTable.Cell>
+
         <IndexTable.Cell>
           <BlockStack inlineAlign="center">
             <Popover
@@ -465,6 +492,8 @@ export default function Index() {
                         { title: 'Component Name' },
                         { title: 'Applies to' },
                         { title: 'Add to cart type' },
+                        { title: 'Total orders', alignment: 'start' },
+                        { title: 'Value', alignment: 'start' },
                         { title: 'Status' },
                         { title: 'Actions', alignment: 'center' },
                       ]}

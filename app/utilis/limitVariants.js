@@ -13,11 +13,17 @@
             }
             const variants = productInfo.variants || [];
 
+           
+
             if (remaining <= 0) {
                 return result;
             }
 
-            const slicedVariants = variants.slice(0, remaining).map(variant => {
+             const availableForSaleVariants = variants?.filter(variant => variant.availableForSale) || [];
+
+             //console.log('availableForSaleVariants', availableForSaleVariants);
+
+            const slicedVariants = availableForSaleVariants.slice(0, remaining).map(variant => {
                 // if(variant.availableForSale){
 
                 // }
@@ -26,7 +32,7 @@
                     id: variant.id,
                     quantity: 1,
                     availableForSale: variant.availableForSale,
-                    title: variant.title,
+                    title: variant.title === "Default Title" ? 'Quantity' : variant.title,
                     image: variant?.image ? variant?.image?.originalSrc : null
                 }
 

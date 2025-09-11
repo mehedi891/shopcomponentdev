@@ -25,6 +25,8 @@ import db from "../db.server";
 import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
+import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
+import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 
 export const loader = async ({ request, params }) => {
   const { id } = params;
@@ -1827,7 +1829,7 @@ const UpdateComponent = () => {
                             </Box>
                           )}
 
-                          <Box paddingBlock={'400'} paddingInline={'300'}>
+                          {/* <Box paddingBlock={'400'} paddingInline={'300'}>
                             <BlockStack gap={'300'}>
                               {selectedProductsInd?.length > 0 && selectedProductsInd?.map((product) => {
                                 return <InlineStack key={product.id} blockAlign="center" align="space-between">
@@ -1847,7 +1849,13 @@ const UpdateComponent = () => {
 
                               }
                             </BlockStack>
-                          </Box>
+                          </Box> */}
+
+                          <DraggableProductInd
+                            handleDeleteProductInd={handleDeleteProductInd}
+                            setSelectedProductsInd={setSelectedProductsInd}
+                            selectedProductsInd={selectedProductsInd}
+                          />
 
                         </Box>
 
@@ -1929,9 +1937,9 @@ const UpdateComponent = () => {
 
 
                           <Box paddingBlock={'400'} paddingInline={'300'}>
-                            <BlockStack gap={'400'}>
 
-                              {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
+
+                            {/* {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
                                 <Box key={product.id} >
                                   <InlineStack align="space-between" blockAlign="center">
                                     <InlineStack gap={'200'} blockAlign="center">
@@ -1996,15 +2004,22 @@ const UpdateComponent = () => {
                               ))
 
 
-                              }
-                              <Box paddingBlockStart={'200'}>
-                                <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
-                                  <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
-                                </Box>
+                              } */}
+
+                            <DraggableProductBulk
+                              handleChangeQuantityDefault={handleChangeQuantityDefault}
+                              handleDeleteProductBulk={handleDeleteProductBulk}
+                              selectedProductsBulk={selectedProductsBulk}
+                              setSelectedProductsBulk={setSelectedProductsBulk}
+                              watchedValues={watchedValues}
+
+                            />
+                            <Box paddingBlockStart={'200'}>
+                              <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
+                                <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
                               </Box>
+                            </Box>
 
-
-                            </BlockStack>
                           </Box>
                         </Box>
                       }
@@ -2332,7 +2347,9 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}>
+                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}
+                  aria-hidden={watchedValues.componentSettings.cartBehavior === 'checkout'}
+                >
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2858,7 +2875,7 @@ const UpdateComponent = () => {
 
                       <Text>Done configuring? Copy code → Paste into an HTML/Custom Code block (where you want to show the component) → Publish. Your component is live.
                         {/* <Text as="span" tone='magic'><Link removeUnderline> <span style={{ paddingLeft: '10px' }}>Learn more</span></Link></Text>  */}
-                        </Text>
+                      </Text>
 
                     </Box>
 
@@ -2888,7 +2905,7 @@ const UpdateComponent = () => {
                     </Box>
                     <Box paddingBlockStart={'300'} paddingInlineEnd={'300'}>
                       <InlineStack blockAlign="center" gap={'200'}>
-                        <Tooltip dismissOnMouseOut  padding="400" content="Done configuring? Copy code → Paste into an HTML/Custom Code block (where you want to show the component) → Publish. Your component is live.">
+                        <Tooltip dismissOnMouseOut padding="400" content="Done configuring? Copy code → Paste into an HTML/Custom Code block (where you want to show the component) → Publish. Your component is live.">
                           <Box maxWidth="30px">
                             <Icon
                               source={InfoIcon}

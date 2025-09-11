@@ -1,7 +1,7 @@
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Button, Card, Layout, Page } from "@shopify/polaris"
 import { authenticate } from "../shopify.server";
-//import db from '../db.server'
+import db from '../db.server'
 export const loader = async ({ request }) => {
   const {admin} =await authenticate.admin(request);
 
@@ -33,15 +33,295 @@ export const loader = async ({ request }) => {
   const storefrontAccessToken = shop.data.shop.storefrontAccessTokens.edges;
 
 
+    // const orderJson = {
+    //   "id": 7833039351908,
+    //   "admin_graphql_api_id": "gid://shopify/Order/6433039351907",
+    //   "app_id": 279364894721,
+    //   "browser_ip": "103.197.153.66",
+    //   "buyer_accepts_marketing": false,
+    //   "cancel_reason": null,
+    //   "cancelled_at": null,
+    //   "cart_token": "hWN2jrWpbRelVBrAzzBfxb1O",
+    //   "checkout_id": 32492592922723,
+    //   "checkout_token": "8788a3605c2f616df44e1e33d3f9feea",
+    //   "client_details": {
+    //     "accept_language": "en",
+    //     "browser_height": null,
+    //     "browser_ip": "103.197.153.66",
+    //     "browser_width": null,
+    //     "session_hash": null,
+    //     "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+    //   },
+    //   "closed_at": null,
+    //   "company": null,
+    //   "confirmation_number": "8H4FTN4Y8",
+    //   "confirmed": true,
+    //   "created_at": "2025-09-08T08:20:32-04:00",
+    //   "currency": "BDT",
+    //   "current_shipping_price_set": {
+    //     "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //   },
+    //   "current_subtotal_price": "10.00",
+    //   "current_subtotal_price_set": {
+    //     "shop_money": { "amount": "10.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "10.00", "currency_code": "BDT" }
+    //   },
+    //   "current_total_additional_fees_set": null,
+    //   "current_total_discounts": "0.00",
+    //   "current_total_discounts_set": {
+    //     "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //   },
+    //   "current_total_duties_set": null,
+    //   "current_total_price": "11.50",
+    //   "current_total_price_set": {
+    //     "shop_money": { "amount": "11.50", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "11.50", "currency_code": "BDT" }
+    //   },
+    //   "current_total_tax": "1.50",
+    //   "current_total_tax_set": {
+    //     "shop_money": { "amount": "1.50", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "1.50", "currency_code": "BDT" }
+    //   },
+    //   "customer_locale": "en-BD",
+    //   "device_id": null,
+    //   "discount_codes": [],
+    //   "duties_included": false,
+    //   "estimated_taxes": false,
+    //   "financial_status": "paid",
+    //   "fulfillment_status": null,
+    //   "landing_site": "/cart/43237791137891:1?access_token=ddf7fe721d2fcad3aff192baf4d2ffc3&attributes[SC_custom_tracking]=GMFDJCHOWN&attributes[shopcomponent_tracking]=FOFFGJ1MSD&ref=shopcomponent",
+    //   "landing_site_ref": "shopcomponent",
+    //   "location_id": null,
+    //   "merchant_business_entity_id": "MTYyNjUxODkxODEx",
+    //   "merchant_of_record_app_id": null,
+    //   "name": "#1020",
+    //   "note": null,
+    //   "note_attributes": [
+    //     { "name": "SC_custom_tracking", "value": "5ZQUWOXPKS" },
+    //     { "name": "shopcomponent_tracking", "value": "TVUCSAEO1A" }
+    //   ],
+    //   "number": 20,
+    //   "order_number": 1020,
+    //   "original_total_additional_fees_set": null,
+    //   "original_total_duties_set": null,
+    //   "payment_gateway_names": ["bogus"],
+    //   "po_number": null,
+    //   "presentment_currency": "BDT",
+    //   "processed_at": "2025-09-08T08:20:29-04:00",
+    //   "reference": null,
+    //   "referring_site": "",
+    //   "source_identifier": null,
+    //   "source_name": "279364894721",
+    //   "source_url": null,
+    //   "subtotal_price": "10.00",
+    //   "subtotal_price_set": {
+    //     "shop_money": { "amount": "10.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "10.00", "currency_code": "BDT" }
+    //   },
+    //   "tags": "",
+    //   "tax_exempt": false,
+    //   "tax_lines": [
+    //     {
+    //       "price": "1.50",
+    //       "rate": 0.15,
+    //       "title": "VAT",
+    //       "price_set": {
+    //         "shop_money": { "amount": "1.50", "currency_code": "BDT" },
+    //         "presentment_money": { "amount": "1.50", "currency_code": "BDT" }
+    //       },
+    //       "channel_liable": false
+    //     }
+    //   ],
+    //   "taxes_included": false,
+    //   "test": true,
+    //   "token": "2231d688b532e6a1e218487d8cf82ca9",
+    //   "total_cash_rounding_payment_adjustment_set": {
+    //     "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //   },
+    //   "total_cash_rounding_refund_adjustment_set": {
+    //     "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //   },
+    //   "total_discounts": "0.00",
+    //   "total_discounts_set": {
+    //     "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //   },
+    //   "total_line_items_price": "10.00",
+    //   "total_line_items_price_set": {
+    //     "shop_money": { "amount": "10.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "10.00", "currency_code": "BDT" }
+    //   },
+    //   "total_outstanding": "0.00",
+    //   "total_price": "11.50",
+    //   "total_price_set": {
+    //     "shop_money": { "amount": "11.50", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "11.50", "currency_code": "BDT" }
+    //   },
+    //   "total_shipping_price_set": {
+    //     "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //   },
+    //   "total_tax": "1.50",
+    //   "total_tax_set": {
+    //     "shop_money": { "amount": "1.50", "currency_code": "BDT" },
+    //     "presentment_money": { "amount": "1.50", "currency_code": "BDT" }
+    //   },
+    //   "total_tip_received": "0.00",
+    //   "total_weight": 0,
+    //   "updated_at": "2025-09-08T08:20:33-04:00",
+    //   "user_id": null,
+    //   "billing_address": {
+    //     "province": null,
+    //     "country": "Bangladesh",
+    //     "country_code": "BD",
+    //     "province_code": null
+    //   },
+    //   "customer": {
+    //     "id": 8365095485539,
+    //     "created_at": "2025-08-28T14:21:30-04:00",
+    //     "updated_at": "2025-09-08T08:20:32-04:00",
+    //     "state": "disabled",
+    //     "note": null,
+    //     "verified_email": true,
+    //     "multipass_identifier": null,
+    //     "tax_exempt": false,
+    //     "currency": "BDT",
+    //     "tax_exemptions": [],
+    //     "admin_graphql_api_id": "gid://shopify/Customer/8365095485539",
+    //     "default_address": {
+    //       "id": 9240192909411,
+    //       "customer_id": 8365095485539,
+    //       "company": null,
+    //       "province": null,
+    //       "country": "Bangladesh",
+    //       "province_code": null,
+    //       "country_code": "BD",
+    //       "country_name": "Bangladesh",
+    //       "default": true
+    //     }
+    //   },
+    //   "discount_applications": [],
+    //   "fulfillments": [],
+    //   "line_items": [
+    //     {
+    //       "id": 16619468882019,
+    //       "admin_graphql_api_id": "gid://shopify/LineItem/16619468882019",
+    //       "attributed_staffs": [],
+    //       "current_quantity": 1,
+    //       "fulfillable_quantity": 1,
+    //       "fulfillment_service": "manual",
+    //       "fulfillment_status": null,
+    //       "gift_card": false,
+    //       "grams": 0,
+    //       "name": "Product With 2 Option fullPage - Black / Small",
+    //       "price": "10.00",
+    //       "price_set": {
+    //         "shop_money": { "amount": "10.00", "currency_code": "BDT" },
+    //         "presentment_money": { "amount": "10.00", "currency_code": "BDT" }
+    //       },
+    //       "product_exists": true,
+    //       "product_id": 7768994021475,
+    //       "properties": [],
+    //       "quantity": 1,
+    //       "requires_shipping": true,
+    //       "sales_line_item_group_id": null,
+    //       "sku": null,
+    //       "taxable": true,
+    //       "title": "Product With 2 Option fullPage",
+    //       "total_discount": "0.00",
+    //       "total_discount_set": {
+    //         "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //         "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //       },
+    //       "variant_id": 43300920885347,
+    //       "variant_inventory_management": "shopify",
+    //       "variant_title": "Black / Small",
+    //       "vendor": "fastdev891",
+    //       "tax_lines": [],
+    //       "duties": [],
+    //       "discount_allocations": []
+    //     }
+    //   ],
+    //   "payment_terms": null,
+    //   "refunds": [],
+    //   "shipping_address": {
+    //     "province": null,
+    //     "country": "Bangladesh",
+    //     "country_code": "BD",
+    //     "province_code": null
+    //   },
+    //   "shipping_lines": [
+    //     {
+    //       "id": 5295272755299,
+    //       "carrier_identifier": null,
+    //       "code": "Standard",
+    //       "current_discounted_price_set": {
+    //         "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //         "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //       },
+    //       "discounted_price": "0.00",
+    //       "discounted_price_set": {
+    //         "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //         "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //       },
+    //       "is_removed": false,
+    //       "phone": null,
+    //       "price": "0.00",
+    //       "price_set": {
+    //         "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    //         "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+    //       },
+    //       "requested_fulfillment_service_id": null,
+    //       "source": "shopify",
+    //       "title": "Standard",
+    //       "tax_lines": [],
+    //       "discount_allocations": []
+    //     }
+    //   ],
+    //   "returns": []
+    // }
 
+  // const order = await db.order.create({
+  //   data:{
+  //     orderId: orderJson.id,
+  //     orderObj : JSON.stringify(orderJson),
+  //     shopId: 7,
+  //     componentId: 20
+  //   }
+  // });
+
+  const response = await admin.graphql(
+  `#graphql
+  query {
+    appByHandle(handle: "shopcomponentdev2") {
+      apiKey
+      id
+    }
+  }`,
+);
+
+const data = await response.json();
+  
+  const orders = await db.order.findUnique({
+    where:{
+      id:6
+    }
+  });
   return {
-    storefrontAccessToken
+    storefrontAccessToken,
+    orders,
+    data:data?.data?.appByHandle ?? {}
   }
 }
 
 const DeleteToken = () => {
-  //const { storefrontAccessToken } = useLoaderData();
-  //console.log('storefrontAccessToken', storefrontAccessToken);
+  const { storefrontAccessToken,orders,data } = useLoaderData();
+  console.log('orders', JSON.parse(orders.orderObj));
+  console.log('data', data);
   const fetcher = useFetcher();
   const handleDeleteAll = () => {
     fetcher.submit(null, { method: 'delete' });

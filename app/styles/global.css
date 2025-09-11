@@ -26,6 +26,10 @@
     user-select: none;
 }
 
+.btncollapsibleHidden[aria-hidden="true"]{
+    display: none;
+}
+
 .supportIcon > span {
     display: unset !important;
 }

@@ -44,13 +44,16 @@ model Component {
   shoppingCartSettings  Json?
   productLayoutSettings Json?
   buttonStyleSettings   Json?
-  tracking              String?
+  tracking              String?    @unique
   customerTracking      String?
   compHtml              String
   shopId                Int
   softDelete            Boolean    @default(false)
   shop                  Shop       @relation(fields: [shopId], references: [id])
+  orders                Order[]
   affiliate             Affiliate?
+  totalOrderCount       Int?       @default(0)
+  totalOrderValue       Float?     @default(0.00)
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
 }
@@ -83,6 +86,9 @@ model Shop {
   plan                 Plan?
   components           Component[]
   affiliates           Affiliate[]
+  orders               Order[]
+  totalOrderCount      Int?        @default(0)
+  totalOrderValue      Float?      @default(0.00)
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
 }
@@ -100,19 +106,40 @@ model Plan {
   updatedAt  DateTime @updatedAt
 }
 
+model Order {
+  id          Int       @id @default(autoincrement())
+  orderId     String    @unique
+  orderObj    String?   @db.Text
+  shopId      Int
+  componentId Int
+  component   Component @relation(fields: [componentId], references: [id])
+  shop        Shop      @relation(fields: [shopId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model Affiliate {
-  id                  Int       @id @default(autoincrement())
-  name                String?   @default("SPC_affiliate")
-  affTrackingCode     String?   @unique @default("SPC_affiliate_tracking")
+  id                  Int        @id @default(autoincrement())
+  name                String?    @default("SPC_affiliate")
+  affTrackingCode     String?    @unique @default("SPC_affiliate_tracking")
   url                 String?
   email               String?
   description         String?
-  comissionPercentage Float?    @default(0.00)
-  comissionAmount     Float?    @default(0.00)
-  componentId         Int ?      @unique
-  shopId              Int       @unique
-  components          Component?  @relation(fields: [componentId], references: [id])
-  shop                Shop      @relation(fields: [shopId], references: [id])
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  paypalId            String?
+  comissionPercentage Float?     @default(0.00)
+  comissionAmount     Float?     @default(0.00)
+  componentId         Int?       @unique
+  shopId              Int        @unique
+  components          Component? @relation(fields: [componentId], references: [id])
+  shop                Shop       @relation(fields: [shopId], references: [id])
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+model App {
+  id              Int      @id @default(autoincrement())
+  totalOrderCount Int?     @default(0)
+  totalOrderValue Float?   @default(0.00)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

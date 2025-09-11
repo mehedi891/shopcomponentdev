@@ -25,6 +25,8 @@ import db from "../db.server";
 import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
+import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
+import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
 
 
 
@@ -267,7 +269,7 @@ const CreateComponent = () => {
         });
 
         if (selected) {
-            //console.log('selected', selected);
+            //console.log('selectedBulk:', selected);
             setSelectedProductsBulk(limitTotalVariants(selected, 10));
         }
 
@@ -309,6 +311,7 @@ const CreateComponent = () => {
     }, [selectedProductsBulk]);
 
     const handleDeleteProductInd = (id) => {
+        // console.log('id:',id);
         setSelectedProductsInd(selectedProductsInd.filter(product => product.id !== id));
     }
 
@@ -1285,8 +1288,8 @@ const CreateComponent = () => {
     }
 
 
-  
-  const scriptsAll = `
+
+    const scriptsAll = `
          <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
          <script src="/shopcomponent/js/shopcomponent.js?v2.11"></script>
     `;
@@ -1761,7 +1764,7 @@ const CreateComponent = () => {
                                                         </Box>
                                                     )}
 
-                                                    <Box paddingBlock={'400'} paddingInline={'300'}>
+                                                    {/* <Box paddingBlock={'400'} paddingInline={'300'}>
                                                         <BlockStack gap={'300'}>
                                                             {selectedProductsInd?.length > 0 && selectedProductsInd?.map((product) => {
                                                                 return <InlineStack key={product.id} blockAlign="center" align="space-between">
@@ -1781,7 +1784,13 @@ const CreateComponent = () => {
 
                                                             }
                                                         </BlockStack>
-                                                    </Box>
+                                                    </Box> */}
+
+                                                    <DraggableProductInd
+                                                        handleDeleteProductInd={handleDeleteProductInd}
+                                                        setSelectedProductsInd={setSelectedProductsInd}
+                                                        selectedProductsInd={selectedProductsInd}
+                                                    />
 
                                                 </Box>
 
@@ -1863,9 +1872,9 @@ const CreateComponent = () => {
                                                     }
 
                                                     <Box paddingBlock={'400'} paddingInline={'300'}>
-                                                        <BlockStack gap={'400'}>
+                                                        
 
-                                                            {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
+                                                            {/* {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
                                                                 <Box key={product.id}>
                                                                     <InlineStack align="space-between" blockAlign="center">
                                                                         <InlineStack gap={'200'} blockAlign="center">
@@ -1930,7 +1939,17 @@ const CreateComponent = () => {
                                                             ))
 
 
-                                                            }
+                                                            } */}
+
+
+                                                            <DraggableProductBulk
+                                                                handleChangeQuantityDefault={handleChangeQuantityDefault}
+                                                                handleDeleteProductBulk={handleDeleteProductBulk}
+                                                                selectedProductsBulk={selectedProductsBulk}
+                                                                setSelectedProductsBulk={setSelectedProductsBulk}
+                                                                watchedValues={watchedValues}
+
+                                                            />
 
 
 
@@ -1939,7 +1958,7 @@ const CreateComponent = () => {
                                                                     <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
                                                                 </Box>
                                                             </Box>
-                                                        </BlockStack>
+                                                       
                                                     </Box>
                                                 </Box>
                                             }
@@ -2264,7 +2283,9 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}>
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}
+                                    aria-hidden={watchedValues.componentSettings.cartBehavior === 'checkout'}
+                                >
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
                                             <div className="collapsibleButtonDiv">
