@@ -221,7 +221,7 @@ export default function Index() {
     if (fetcher.data?.success) {
       setIsLoading(false);
       shopify.toast.show(fetcher.data.message, {
-        duration: 3000,
+        duration: 2000,
       });
     }
   }, [fetcher?.data]);

@@ -1,0 +1,399 @@
+{
+  "id": 6353299374179,
+  "admin_graphql_api_id": "gid://shopify/Order/6353299374179",
+  "app_id": 580111,
+  "browser_ip": "103.197.153.66",
+  "buyer_accepts_marketing": false,
+  "cancel_reason": null,
+  "cancelled_at": null,
+  "cart_token": "hWN0yu202lSRtmFDdTgbKWUE",
+  "checkout_id": 32345554321507,
+  "checkout_token": "fd8b356324a38d6c645c29ea057b6f65",
+  "client_details": {
+    "accept_language": "en-US",
+    "browser_height": null,
+    "browser_ip": "103.197.153.66",
+    "browser_width": null,
+    "session_hash": null,
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+  },
+  "closed_at": "2025-09-15T11:34:45+05:00",
+  "company": null,
+  "confirmation_number": "CU5EGCKMJ",
+  "confirmed": true,
+  "created_at": "2025-07-24T10:15:55+05:00",
+  "currency": "BDT",
+  "current_shipping_price_set": {
+    "shop_money": { "amount": "30.00", "currency_code": "BDT" },
+    "presentment_money": { "amount": "30.00", "currency_code": "BDT" }
+  },
+  "current_subtotal_price": "154.20",
+  "current_subtotal_price_set": {
+    "shop_money": { "amount": "154.20", "currency_code": "BDT" },
+    "presentment_money": { "amount": "154.20", "currency_code": "BDT" }
+  },
+  "current_total_additional_fees_set": null,
+  "current_total_discounts": "5.00",
+  "current_total_discounts_set": {
+    "shop_money": { "amount": "5.00", "currency_code": "BDT" },
+    "presentment_money": { "amount": "5.00", "currency_code": "BDT" }
+  },
+  "current_total_duties_set": null,
+  "current_total_price": "184.20",
+  "current_total_price_set": {
+    "shop_money": { "amount": "184.20", "currency_code": "BDT" },
+    "presentment_money": { "amount": "184.20", "currency_code": "BDT" }
+  },
+  "current_total_tax": "0.00",
+  "current_total_tax_set": {
+    "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+  },
+  "customer_locale": "en-US",
+  "discount_codes": [
+    { "code": "8BMC14ANFVR5", "amount": "5.00", "type": "fixed_amount" }
+  ],
+  "duties_included": false,
+  "estimated_taxes": false,
+  "financial_status": "partially_refunded",
+  "fulfillment_status": "fulfilled",
+  "landing_site": "/cart/43326297571427:4,43326297604195:2",
+  "landing_site_ref": null,
+  "location_id": null,
+  "merchant_business_entity_id": "MTYyNjUxODkxODEx",
+  "merchant_of_record_app_id": null,
+  "name": "#1006",
+  "note": "Mehedi-Store-note3",
+  "note_attributes": [
+    { "name": "refM", "value": "refMehediAttr3" }
+  ],
+  "number": 6,
+  "order_number": 1006,
+  "payment_gateway_names": ["bogus"],
+  "po_number": null,
+  "presentment_currency": "BDT",
+  "processed_at": "2025-07-24T10:15:54+05:00",
+  "reference": null,
+  "referring_site": "",
+  "source_identifier": null,
+  "source_name": "web",
+  "source_url": null,
+  "subtotal_price": "154.20",
+  "subtotal_price_set": {
+    "shop_money": { "amount": "154.20", "currency_code": "BDT" },
+    "presentment_money": { "amount": "154.20", "currency_code": "BDT" }
+  },
+  "tags": "",
+  "tax_exempt": false,
+  "tax_lines": [],
+  "taxes_included": false,
+  "test": true,
+  "token": "62cdd477c27d699df409fb9b7c8d202a",
+  "total_discounts": "5.00",
+  "total_discounts_set": {
+    "shop_money": { "amount": "5.00", "currency_code": "BDT" },
+    "presentment_money": { "amount": "5.00", "currency_code": "BDT" }
+  },
+  "total_line_items_price": "159.20",
+  "total_line_items_price_set": {
+    "shop_money": { "amount": "159.20", "currency_code": "BDT" },
+    "presentment_money": { "amount": "159.20", "currency_code": "BDT" }
+  },
+  "total_outstanding": "0.00",
+  "total_price": "184.20",
+  "total_price_set": {
+    "shop_money": { "amount": "184.20", "currency_code": "BDT" },
+    "presentment_money": { "amount": "184.20", "currency_code": "BDT" }
+  },
+  "total_shipping_price_set": {
+    "shop_money": { "amount": "30.00", "currency_code": "BDT" },
+    "presentment_money": { "amount": "30.00", "currency_code": "BDT" }
+  },
+  "total_tax": "0.00",
+  "total_tax_set": {
+    "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+    "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+  },
+  "total_tip_received": "0.00",
+  "total_weight": 0,
+  "updated_at": "2025-09-15T12:16:55+05:00",
+  "user_id": null,
+  "discount_applications": [
+    {
+      "target_type": "line_item",
+      "type": "discount_code",
+      "value": "5.0",
+      "value_type": "fixed_amount",
+      "allocation_method": "across",
+      "target_selection": "all",
+      "code": "8BMC14ANFVR5"
+    }
+  ],
+  "fulfillments": [
+    {
+      "id": 5895953449059,
+      "admin_graphql_api_id": "gid://shopify/Fulfillment/5895953449059",
+      "created_at": "2025-09-15T11:34:44+05:00",
+      "location_id": 70772523107,
+      "name": "#1006.1",
+      "order_id": 6353299374179,
+      "origin_address": {},
+      "receipt": {},
+      "service": "manual",
+      "shipment_status": null,
+      "status": "success",
+      "tracking_company": null,
+      "tracking_number": null,
+      "tracking_numbers": [],
+      "tracking_url": null,
+      "tracking_urls": [],
+      "updated_at": "2025-09-15T11:34:44+05:00",
+      "line_items": [
+        {
+          "id": 16397431963747,
+          "admin_graphql_api_id": "gid://shopify/LineItem/16397431963747",
+          "attributed_staffs": [],
+          "current_quantity": 5,
+          "fulfillable_quantity": 0,
+          "fulfillment_service": "manual",
+          "fulfillment_status": "fulfilled",
+          "gift_card": false,
+          "grams": 0,
+          "name": "Product 3 Options - Black / S / Bamboo",
+          "price": "19.90",
+          "price_set": {
+            "shop_money": { "amount": "19.90", "currency_code": "BDT" },
+            "presentment_money": { "amount": "19.90", "currency_code": "BDT" }
+          },
+          "product_exists": true,
+          "product_id": 7775401279587,
+          "properties": [],
+          "quantity": 5,
+          "requires_shipping": true,
+          "sku": "",
+          "taxable": true,
+          "title": "Product 3 Options",
+          "total_discount": "0.00",
+          "total_discount_set": {
+            "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+            "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+          },
+          "variant_id": 43326297604195,
+          "variant_inventory_management": "shopify",
+          "variant_title": "Black / S / Bamboo",
+          "vendor": "fastdev891",
+          "tax_lines": [],
+          "duties": [],
+          "discount_allocations": [
+            {
+              "amount": "3.13",
+              "amount_set": {
+                "shop_money": { "amount": "3.13", "currency_code": "BDT" },
+                "presentment_money": { "amount": "3.13", "currency_code": "BDT" }
+              },
+              "discount_application_index": 0
+            }
+          ]
+        },
+        {
+          "id": 16397431996515,
+          "admin_graphql_api_id": "gid://shopify/LineItem/16397431996515",
+          "attributed_staffs": [],
+          "current_quantity": 3,
+          "fulfillable_quantity": 0,
+          "fulfillment_service": "manual",
+          "fulfillment_status": "fulfilled",
+          "gift_card": false,
+          "grams": 0,
+          "name": "Product 3 Options - Black / S / Acrylic",
+          "price": "19.90",
+          "price_set": {
+            "shop_money": { "amount": "19.90", "currency_code": "BDT" },
+            "presentment_money": { "amount": "19.90", "currency_code": "BDT" }
+          },
+          "product_exists": true,
+          "product_id": 7775401279587,
+          "properties": [
+            { "name": "_TestPHidden", "value": "Test Properties M" }
+          ],
+          "quantity": 3,
+          "requires_shipping": true,
+          "sku": "",
+          "taxable": true,
+          "title": "Product 3 Options",
+          "total_discount": "0.00",
+          "total_discount_set": {
+            "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+            "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+          },
+          "variant_id": 43326297571427,
+          "variant_inventory_management": "shopify",
+          "variant_title": "Black / S / Acrylic",
+          "vendor": "fastdev891",
+          "tax_lines": [],
+          "duties": [],
+          "discount_allocations": [
+            {
+              "amount": "1.87",
+              "amount_set": {
+                "shop_money": { "amount": "1.87", "currency_code": "BDT" },
+                "presentment_money": { "amount": "1.87", "currency_code": "BDT" }
+              },
+              "discount_application_index": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "payment_terms": null,
+  "refunds": [
+    {
+      "id": 999534067811,
+      "admin_graphql_api_id": "gid://shopify/Refund/999534067811",
+      "created_at": "2025-09-15T11:37:45+05:00",
+      "note": "",
+      "order_id": 6353299374179,
+      "processed_at": "2025-09-15T11:37:45+05:00",
+      "restock": false,
+      "total_duties_set": {
+        "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+        "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+      },
+      "user_id": 82562416739,
+      "order_adjustments": [
+        {
+          "id": 349292986467,
+          "amount": "-80.00",
+          "amount_set": {
+            "shop_money": { "amount": "-80.00", "currency_code": "BDT" },
+            "presentment_money": { "amount": "-80.00", "currency_code": "BDT" }
+          },
+          "kind": "refund_discrepancy",
+          "order_id": 6353299374179,
+          "reason": "Refund discrepancy",
+          "refund_id": 999534067811,
+          "tax_amount": "0.00",
+          "tax_amount_set": {
+            "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+            "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+          }
+        }
+      ],
+      "transactions": [
+        {
+          "id": 8045115048035,
+          "admin_graphql_api_id": "gid://shopify/OrderTransaction/8045115048035",
+          "amount": "80.00",
+          "authorization": null,
+          "created_at": "2025-09-15T11:37:45+05:00",
+          "currency": "BDT",
+          "device_id": null,
+          "error_code": null,
+          "gateway": "bogus",
+          "kind": "refund",
+          "location_id": null,
+          "message": "Bogus Gateway: Forced success",
+          "order_id": 6353299374179,
+          "parent_id": 7928817582179,
+          "payment_id": "#1006.3",
+          "processed_at": "2025-09-15T11:37:45+05:00",
+          "receipt": { "paid_amount": "80.00" },
+          "source_name": "1830279",
+          "status": "success",
+          "test": true,
+          "user_id": 82562416739,
+          "payment_details": {
+            "credit_card_bin": "1",
+            "avs_result_code": null,
+            "cvv_result_code": null,
+            "credit_card_number": "•••• •••• •••• 1",
+            "credit_card_company": "Bogus",
+            "buyer_action_info": null,
+            "credit_card_name": "Steven ref Attr 3",
+            "credit_card_wallet": null,
+            "credit_card_expiration_month": 12,
+            "credit_card_expiration_year": 2028,
+            "payment_method_name": "bogus"
+          }
+        }
+      ],
+      "refund_line_items": [],
+      "duties": []
+    },
+    {
+      "id": 999535083619,
+      "admin_graphql_api_id": "gid://shopify/Refund/999535083619",
+      "created_at": "2025-09-15T12:16:55+05:00",
+      "note": "",
+      "order_id": 6353299374179,
+      "processed_at": "2025-09-15T12:16:55+05:00",
+      "restock": false,
+      "total_duties_set": {
+        "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+        "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+      },
+      "user_id": 82562416739,
+      "order_adjustments": [
+        {
+          "id": 349293641827,
+          "amount": "-14.20",
+          "amount_set": {
+            "shop_money": { "amount": "-14.20", "currency_code": "BDT" },
+            "presentment_money": { "amount": "-14.20", "currency_code": "BDT" }
+          },
+          "kind": "refund_discrepancy",
+          "order_id": 6353299374179,
+          "reason": "Refund discrepancy",
+          "refund_id": 999535083619,
+          "tax_amount": "0.00",
+          "tax_amount_set": {
+            "shop_money": { "amount": "0.00", "currency_code": "BDT" },
+            "presentment_money": { "amount": "0.00", "currency_code": "BDT" }
+          }
+        }
+      ],
+      "transactions": [
+        {
+          "id": 8045173735523,
+          "admin_graphql_api_id": "gid://shopify/OrderTransaction/8045173735523",
+          "amount": "14.20",
+          "authorization": null,
+          "created_at": "2025-09-15T12:16:55+05:00",
+          "currency": "BDT",
+          "device_id": null,
+          "error_code": null,
+          "gateway": "bogus",
+          "kind": "refund",
+          "location_id": null,
+          "message": "Bogus Gateway: Forced success",
+          "order_id": 6353299374179,
+          "parent_id": 7928817582179,
+          "payment_id": "#1006.4",
+          "processed_at": "2025-09-15T12:16:55+05:00",
+          "receipt": { "paid_amount": "14.20" },
+          "source_name": "1830279",
+          "status": "success",
+          "test": true,
+          "user_id": 82562416739,
+          "payment_details": {
+            "credit_card_bin": "1",
+            "avs_result_code": null,
+            "cvv_result_code": null,
+            "credit_card_number": "•••• •••• •••• 1",
+            "credit_card_company": "Bogus",
+            "buyer_action_info": null,
+            "credit_card_name": "Steven ref Attr 3",
+            "credit_card_wallet": null,
+            "credit_card_expiration_month": 12,
+            "credit_card_expiration_year": 2028,
+            "payment_method_name": "bogus"
+          }
+        }
+      ],
+      "refund_line_items": [],
+      "duties": []
+    }
+  ],
+  "returns": []
+}

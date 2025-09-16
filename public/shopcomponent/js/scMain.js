@@ -389,7 +389,7 @@ async function cartLineAddFnc(existCartId, shop, accessToken, variants) {
 }
 
 async function cartCreateFnc(shop, accessToken, variants, tracingCode, customertackingCode) {
-  const withoutMyShopify = shop.replace('.myshopify.com', '');
+  
   const mutation = `#graphql
       mutation cartCreate($input: CartInput) {
         cartCreate(input: $input) {

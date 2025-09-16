@@ -80,7 +80,7 @@
     }
   },
   "customer_locale": "en-BD",
-  "device_id": null,
+  "device_id": null, x
   "discount_codes": [],
   "duties_included": false,
   "estimated_taxes": false,
@@ -105,8 +105,8 @@
   ],
   "number": 20,
   "order_number": 1020,
-  "original_total_additional_fees_set": null,
-  "original_total_duties_set": null,
+  "original_total_additional_fees_set": null,x
+  "original_total_duties_set": null,x
   "payment_gateway_names": [
     "bogus"
   ],
@@ -152,7 +152,7 @@
   "taxes_included": false,
   "test": true,
   "token": "2231d688b532e6a1e218487d8cf82ca9",
-  "total_cash_rounding_payment_adjustment_set": {
+  "total_cash_rounding_payment_adjustment_set": {x
     "shop_money": {
       "amount": "0.00",
       "currency_code": "BDT"
@@ -162,7 +162,7 @@
       "currency_code": "BDT"
     }
   },
-  "total_cash_rounding_refund_adjustment_set": {
+  "total_cash_rounding_refund_adjustment_set": {x
     "shop_money": {
       "amount": "0.00",
       "currency_code": "BDT"
@@ -231,13 +231,13 @@
   "total_weight": 0,
   "updated_at": "2025-09-08T08:20:33-04:00",
   "user_id": null,
-  "billing_address": {
+  "billing_address": {x
     "province": null,
     "country": "Bangladesh",
     "country_code": "BD",
     "province_code": null
   },
-  "customer": {
+  "customer": {x
     "id": 8365095485539,
     "created_at": "2025-08-28T14:21:30-04:00",
     "updated_at": "2025-09-08T08:20:32-04:00",
@@ -263,7 +263,7 @@
   },
   "discount_applications": [],
   "fulfillments": [],
-  "line_items": [
+  "line_items": [x
     {
       "id": 16619468882019,
       "admin_graphql_api_id": "gid://shopify/LineItem/16619468882019",
@@ -317,13 +317,13 @@
   ],
   "payment_terms": null,
   "refunds": [],
-  "shipping_address": {
+  "shipping_address": {x
     "province": null,
     "country": "Bangladesh",
     "country_code": "BD",
     "province_code": null
   },
-  "shipping_lines": [
+  "shipping_lines": [x
     {
       "id": 5295272755299,
       "carrier_identifier": null,

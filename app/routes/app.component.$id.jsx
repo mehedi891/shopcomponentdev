@@ -1060,7 +1060,6 @@ const UpdateComponent = () => {
   const productLayoutBulkCardHtml = selectedProductsBulk?.length > 0 ? selectedProductsBulk?.map((product) => (
     `
             <div class="product-card spcProductCard_${watchedValues.tracking}">
-    <!-- Set product you want to display -->
     <shopify-context type="product" handle="${product.handle}">
       <template>
         <div class="product-card__container">
@@ -1226,10 +1225,7 @@ const UpdateComponent = () => {
         : pdCheckoutBtnHtml)
       : pdQuickViewBtnCollectionHtml
     }
-             
-
-
-              <!-- Add buy button -->
+      
             </div>
 
              </div>
@@ -1309,39 +1305,61 @@ const UpdateComponent = () => {
          <script src="/shopcomponent/js/shopcomponent.js?v2.11"></script>
     `;
 
-  const copyCode = `
+  // const copyCode = `
+  //   <!-------------- ShopComponent [https://shopcomponent.com/] app code start ---------->
+
+  // <div id="shopcomponent-${watchedValues.tracking}"></div>
+  // <script type="module">
+  //   window.addEventListener('DOMContentLoaded', async () => {
+  //     const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
+  //     const isExistWebcomJs2 = document.querySelector('script[src="${appUrl}/api/webcompjs"]');
+
+  //     if (!isExistWebcomJs2) {
+  //       const scriptTag2 = document.createElement('script');
+  //       scriptTag2.type = 'text/javascript';
+  //       scriptTag2.id = 'shopcomponents-js';
+  //       scriptTag2.src = '${appUrl}/api/webcompjs';
+  //       document.head.appendChild(scriptTag2);
+  //     }
+  //     if (!isExistWebcomJs) {
+  //       const scriptTag = document.createElement('script');
+  //       scriptTag.type = 'module';
+  //       scriptTag.id = 'shopcomponents-webcomJs';
+  //       scriptTag.src = 'https://cdn.shopify.com/storefront/web-components.js';
+  //       document.body.appendChild(scriptTag);
+  //     }
+  //     const holder = document.getElementById('shopcomponent-${watchedValues.tracking}');
+  //     if (holder) {
+  //       const response = await fetch('${appUrl}/api/component?id=${component?.id}');
+  //       const data = await response.json();
+  //       if (data?.data?.compHtml) {
+  //         holder.innerHTML = data.data.compHtml;
+  //         localStorage.setItem('shopcomponentData', JSON.stringify({ plan: data?.data?.shop?.plan?.planName, shop: data?.data?.shop?.shopifyDomain }));
+  //       }
+  //     }
+     
+  //   })
+  // </script>
+  // <!-------------- ShopComponent app code end -------------->
+  //   `;
+
+
+   const copyCode = `
     <!-------------- ShopComponent [https://shopcomponent.com/] app code start ---------->
 
-  <div id="shopcomponent-${watchedValues.tracking}"></div>
+  <div id="shopcomponent-${watchedValues.tracking}" class="spc_rootElement" data-props='{"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com",'')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"
+}'></div>
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
-      const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
-      const isExistWebcomJs2 = document.querySelector('script[src="${appUrl}/api/webcompjs"]');
-
-      if (!isExistWebcomJs2) {
-        const scriptTag2 = document.createElement('script');
-        scriptTag2.type = 'text/javascript';
-        scriptTag2.id = 'shopcomponents-js';
-        scriptTag2.src = '${appUrl}/api/webcompjs';
-        document.head.appendChild(scriptTag2);
-      }
-      if (!isExistWebcomJs) {
-        const scriptTag = document.createElement('script');
-        scriptTag.type = 'module';
-        scriptTag.id = 'shopcomponents-webcomJs';
-        scriptTag.src = 'https://cdn.shopify.com/storefront/web-components.js';
-        document.body.appendChild(scriptTag);
-      }
-      const holder = document.getElementById('shopcomponent-${watchedValues.tracking}');
-      if (holder) {
-        const response = await fetch('${appUrl}/api/component?id=${component?.id}');
-        const data = await response.json();
-        if (data?.data?.compHtml) {
-          holder.innerHTML = data.data.compHtml;
-          localStorage.setItem('shopcomponentData', JSON.stringify({ plan: data?.data?.shop?.plan?.planName, shop: data?.data?.shop?.shopifyDomain }));
-        }
-      }
-     
+            (function () {
+        if (window.__SPC_SCRIPT_LOADING__ || window.__SPC_BOOTED__) return;
+        window.__SPC_SCRIPT_LOADING__ = true;
+        var s = document.createElement("script");
+        s.type = "module";
+        s.crossOrigin = "anonymous";
+        s.src = "${appUrl}/api/spceflmainjs?v=1";
+        document.head.appendChild(s);
+      })();
     })
   </script>
   <!-------------- ShopComponent app code end -------------->

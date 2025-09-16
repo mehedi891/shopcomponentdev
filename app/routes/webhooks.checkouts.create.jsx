@@ -7,8 +7,8 @@ export const action = async ({ request }) => {
   const { payload,topic,subTopic } = await authenticate.webhook(request);
 
 
-  console.log('from orders update');
-  console.log('from orders update payload',payload);
+  console.log('from Checkout creates ');
+  console.log('from Checkouts create payload',payload);
   console.log('topic:',topic,'Subtopic:',subTopic);
 
   console.log(
