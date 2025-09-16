@@ -11,7 +11,7 @@ const Container = ({ id, token, store }) => {
     const fetchData = async () => {
 
       try {
-        const url = `http://localhost:3000/api/getcomponent?id=${id}`;
+        const url = `https://app.shopcomponent.com/api/getcomponent?id=${id}`;
         const response = await fetch(url);
         const result = await response.json();
 
