@@ -1,19 +1,22 @@
 import {
   Badge,
+  Banner,
   BlockStack,
   Box,
   Button,
   Card,
   Divider,
+  Icon,
   IndexTable,
   InlineStack,
   Layout,
+  Link,
   Page,
   Popover,
   Spinner,
   Text,
 } from "@shopify/polaris";
-import { DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, LockFilledIcon, MenuHorizontalIcon, StatusActiveIcon } from '@shopify/polaris-icons';
+import { DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, ExternalSmallIcon, LockFilledIcon, MenuHorizontalIcon, QuestionCircleIcon, StatusActiveIcon } from '@shopify/polaris-icons';
 import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
@@ -161,20 +164,59 @@ export const loader = async ({ request }) => {
     }
   });
 
+
+
+  const totalPdJson = await admin.graphql(
+    `#graphql
+            query {
+                productsCount(query:null) {
+                count
+                }
+            }`,
+  );
+  const totalproduct = await totalPdJson.json();
+
+  const totalPublishSpc = await admin.graphql(
+    `#graphql
+  query PublishedProductCount($publicationId: ID!) {
+    publishedProductsCount(publicationId: $publicationId) {
+      count
+      precision
+    }
+  }`,
+
+    {
+      variables: {
+        "publicationId": `gid://shopify/Publication/${process.env.PUBLICATION_ID}`
+      },
+    },
+  );
+  const totalPublishSpcJson = await totalPublishSpc.json();
+
+
+
   if (!shopData?.plan) {
     throw redirect('/app/plans');
   }
+
+
+
+
   return {
     shopData: shopData,
     components: components || [],
     hasActivePayment,
+    totalPd: totalproduct?.data?.productsCount?.count ?? 0,
+    totalPublishProduct: totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0,
+    pubblicationId: process.env.PUBLICATION_ID,
+    cataglogId: process.env.CATALOG_ID,
     success: true
   };
 };
 
 export default function Index() {
   const shopify = useAppBridge();
-  const { shopData, components } = useLoaderData();
+  const { shopData, components, totalPd, totalPublishProduct, pubblicationId, cataglogId } = useLoaderData();
   //console.log('components', components);
   const navigate = useNavigate();
   const navigation = useNavigation();
@@ -182,6 +224,7 @@ export default function Index() {
   const fetcher = useFetcher();
   const [activePopoverId, setActivePopoverId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showProductStatusBanner, setShowProductStatusBanner] = useState(true);
   const [searchParams] = useSearchParams();
   const togglePopoverActive = useCallback((id) => {
     setActivePopoverId((prevId) => (prevId === id ? null : id));
@@ -230,7 +273,7 @@ export default function Index() {
 
   const rowMarkup = components?.length > 0 && components?.map(
     (
-      { id, title, addToCartType, status, appliesTo, componentSettings,totalOrderCount,totalOrderValue },
+      { id, title, addToCartType, status, appliesTo, componentSettings, totalOrderCount, totalOrderValue },
       index,
     ) => (
       <IndexTable.Row
@@ -254,13 +297,13 @@ export default function Index() {
         </IndexTable.Cell>
 
 
-        <IndexTable.Cell className="sc-addToCartType">
+        {/* <IndexTable.Cell className="sc-addToCartType">
           <Box paddingInlineStart={'400'}><Text>{totalOrderCount}</Text></Box>
         </IndexTable.Cell>
 
         <IndexTable.Cell className="sc-addToCartType">
           <Box paddingInlineStart={'300'}><Text>
-            {shopData?.currencyCode + ' ' 
+            {shopData?.currencyCode + ' '
 
             }
             {
@@ -277,7 +320,7 @@ export default function Index() {
               totalOrderValue
             }
           </Text></Box>
-        </IndexTable.Cell>
+        </IndexTable.Cell> */}
 
         <IndexTable.Cell className="sc-addToCartType">
           {status === 'activate' ? <Badge tone="success">{t("activate")}</Badge> : <Badge tone="critical-strong">{t("deactivate")}</Badge>
@@ -492,8 +535,8 @@ export default function Index() {
                         { title: 'Component Name' },
                         { title: 'Applies to' },
                         { title: 'Add to cart type' },
-                        { title: 'Total orders', alignment: 'start' },
-                        { title: 'Value', alignment: 'start' },
+                        // { title: 'Total orders', alignment: 'start' },
+                        // { title: 'Value', alignment: 'start' },
                         { title: 'Status' },
                         { title: 'Actions', alignment: 'center' },
                       ]}
@@ -516,8 +559,95 @@ export default function Index() {
                     </BlockStack>
                   </Box>
                 }
+
+
+
               </Card>
             </Box>
+
+            <Box paddingBlock={'400'}>
+              <Box width="100%">
+                <Card>
+                  <BlockStack gap={'300'}>
+                    <InlineStack align="space-between" blockAlign="center">
+                      <Text variant="headingMd">Product status</Text>
+                      <Link removeUnderline target="_blank" url={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/bulk/product?resource_name=Product&edit=status`}>Manage availability</Link>
+                    </InlineStack>
+                    {showProductStatusBanner &&
+                      <Banner
+                        tone="info"
+                        onDismiss={() => { setShowProductStatusBanner(false) }}
+                      >
+                        <Text>Product publishing to EmbedUp can take 30 minutes to update. Once your products are successfully published your products will be visible on EmbedUp</Text>
+                      </Banner>
+                    }
+                    <Text><Text as="span" fontWeight="bold">{totalPd}</Text> products are available to EmbedUp</Text>
+
+                    <BlockStack gap={'300'} align="start">
+                      <InlineStack gap={'400'} blockAlign="center">
+                        <Badge
+                          tone="success"
+                          progress="complete"
+                          size="medium"
+                        >
+                          Published
+                        </Badge>
+                        <Link removeUnderline target="_blank" url={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_all=${cataglogId}`}>{totalPublishProduct} products</Link>
+                      </InlineStack>
+                      {totalPd - totalPublishProduct >= 0 &&
+                        <InlineStack gap={'400'} blockAlign="center">
+                          <Badge
+                            tone="critical-strong"
+                            progress="incomplete"
+                            size="medium"
+                          >
+                            Not published
+                          </Badge>
+                          <Link removeUnderline target="_blank" url={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_not=${cataglogId}`}>{totalPd - totalPublishProduct} products</Link>
+                        </InlineStack>
+                      }
+
+                    </BlockStack>
+                  </BlockStack>
+                </Card>
+              </Box>
+            </Box>
+
+            <Box paddingBlockEnd={'400'}>
+              <Card>
+                <BlockStack gap={'100'}>
+                  <Text variant="headingMd">Terms and conditions</Text>
+                  <Text variant="bodyLg">View EmbedUp terms and conditions here at anytime</Text>
+
+                </BlockStack>
+                <Box paddingBlockStart={'400'}>
+
+                  <InlineStack gap={'100'}>
+                    <Text>You have accepted the</Text>
+                    <Link removeUnderline target="_blank" url="https://embedup.com/terms-conditions/">EmbedUp terms and conditions
+                    </Link>
+                    <Box maxWidth="20px"><Icon tone="interactive" source={ExternalSmallIcon} /></Box>
+                  </InlineStack>
+                </Box>
+              </Card>
+            </Box>
+
+            <InlineStack align="center">
+              <Box paddingBlockEnd={'400'} maxWidth="max-content">
+                <Card>
+                  <InlineStack gap={'100'}>
+                    <Box maxWidth="20px">
+                      <Icon
+                        tone="success"
+                        source={QuestionCircleIcon}
+                      />
+                    </Box>
+                    <Text>Learn more about</Text>
+                    <Link removeUnderline target="_blank" url="https://embedup.com/terms-conditions/">showing your products in EmbedUp</Link>
+                  </InlineStack>
+                </Card>
+              </Box>
+            </InlineStack>
           </Layout.Section>
         </Layout>
       </Page>

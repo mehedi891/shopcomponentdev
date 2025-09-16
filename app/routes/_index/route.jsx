@@ -24,7 +24,7 @@ export default function App() {
           <div className={styles.brand}>
             {/* <img src="/images/spcLogo.png" alt="ShopComponent" /> */}
             <div className={styles.logo}>SC</div>
-            <span className={styles.brandText}>ShopComponent</span>
+            <span className={styles.brandText}>EmbedUp</span>
           </div>
           <nav className={styles.nav}>
             <a className={styles.navLink} href="https://apps.shopify.com" target="_blank" rel="noreferrer">App Store</a>
@@ -192,7 +192,7 @@ export default function App() {
               <button className={styles.buttonSm} type="submit">Start free</button>
             </Form>
           )}
-          <small className={styles.legal}>© {new Date().getFullYear()} ShopComponent</small>
+          <small className={styles.legal}>© {new Date().getFullYear()} EmbedUp</small>
         </div>
       </footer>
     </div>

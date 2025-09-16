@@ -1,5 +1,5 @@
 import { useFetcher, useLoaderData, useNavigation } from "@remix-run/react";
-import { BlockStack, Box, Card, InlineStack, Layout, Page, RadioButton, Text } from "@shopify/polaris"
+import {  BlockStack, Box, Card, InlineStack, Layout, Page, RadioButton, Text } from "@shopify/polaris"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 
 
@@ -22,8 +22,91 @@ export const loader = async ({ request }) => {
     if (!shop?.plan) {
         throw redirect('/app/plans')
     }
+
+//     const totalPdJson = await admin.graphql(
+//         `#graphql
+//             query {
+//                 productsCount(query:null) {
+//                 count
+//                 }
+//             }`,
+//     );
+//     const totalproduct = await totalPdJson.json();
+
+//     const totalPublishSpc = await admin.graphql(
+//         `#graphql
+//   query PublishedProductCount($publicationId: ID!) {
+//     publishedProductsCount(publicationId: $publicationId) {
+//       count
+//       precision
+//     }
+//   }`,
+
+//         {
+//             variables: {
+//                 "publicationId": `gid://shopify/Publication/${process.env.PUBLICATION_ID}`
+//             },
+//         },
+//     );
+//     const totalPublishSpcJson = await totalPublishSpc.json();
+
+
+//     const response = await admin.graphql(
+//   `#graphql
+//   mutation ShopResourceFeedbackCreate($input: ResourceFeedbackCreateInput!) {
+//     shopResourceFeedbackCreate(input: $input) {
+//       feedback {
+//         messages {
+//           message
+//         }
+//         feedbackGeneratedAt
+//         state
+//       }
+//       userErrors {
+//         field
+//         message
+//       }
+//     }
+//   }`,
+//   {
+//     variables: {
+//         "input": {
+//             "messages": [
+//                 "is not connected. Connect your account to use this sales channel."
+//             ],
+//             "state": "REQUIRES_ACTION",
+//             "feedbackGeneratedAt": new Date().toISOString()
+//         }
+//     },
+//   },
+// );
+
+// const data = await response.json();
+
+// const response = await admin.graphql(
+//   `#graphql
+//   query publication($id: ID!) {
+//     publication(id: $id) {
+//       name
+//       id
+//       catalog{
+//         id
+//       }
+//     }
+//   }`,
+//   {
+//     variables: {
+//         "id": `gid://shopify/Publication/${process.env.PUBLICATION_ID}`
+//     },
+//   },
+// );
+//     const totalproduct = await response.json();
+
+    //console.log('totalproduct:::',totalproduct);
+
     return {
-        shopData: shop
+        shopData: shop,
+       // totalproduct:totalproduct?.data?.publication ?? {}
     };
 }
 
@@ -36,6 +119,10 @@ const Settings = () => {
         shopData?.appDisabled ? "yes" : "no"
     );
 
+    //console.log('totalproduct',totalproduct);
+    
+    //console.log('PD:', totalPd, 'PB:', totalPublishProduct);
+  
     useEffect(() => {
         if (fetcher?.data?.success) {
             shopify.toast.show('App Status updted Successfully', { duration: 2000 });
@@ -55,15 +142,15 @@ const Settings = () => {
             <Layout>
                 <Layout.Section>
                     <BlockStack gap={'300'} align="center" inlineAlign="center">
-                        <Box width="100%">
+                        {/* <Box width="100%">
                             <Card>
                                 <HeadlessVerify
                                     showBanner={shopData?.headlessAccessToken ? false : true}
                                     defaultToken={shopData?.headlessAccessToken ? shopData?.headlessAccessToken : ''}
-                                    pageName = {'settings'}
+                                    pageName={'settings'}
                                 />
                             </Card>
-                        </Box>
+                        </Box> */}
 
                         <Box width="100%">
                             <Card>
@@ -92,9 +179,10 @@ const Settings = () => {
                                 </BlockStack>
                             </Card>
                         </Box>
+
                     </BlockStack>
                 </Layout.Section>
-               
+
             </Layout>
         </Page>
     )

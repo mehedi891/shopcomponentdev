@@ -1582,7 +1582,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'}>
+                <Box paddingBlockEnd={'400'} className="Polaris-Box hideSection">
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
