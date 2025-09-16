@@ -228,6 +228,7 @@ export const loader = async ({ request }) => {
         isInstalled: true,
       },
       create: {
+        shopifyDomain:session.shop,
         publicationId: publicationjson?.data?.publication?.id,
         appCatalogId: publicationjson?.data?.publication?.catalog?.id,
         isInstalled: false,
