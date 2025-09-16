@@ -176,73 +176,73 @@ export const loader = async ({ request }) => {
   const totalproduct = await totalPdJson.json();
 
 
-  // if (!shopData?.publicationId) {
-  //   const appResponse = await admin.graphql(
-  //     `#graphql
-  //           query ($apiKey: String!) {
-  //             appByKey(apiKey: $apiKey) {
-  //               id
-  //               title
-  //               installation {
-  //                 publication {
-  //                   id
-  //                 }
-  //               }
-  //             }
-  //           }
-  // `,
-  //     {
-  //       variables: { apiKey: process.env.SHOPIFY_API_KEY },
-  //     }
-  //   );
+  if (!shopData?.publicationId) {
+    const appResponse = await admin.graphql(
+      `#graphql
+            query ($apiKey: String!) {
+              appByKey(apiKey: $apiKey) {
+                id
+                title
+                installation {
+                  publication {
+                    id
+                  }
+                }
+              }
+            }
+  `,
+      {
+        variables: { apiKey: process.env.SHOPIFY_API_KEY },
+      }
+    );
 
-  //   const appResponseJson = await appResponse.json();
+    const appResponseJson = await appResponse.json();
 
-  //   const publication = await admin.graphql(
-  //     `#graphql
-  // query publication($id: ID!) {
-  //   publication(id: $id) {
-  //     id
-  //   catalog{
-  //     id
-  //   }
-  //   }
-  // }`,
-  //     {
-  //       variables: {
-  //         "id": appResponseJson?.data?.appByKey?.installation?.publication?.id
-  //       },
-  //     },
-  //   );
+    const publication = await admin.graphql(
+      `#graphql
+  query publication($id: ID!) {
+    publication(id: $id) {
+      id
+    catalog{
+      id
+    }
+    }
+  }`,
+      {
+        variables: {
+          "id": appResponseJson?.data?.appByKey?.installation?.publication?.id
+        },
+      },
+    );
 
-  //   const publicationjson = await publication.json();
+    const publicationjson = await publication.json();
 
 
-  //   shopData = await db.shop.upsert({
-  //     where: {
-  //       shopifyDomain: session.shop,
-  //     },
-  //     update: {
-  //       publicationId: publicationjson?.data?.publication?.id,
-  //       appCatalogId: publicationjson?.data?.publication?.catalog?.id,
-  //       isInstalled: true,
-  //     },
-  //     create: {
-  //       publicationId: publicationjson?.data?.publication?.id,
-  //       appCatalogId: publicationjson?.data?.publication?.catalog?.id,
-  //       isInstalled: false,
-  //     },
-  //     include: {
-  //       components: {
-  //         orderBy: {
-  //           id: 'desc',
-  //         },
-  //       },
-  //       plan: true
-  //     }
-  //   });
+    shopData = await db.shop.upsert({
+      where: {
+        shopifyDomain: session.shop,
+      },
+      update: {
+        publicationId: publicationjson?.data?.publication?.id,
+        appCatalogId: publicationjson?.data?.publication?.catalog?.id,
+        isInstalled: true,
+      },
+      create: {
+        publicationId: publicationjson?.data?.publication?.id,
+        appCatalogId: publicationjson?.data?.publication?.catalog?.id,
+        isInstalled: false,
+      },
+      include: {
+        components: {
+          orderBy: {
+            id: 'desc',
+          },
+        },
+        plan: true
+      }
+    });
 
-  // }
+  }
 
   const totalPublishSpc = await admin.graphql(
     `#graphql
@@ -255,7 +255,7 @@ export const loader = async ({ request }) => {
 
     {
       variables: {
-        "publicationId": shopData?.publicationId
+        "publicationId": shopData?.publicationId 
       },
     },
   );

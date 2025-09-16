@@ -61,7 +61,7 @@ model Component {
 model Shop {
   id                   Int         @id @default(autoincrement())
   shopifyShopGid       String?     @unique
-  shopifyDomain        String      @unique
+  shopifyDomain        String?     @unique
   scAccessToken        String?
   headlessAccessToken  String?
   installationCount    Int?
