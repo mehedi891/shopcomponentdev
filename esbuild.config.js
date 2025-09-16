@@ -14,7 +14,7 @@ const config = {
   outfile: "public/shopcomponent/js/spceflmain.js",
   format: "esm",
   platform: "browser",
-  minify: false,
+  minify: true,
   sourcemap: false,
   loader: {
     ".js": "jsx",
