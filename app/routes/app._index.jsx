@@ -43,6 +43,8 @@ export const loader = async ({ request }) => {
   // );
 
   // const shop = await shopResponse.json();
+
+  
   let shopData = await db.shop.findUnique({
     where: {
       shopifyDomain: session.shop
