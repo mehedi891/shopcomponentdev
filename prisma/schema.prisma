@@ -83,6 +83,9 @@ model Shop {
   shopifyPlus          Boolean?    @default(false)
   myshopifyDomain      String?
   appDisabled          Boolean?    @default(false)
+  appCatalogId         String?
+  publicationId        String?
+  isInstalled          Boolean?    @default(false)
   plan                 Plan?
   components           Component[]
   affiliates           Affiliate[]

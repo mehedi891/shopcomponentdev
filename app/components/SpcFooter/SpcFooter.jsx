@@ -9,7 +9,7 @@ const SpcFooter = ({planName}) => {
         <Box>
           <InlineStack gap={'200'} blockAlign="center">
             <Button url="https://embedup.com/" target="_blank" variant="tertiary">
-              <img className="spc-footer-img" src="/images/spcLogonew.png" alt="Shopcomponent" />
+              <img className="spc-footer-img" src="/images/spcLogonew.png" alt="EmbedUp" />
             </Button>
             <Text>|</Text>
             <Button  url="/app/getsupport/" variant="tertiary">Get support</Button>

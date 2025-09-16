@@ -165,7 +165,6 @@ export const loader = async ({ request }) => {
   });
 
 
-
   const totalPdJson = await admin.graphql(
     `#graphql
             query {
@@ -175,6 +174,75 @@ export const loader = async ({ request }) => {
             }`,
   );
   const totalproduct = await totalPdJson.json();
+
+
+  if (!shopData?.publicationId) {
+    const appResponse = await admin.graphql(
+      `#graphql
+            query ($apiKey: String!) {
+              appByKey(apiKey: $apiKey) {
+                id
+                title
+                installation {
+                  publication {
+                    id
+                  }
+                }
+              }
+            }
+  `,
+      {
+        variables: { apiKey: process.env.SHOPIFY_API_KEY },
+      }
+    );
+
+    const appResponseJson = await appResponse.json();
+
+    const publication = await admin.graphql(
+      `#graphql
+  query publication($id: ID!) {
+    publication(id: $id) {
+      id
+    catalog{
+      id
+    }
+    }
+  }`,
+      {
+        variables: {
+          "id": appResponseJson?.data?.appByKey?.installation?.publication?.id
+        },
+      },
+    );
+
+    const publicationjson = await publication.json();
+
+
+    shopData = await db.shop.upsert({
+      where: {
+        shopifyDomain: session.shop,
+      },
+      update: {
+        publicationId: publicationjson?.data?.publication?.id,
+        appCatalogId: publicationjson?.data?.publication?.catalog?.id,
+        isInstalled: true,
+      },
+      create: {
+        publicationId: publicationjson?.data?.publication?.id,
+        appCatalogId: publicationjson?.data?.publication?.catalog?.id,
+        isInstalled: false,
+      },
+      include: {
+        components: {
+          orderBy: {
+            id: 'desc',
+          },
+        },
+        plan: true
+      }
+    });
+
+  }
 
   const totalPublishSpc = await admin.graphql(
     `#graphql
@@ -187,7 +255,7 @@ export const loader = async ({ request }) => {
 
     {
       variables: {
-        "publicationId": `gid://shopify/Publication/${process.env.PUBLICATION_ID}`
+        "publicationId": shopData?.publicationId
       },
     },
   );
@@ -208,15 +276,14 @@ export const loader = async ({ request }) => {
     hasActivePayment,
     totalPd: totalproduct?.data?.productsCount?.count ?? 0,
     totalPublishProduct: totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0,
-    pubblicationId: process.env.PUBLICATION_ID,
-    cataglogId: process.env.CATALOG_ID,
+    cataglogId: shopData?.appCatalogId ? shopData?.appCatalogId.replace('gid://shopify/AppCatalog/', '') : '',
     success: true
   };
 };
 
 export default function Index() {
   const shopify = useAppBridge();
-  const { shopData, components, totalPd, totalPublishProduct, pubblicationId, cataglogId } = useLoaderData();
+  const { shopData, components, totalPd, totalPublishProduct, cataglogId } = useLoaderData();
   //console.log('components', components);
   const navigate = useNavigate();
   const navigation = useNavigation();

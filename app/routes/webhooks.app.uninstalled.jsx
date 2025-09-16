@@ -28,6 +28,7 @@ export const action = async ({ request }) => {
           appDisabled: true,
           headlessAccessToken: null,
           scAccessToken: null,
+          isInstalled: false,
         },
       });
     } else {
@@ -39,6 +40,7 @@ export const action = async ({ request }) => {
           //   deleteMany: {}, 
           // },
           appDisabled: true,
+          isInstalled: false,
           headlessAccessToken: null,
           scAccessToken: null,
         },

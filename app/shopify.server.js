@@ -112,6 +112,46 @@ const shopify = shopifyApp({
         storefrontAccessToken = scToken?.data?.storefrontAccessTokenCreate?.storefrontAccessToken?.accessToken;
       }
 
+      const appResponse = await admin.graphql(
+        `#graphql
+            query ($apiKey: String!) {
+              appByKey(apiKey: $apiKey) {
+                id
+                title
+                installation {
+                  publication {
+                    id
+                  }
+                }
+              }
+            }
+  `,
+        {
+          variables: { apiKey: process.env.SHOPIFY_API_KEY },
+        }
+      );
+
+      const appResponseJson = await appResponse.json();
+
+      const publication = await admin.graphql(
+        `#graphql
+  query publication($id: ID!) {
+    publication(id: $id) {
+      id
+    catalog{
+      id
+    }
+    }
+  }`,
+        {
+          variables: {
+            "id": appResponseJson?.data?.appByKey?.installation?.publication?.id
+          },
+        },
+      );
+
+      const publicationjson = await publication.json();
+
 
       //console.log('Token Created From ServerShopify:', storefrontAccessToken);
       await prisma.shop.upsert({
@@ -135,6 +175,9 @@ const shopify = shopifyApp({
           shopifyPlan: shop?.plan?.publicDisplayName,
           shopifyPlus: shop?.plan?.shopifyPlus,
           appDisabled: false,
+          publicationId:publicationjson?.data?.publication?.id,
+          appCatalogId:publicationjson?.data?.publication?.catalog?.id,
+          isInstalled: true,
         },
         create: {
           shopifyDomain: session.shop,
@@ -154,6 +197,9 @@ const shopify = shopifyApp({
           shopifyPlan: shop?.plan?.publicDisplayName,
           shopifyPlus: shop?.plan?.shopifyPlus,
           appDisabled: false,
+          publicationId:publicationjson?.data?.publication?.id,
+          appCatalogId:publicationjson?.data?.publication?.catalog?.id,
+          isInstalled: true,
         },
       });
 
