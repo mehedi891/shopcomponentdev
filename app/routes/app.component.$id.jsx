@@ -1345,7 +1345,7 @@ const UpdateComponent = () => {
 
 
    const copyCode = `
-    <!-------------- ShopComponent [https://shopcomponent.com/] app code start ---------->
+    <!-------------- EmbedUp [https://embedup.com/] ------------>
 
   <div id="shopcomponent-${watchedValues.tracking}" class="spc_rootElement" data-props='{"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com",'')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"
 }'></div>
@@ -1362,7 +1362,7 @@ const UpdateComponent = () => {
       })();
     })
   </script>
-  <!-------------- ShopComponent app code end -------------->
+  <!-------------- EmbedUp app code end -------------->
     `;
 
   const handleCopyHtmlCode = () => {

@@ -122,12 +122,12 @@ const Getsupport = () => {
                               <div id="supportEmailDescription">
                                 <Trans
                                   i18nKey="email_support_description"
-                                  values={{ email: "support@Shopcomponent.com" }}
+                                  values={{ email: "support@embedup.com" }}
                                   components={{ strong: <strong /> }}
                                 />
                               </div>
                             </Box>
-                            <Button onClick={() => { }} id="4" size="large" url={`mailto:support@shopcomponent.com`} target="_blank">{t("email_us")}</Button>
+                            <Button onClick={() => { }} id="4" size="large" url={`mailto:support@embedup.com`} target="_blank">{t("email_us")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>
@@ -145,7 +145,7 @@ const Getsupport = () => {
                             <Box minHeight="6rem">
                               <Text variant="bodyLg" as="p">{t("discover_our_wide_range_of_video_tutorials")}</Text>
                             </Box>
-                            <Button url="https://www.youtube.com/@ShopComponent" target="_blank" size="large">{t("watch_videos")}</Button>
+                            <Button url="https://www.youtube.com/@embedup" target="_blank" size="large">{t("watch_videos")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>
@@ -163,7 +163,7 @@ const Getsupport = () => {
                             <Box minHeight="6rem">
                               <Text variant="bodyLg" as="p">{t("explore_our_in_depth_help_documentation")}</Text>
                             </Box>
-                            <Button url="https://shopcomponent.com/academy/" target="_blank" size="large">{t("browse_docs")}</Button>
+                            <Button url="https://embedup.com/academy/" target="_blank" size="large">{t("browse_docs")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>

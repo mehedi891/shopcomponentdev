@@ -205,7 +205,7 @@ const Plans = () => {
         <Layout.Section variant="fullWidth">
           <Box paddingBlockEnd={'600'}>
             <BlockStack gap={"200"}>
-              <Text alignment="center" fontWeight="bold" variant="headingLg">Ready to start with ShopComponent?</Text>
+              <Text alignment="center" fontWeight="bold" variant="headingLg">Ready to start with EmbedUp?</Text>
               <Text alignment="center" variant="headingLg" tone="subdued" fontWeight="regular">Choose the package that best suits your Business Needs</Text>
               {remainTrialDays > 0 &&
                 <Box>

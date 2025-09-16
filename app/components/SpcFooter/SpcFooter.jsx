@@ -8,8 +8,8 @@ const SpcFooter = ({planName}) => {
       <InlineStack align="space-between" blockAlign="center" gap="200">
         <Box>
           <InlineStack gap={'200'} blockAlign="center">
-            <Button url="https://shopcomponent.com/" target="_blank" variant="tertiary">
-              <img className="spc-footer-img" src="/images/spcLogo.png" alt="Shopcomponent" />
+            <Button url="https://embedup.com/" target="_blank" variant="tertiary">
+              <img className="spc-footer-img" src="/images/spcLogonew.png" alt="Shopcomponent" />
             </Button>
             <Text>|</Text>
             <Button  url="/app/getsupport/" variant="tertiary">Get support</Button>
