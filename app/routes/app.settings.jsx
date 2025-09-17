@@ -190,7 +190,7 @@ const Settings = () => {
             <Layout>
                 <Layout.Section>
                     <BlockStack gap={'300'} align="center" inlineAlign="center">
-                        <Box width="100%">
+                        {/* <Box width="100%">
                             <Card>
                                 <HeadlessVerify
                                     showBanner={shopData?.headlessAccessToken ? false : true}
@@ -198,7 +198,7 @@ const Settings = () => {
                                     pageName={'settings'}
                                 />
                             </Card>
-                        </Box>
+                        </Box> */}
 
                         {/* <Box paddingBlock={'200'}>
                             <Card>  
