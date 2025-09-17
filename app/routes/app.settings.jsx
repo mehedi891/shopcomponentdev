@@ -190,13 +190,22 @@ const Settings = () => {
             <Layout>
                 <Layout.Section>
                     <BlockStack gap={'300'} align="center" inlineAlign="center">
-                        {/* <Box width="100%">
+                        <Box width="100%">
                             <Card>
                                 <HeadlessVerify
                                     showBanner={shopData?.headlessAccessToken ? false : true}
                                     defaultToken={shopData?.headlessAccessToken ? shopData?.headlessAccessToken : ''}
                                     pageName={'settings'}
                                 />
+                            </Card>
+                        </Box>
+
+                        {/* <Box paddingBlock={'200'}>
+                            <Card>  
+                                <BlockStack gap={'150'}>
+                                    <Text>App Created Token : <strong>8ac8662f5be86692a174712ebc1fe14a</strong></Text>
+                                    <Text>Headless App Token : <strong>40e54142b7de3372a26b591477308f56</strong></Text>
+                                    </BlockStack>
                             </Card>
                         </Box> */}
 

@@ -118,7 +118,7 @@ const PlanPurchase = () => {
     <Page>
       <PageTitle
 
-        title='ShopComponent - Subscription Confirmed'
+        title='EmbedUp - Subscription Confirmed'
 
       />
       <Layout>
@@ -131,7 +131,7 @@ const PlanPurchase = () => {
                   <BlockStack inlineAlign="center">
                     <Box paddingBlockEnd={150}>
                       {/* <Text variant="headingMd" as="h6" alignment="center">{t('Thanks', { plan: 'Free' })}</Text> */}
-                      <Text variant="headingLg" as="h2" alignment="center">{"Congratulations! Your ShopComponent subscription is now activated."}</Text>
+                      <Text variant="headingLg" as="h2" alignment="center">{"Congratulations! Your EmbedUp subscription is now activated."}</Text>
                     </Box>
                     {/* <Box maxWidth="24rem">
                       <Text variant="bodySm" as="p" alignment="center">{t("enjoy_app_message")}</Text>

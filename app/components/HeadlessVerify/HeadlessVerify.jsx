@@ -68,7 +68,7 @@ const HeadlessVerify = ({ showBanner = true, defaultToken = '',pageName='others'
                 <BlockStack gap={'200'}>
                   {/* <Text>{t("headless_token_required_msg")} <Text as='span' fontWeight='medium'>(No charge applicable)</Text></Text> */}
 
-                  <Text>Install the official Headless app <Text as='span' fontWeight='medium'>by Shopify</Text> to use Shopify’s Web Component cart drawer with ShopComponent <Text as='span' fontWeight='medium'>(No charge applicable).</Text></Text>
+                  <Text>Install the official Headless app <Text as='span' fontWeight='medium'>by Shopify</Text> to use Shopify’s Web Component cart drawer with EmbedUp <Text as='span' fontWeight='medium'>(No charge applicable).</Text></Text>
 
                   <InlineStack gap={'400'} blockAlign="center" align='start'>
                     <Button variant="secondary" url="https://apps.shopify.com/headless?utm_source=shopcomponent" target="_blank">Install Headless by Shopify</Button>
@@ -79,7 +79,7 @@ const HeadlessVerify = ({ showBanner = true, defaultToken = '',pageName='others'
                       </TitleBar>
                       <Box>
                         <InlineStack>
-                          <iframe width="100%" height="400px" src="https://www.youtube.com/embed/0T44_gFo0TI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                          <iframe width="100%" height="400px" src="https://www.youtube.com/embed/0T44_gFo0TI" title="YouTube video player"  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         </InlineStack>
                       </Box>
                     </Modal>

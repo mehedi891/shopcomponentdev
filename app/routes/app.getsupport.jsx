@@ -145,7 +145,7 @@ const Getsupport = () => {
                             <Box minHeight="6rem">
                               <Text variant="bodyLg" as="p">{t("discover_our_wide_range_of_video_tutorials")}</Text>
                             </Box>
-                            <Button url="https://www.youtube.com/@embedup" target="_blank" size="large">{t("watch_videos")}</Button>
+                            <Button url="https://www.youtube.com/@EmbedUpApp" target="_blank" size="large">{t("watch_videos")}</Button>
                           </Box>
                         </BlockStack>
                       </Card>
