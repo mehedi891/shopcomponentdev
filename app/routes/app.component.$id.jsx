@@ -27,6 +27,7 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
+import { ADD_TO_CART_TYPE, APPLIES_TO, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
 
 export const loader = async ({ request, params }) => {
   const { id } = params;
@@ -134,19 +135,19 @@ const UpdateComponent = () => {
     defaultValues: {
       title: component?.title || '',
       description: component?.description || '',
-      appliesTo: component?.appliesTo || 'product',
+      appliesTo: component?.appliesTo || APPLIES_TO.byproduct,
       addToCartType: {
-        type: component?.addToCartType?.type || 'individual',
+        type: component?.addToCartType?.type || ADD_TO_CART_TYPE.individual,
         products: component?.addToCartType?.products || [],
       },
       enableQtyField: component?.enableQtyField || false,
-      layout: component?.layout || 'grid',
-      status: component?.status || 'activate',
+      layout: component?.layout || LAYOUT.grid,
+      status: component?.status || STATUS.activate,
       componentSettings: {
         fullView: component?.componentSettings?.fullView || false,
-        cartBehavior: component?.componentSettings?.cartBehavior || 'cart',
+        cartBehavior: component?.componentSettings?.cartBehavior || CART_BEHAVIOR.checkout,
         customCss: component?.componentSettings?.customCss || '',
-        showComponentTitle: component?.componentSettings?.showComponentTitle || 'yes'
+        showComponentTitle: component?.componentSettings?.showComponentTitle || SHOW_COMPONENT_TITLE.yes
       },
       shoppingCartSettings: {
         heading: component?.shoppingCartSettings?.heading || 'Shopping cart',
@@ -182,7 +183,7 @@ const UpdateComponent = () => {
       tracking: component.tracking,
       customerTracking: component.customerTracking,
       shopId: component.shopId,
-      compHtml: ''
+      compHtml: 'EmptyHtml'
     }
   });
   const watchedValues = watch();
@@ -203,15 +204,15 @@ const UpdateComponent = () => {
 
   useEffect(() => {
     const limitedProducts = component?.shop?.plan?.planName === "Free" ? component?.addToCartType?.products?.slice(0, 3) : component?.addToCartType?.products;
-    if (component?.appliesTo === 'product') {
-      if (component?.addToCartType?.type === 'individual') {
+    if (component?.appliesTo === APPLIES_TO.byproduct) {
+      if (component?.addToCartType?.type === ADD_TO_CART_TYPE.individual) {
 
         setSelectedProductsInd(limitedProducts);
 
-      } else if (component?.addToCartType?.type === 'bulk') {
+      } else if (component?.addToCartType?.type === ADD_TO_CART_TYPE.bulk) {
         setSelectedProductsBulk(limitedProducts);
       }
-    } else if (component?.appliesTo === 'collection') {
+    } else if (component?.appliesTo === APPLIES_TO.bycollection) {
       setSelectedCollection(component?.addToCartType?.products);
     }
   }, [component]);
@@ -219,20 +220,20 @@ const UpdateComponent = () => {
   //console.log('selectedCollection', selectedCollection);
 
   useEffect(() => {
-    if (watchedValues.appliesTo === 'product') {
-      if (watchedValues.addToCartType.type === 'individual') {
+    if (watchedValues.appliesTo === APPLIES_TO.byproduct) {
+      if (watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual) {
         setValue('addToCartType.products', selectedProductsInd, { shouldDirty: true, shouldValidate: true });
-      } else if (watchedValues.addToCartType.type === 'bulk') {
+      } else if (watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk) {
         setValue('addToCartType.products', selectedProductsBulk, { shouldDirty: true, shouldValidate: true });
       }
-    } else if (watchedValues.appliesTo === 'collection') {
+    } else if (watchedValues.appliesTo === APPLIES_TO.bycollection) {
       setValue('addToCartType.products', selectedCollection, { shouldDirty: true, shouldValidate: true });
     }
 
   }, [selectedProductsInd, selectedCollection, watchedValues.appliesTo, selectedProductsBulk, watchedValues.addToCartType.type]);
 
   const formHandleSubmit = (data) => {
-    if (data.componentSettings.cartBehavior === "cart" && !component?.shop?.headlessAccessToken) {
+    if (data.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken) {
       setError("componentSettings.cartBehavior", {
         type: "manual",
         message: t("headless_token_required_msg"),
@@ -240,7 +241,7 @@ const UpdateComponent = () => {
       shopify.toast.show(t("headless_token_required_msg"), { duration: 2000 });
       return;
     }
-    const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings), compHtml: embedPHtmlCode };
+    const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings)};
     //console.log(updatedData);
     submit(updatedData, { method: 'patch' });
     setShowNewCreatedBanner(false);
@@ -439,7 +440,7 @@ const UpdateComponent = () => {
   }, [isDirty]);
 
   useEffect(() => {
-    if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
+    if (watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk) {
       setValue('componentSettings.fullView', false, { shouldValidate: true });
     }
   }, [setValue, watchedValues.appliesTo, watchedValues.addToCartType.type]);
@@ -447,7 +448,7 @@ const UpdateComponent = () => {
 
   const handleDiscard = () => {
     reset();
-    watchedValues.appliesTo === 'collection' ? setSelectedCollection(component?.addToCartType?.products) : watchedValues.addToCartType?.type === 'individual' ? setSelectedProductsInd(component?.addToCartType?.products) : setSelectedProductsBulk(component?.addToCartType?.products);
+    watchedValues.appliesTo === APPLIES_TO.bycollection ? setSelectedCollection(component?.addToCartType?.products) : watchedValues.addToCartType?.type === ADD_TO_CART_TYPE.individual ? setSelectedProductsInd(component?.addToCartType?.products) : setSelectedProductsBulk(component?.addToCartType?.products);
 
     setProductLayoutSettings({
       productTitleColor: component?.productLayoutSettings?.productTitleColor || '#303030',
@@ -470,7 +471,7 @@ const UpdateComponent = () => {
   }
 
   useEffect(() => {
-    if (watchedValues.componentSettings.cartBehavior === "cart" && !component?.shop?.headlessAccessToken) {
+    if (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken) {
       setToogleBtnDisabled(true);
     } else {
       setToogleBtnDisabled(false);
@@ -554,7 +555,7 @@ const UpdateComponent = () => {
                 line-height: 24px;
                 letter-spacing: -0.2px; 
                 margin-bottom: 10px;
-                display: ${watchedValues.componentSettings.showComponentTitle === 'no' ? 'none' : 'block'}             
+                display: ${watchedValues.componentSettings.showComponentTitle === SHOW_COMPONENT_TITLE.no ? 'none' : 'block'}             
             }
             .shopcomponent_description{
                 font-family: Inter;
@@ -747,7 +748,7 @@ const UpdateComponent = () => {
     }
   }, [selectedViewMDF.id, selectedViewMDF.view]);
 
-  const pdAddToCartHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
+  const pdAddToCartHtml = watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk ? `
              <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutBulkProduct(event,'${component.shop.scAccessToken}','${shopData.myshopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
@@ -769,7 +770,7 @@ const UpdateComponent = () => {
               </button>
     ` ;
 
-  const pdCheckoutBtnHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
+  const pdCheckoutBtnHtml = watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk ? `
              <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${watchedValues.tracking}"
                  onclick="addToCartNcheckoutBulkProduct(event,'${component.shop.scAccessToken}','${shopData.myshopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
@@ -927,7 +928,7 @@ const UpdateComponent = () => {
               <shopify-variant-selector class="product-card__variant-selector" shopify-attr--data-variant-id="product.selectedOrFirstAvailableVariant.id"></shopify-variant-selector>
 
               <div class="product-modal__buttons product-card__buttons">
-                    ${watchedValues.componentSettings.cartBehavior === 'cart' ? pdAddToCartHtml : pdCheckoutBtnHtml}
+                    ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? pdAddToCartHtml : pdCheckoutBtnHtml}
               </div>
               <div class="product-modal__description">
                 <span class="product-modal__description-text">
@@ -992,7 +993,7 @@ const UpdateComponent = () => {
               <!-- Add behavior to an existing button -->
                
               ${!watchedValues.componentSettings.fullView
-      ? (watchedValues.componentSettings.cartBehavior === 'cart'
+      ? (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart
         ? pdAddToCartHtml
         : pdCheckoutBtnHtml)
       : pdViewBtnHtml
@@ -1018,7 +1019,7 @@ const UpdateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1122,7 +1123,7 @@ const UpdateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1157,7 +1158,7 @@ const UpdateComponent = () => {
               <!-- Add behavior to an existing button -->
                
               ${!watchedValues.componentSettings.fullView
-      ? (watchedValues.componentSettings.cartBehavior === 'cart'
+      ? (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart
         ? pdAddToCartHtml
         : pdCheckoutBtnHtml)
       : pdViewBtnHtml
@@ -1220,7 +1221,7 @@ const UpdateComponent = () => {
               <!-- Add behavior to an existing button -->
                
               ${!watchedValues.componentSettings.fullView
-      ? (watchedValues.componentSettings.cartBehavior === 'cart'
+      ? (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart
         ? pdAddToCartHtml
         : pdCheckoutBtnHtml)
       : pdQuickViewBtnCollectionHtml
@@ -1245,7 +1246,7 @@ const UpdateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1286,12 +1287,12 @@ const UpdateComponent = () => {
     `;
 
   useEffect(() => {
-    if (watchedValues.appliesTo === 'collection') {
+    if (watchedValues.appliesTo === APPLIES_TO.bycollection) {
       setEmbedPHtmlCode(collectionLayoutIndHtml)
     } else {
-      if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'individual') {
+      if (watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual) {
         setEmbedPHtmlCode(productLayoutIndHtml)
-      } else if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
+      } else if (watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk) {
         setEmbedPHtmlCode(productLayoutBulkHtml)
       }
     }
@@ -1482,7 +1483,7 @@ const UpdateComponent = () => {
                     </Button>
                     <Button variant="plain" onClick={() => navigate(`/app`)}><Link>Component list</Link>
                     </Button>
-                    <Button variant="plain" disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
+                    <Button variant="plain" disabled={isDirty || watchedValues.status === STATUS.deactivate || (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken)} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
                     </Button>
 
                   </InlineStack>
@@ -1614,22 +1615,22 @@ const UpdateComponent = () => {
                           <Controller
                             name="componentSettings.cartBehavior"
                             control={control}
-                            defaultValue="active"
+                            defaultValue={CART_BEHAVIOR.checkout}
                             render={({ field }) => (
                               <BlockStack gap={'200'}>
                                 <RadioButton
                                   name="componentSettings.cartBehavior"
                                   // label={t("checkout")}
                                   label="Buy Now (Checkout)"
-                                  checked={field.value === 'checkout'}
-                                  onChange={() => field.onChange('checkout')}
+                                  checked={field.value === CART_BEHAVIOR.checkout}
+                                  onChange={() => field.onChange(CART_BEHAVIOR.checkout)}
 
                                 />
                                 <RadioButton
                                   name="componentSettings.cartBehavior"
                                   label={t("open_to_cart")}
-                                  checked={field.value === 'cart'}
-                                  onChange={() => field.onChange('cart')}
+                                  checked={field.value === CART_BEHAVIOR.cart}
+                                  onChange={() => field.onChange(CART_BEHAVIOR.cart)}
 
                                 />
                               </BlockStack>
@@ -1639,7 +1640,7 @@ const UpdateComponent = () => {
 
 
                         </BlockStack>
-                        {watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken &&
+                        {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken &&
                           <Box paddingBlockStart={'200'}>
                             <HeadlessVerify />
                           </Box>
@@ -1681,20 +1682,20 @@ const UpdateComponent = () => {
                           <Controller
                             name="appliesTo"
                             control={control}
-                            defaultValue="product"
+                            defaultValue={APPLIES_TO.byproduct}
                             render={({ field }) => (
                               <>
                                 <RadioButton
                                   name="appliesTo"
                                   label={t("applies_to_collection")}
-                                  checked={field.value === 'collection'}
-                                  onChange={() => field.onChange('collection')}
+                                  checked={field.value === APPLIES_TO.bycollection}
+                                  onChange={() => field.onChange(APPLIES_TO.bycollection)}
                                 />
                                 <RadioButton
                                   name="appliesTo"
                                   label={t("applies_to_product")}
-                                  checked={field.value === 'product'}
-                                  onChange={() => field.onChange('product')}
+                                  checked={field.value === APPLIES_TO.byproduct}
+                                  onChange={() => field.onChange(APPLIES_TO.byproduct)}
                                 />
                               </>
                             )}
@@ -1704,7 +1705,7 @@ const UpdateComponent = () => {
                         </BlockStack>
                       </Box>
 
-                      {watchedValues.appliesTo === "collection" &&
+                      {watchedValues.appliesTo === APPLIES_TO.bycollection &&
                         <Box>
                           <Box padding={'300'}>
                             <InlineStack blockAlign="center" align="space-between">
@@ -1779,17 +1780,17 @@ const UpdateComponent = () => {
                           </Box>
                         </Box>
                       }
-                      {watchedValues.appliesTo === "product" &&
+                      {watchedValues.appliesTo === APPLIES_TO.byproduct &&
                         <Box paddingBlockStart={'100'} paddingInline={'300'} paddingBlockEnd={'300'}>
                           <Controller
                             name="addToCartType.type"
                             control={control}
                             render={({ field }) => (
                               <Select
-                                label={watchedValues.componentSettings.cartBehavior === 'cart' ? t("add_to_cart_type") : 'Checkout type'}
+                                label={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? t("add_to_cart_type") : 'Checkout type'}
                                 options={[
-                                  { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("individual_add_to_cart") : 'Individual Checkout', value: 'individual' },
-                                  { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}
+                                  { label: watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? t("individual_add_to_cart") : 'Individual Checkout', value: ADD_TO_CART_TYPE.individual },
+                                  { label: watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? t("bulk_add_to_cart") : 'Bulk checkout', value: ADD_TO_CART_TYPE.bulk, disabled: disabledContentByPlan }]}
                                 selected={field.value}
                                 onChange={field.onChange}
                                 value={field.value}
@@ -1799,7 +1800,7 @@ const UpdateComponent = () => {
                         </Box>
 
                       }
-                      {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "individual" &&
+                      {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual &&
                         <Box className="Polaris-Box Individual">
                           <Box padding={'300'}>
                             <InlineStack blockAlign="center" align="space-between">
@@ -1878,7 +1879,7 @@ const UpdateComponent = () => {
                         </Box>
 
                       }
-                      {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk" &&
+                      {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk &&
                         <Box className="Polaris-Box Bulk">
                           <Box padding={'300'}>
                             <InlineStack blockAlign="center" align="space-between">
@@ -2077,29 +2078,29 @@ const UpdateComponent = () => {
                           <Controller
                             name="layout"
                             control={control}
-                            defaultValue="list"
+                            defaultValue={LAYOUT.grid}
                             render={({ field }) => (
                               <>
                                 <RadioButton
                                   name="layout"
                                   label={t("list")}
-                                  checked={field.value === 'list'}
-                                  onChange={() => field.onChange('list')}
+                                  checked={field.value === LAYOUT.list}
+                                  onChange={() => field.onChange(LAYOUT.list)}
 
                                 />
                                 <RadioButton
                                   name="layout"
                                   label={t("grid")}
-                                  checked={field.value === 'grid'}
-                                  onChange={() => field.onChange('grid')}
+                                  checked={field.value === LAYOUT.grid}
+                                  onChange={() => field.onChange(LAYOUT.grid)}
 
                                 />
                                 <InlineStack align="start" blockAlign="center" gap={'150'}>
                                   <RadioButton
                                     name="layout"
                                     label={t("grid_slider")}
-                                    checked={field.value === 'gridSlider'}
-                                    onChange={() => field.onChange('gridSlider')}
+                                    checked={field.value === LAYOUT.grid_slider}
+                                    onChange={() => field.onChange(LAYOUT.grid_slider)}
                                     disabled={disabledContentByPlan}
                                   />
                                   {disabledContentByPlan &&
@@ -2147,21 +2148,21 @@ const UpdateComponent = () => {
                           <Controller
                             name="status"
                             control={control}
-                            defaultValue="active"
+                            defaultValue={STATUS.activate}
                             render={({ field }) => (
                               <>
                                 <RadioButton
                                   name="status"
                                   label={t("activate")}
-                                  checked={field.value === 'activate'}
-                                  onChange={() => field.onChange('activate')}
+                                  checked={field.value === STATUS.activate}
+                                  onChange={() => field.onChange(STATUS.activate)}
 
                                 />
                                 <RadioButton
                                   name="status"
                                   label={t("deactivate")}
-                                  checked={field.value === 'deactivate'}
-                                  onChange={() => field.onChange('deactivate')}
+                                  checked={field.value === STATUS.deactivate}
+                                  onChange={() => field.onChange(STATUS.deactivate)}
 
                                 />
                               </>
@@ -2203,7 +2204,7 @@ const UpdateComponent = () => {
                       <Box padding={'300'}>
                         <BlockStack gap={'300'}>
                           <BlockStack gap={'300'}>
-                            {watchedValues.componentSettings.cartBehavior === 'cart' &&
+                            {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart &&
                               <Controller
                                 name="buttonStyleSettings.addToCartBtnTxt"
                                 control={control}
@@ -2221,7 +2222,7 @@ const UpdateComponent = () => {
                                 )}
                               />
                             }
-                            {watchedValues.componentSettings.cartBehavior === 'checkout' &&
+                            {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout &&
                               <Controller
                                 name="buttonStyleSettings.checkoutBtnTxt"
                                 control={control}
@@ -2365,8 +2366,8 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}
-                  aria-hidden={watchedValues.componentSettings.cartBehavior === 'checkout'}
+                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
+                  aria-hidden={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
                 >
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
@@ -2548,7 +2549,7 @@ const UpdateComponent = () => {
                           {settingsTabSelected === 0 &&
                             <Box paddingInline={'300'} paddingBlock={'200'}>
                               <BlockStack gap={'300'}>
-                                <Box visuallyHidden={watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk"}>
+                                <Box visuallyHidden={watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk}>
                                   <BlockStack gap={'100'}>
                                     {/* <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text> */}
                                     <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text>
@@ -2585,21 +2586,21 @@ const UpdateComponent = () => {
                                     <Controller
                                       name="componentSettings.showComponentTitle"
                                       control={control}
-                                      defaultValue="active"
+                                      defaultValue={SHOW_COMPONENT_TITLE.yes}
                                       render={({ field }) => (
                                         <InlineStack gap={'400'} blockAlign="center">
                                           <RadioButton
                                             name="componentSettings.showComponentTitle"
                                             label={t("yes")}
-                                            checked={field.value === 'yes'}
-                                            onChange={() => field.onChange('yes')}
+                                            checked={field.value === SHOW_COMPONENT_TITLE.yes}
+                                            onChange={() => field.onChange(SHOW_COMPONENT_TITLE.yes)}
 
                                           />
                                           <RadioButton
                                             name="componentSettings.showComponentTitle"
                                             label={t("no")}
-                                            checked={field.value === 'no'}
-                                            onChange={() => field.onChange('no')}
+                                            checked={field.value === SHOW_COMPONENT_TITLE.no}
+                                            onChange={() => field.onChange(SHOW_COMPONENT_TITLE.no)}
 
                                           />
                                         </InlineStack>
@@ -2930,7 +2931,7 @@ const UpdateComponent = () => {
                             />
                           </Box>
                         </Tooltip>
-                        <Button disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                        <Button disabled={isDirty || watchedValues.status === STATUS.deactivate || (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                       </InlineStack>
                     </Box>
 
@@ -2986,7 +2987,7 @@ const UpdateComponent = () => {
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                     <InlineStack align="end">
-                      <Button variant="primary" disabled={isDirty || watchedValues.status === 'deactivate' || (watchedValues.componentSettings.cartBehavior === 'cart' && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      <Button variant="primary" disabled={isDirty || watchedValues.status === STATUS.deactivate || (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </InlineStack>
                   </Box>
                 </Card>
@@ -3088,12 +3089,14 @@ export const action = async ({ request, params }) => {
       message: `Component ${data.status} successfully`,
     }
   } else if (request.method === 'DELETE') {
+    //console.log('Delelte:',id);
     try {
-      await db.component.delete({
+       await db.component.delete({
         where: {
           id: Number(id),
         },
       });
+     
     } catch (error) {
       return {
         success: false,
@@ -3130,7 +3133,7 @@ export const action = async ({ request, params }) => {
       const newComponentData = {
         ...clonableData,
         title: 'Copy ' + original.title,
-        status: 'deactivate',
+        status: STATUS.deactivate,
         customerTracking: (original.customerTracking || '') + '_DP',
         tracking: (original.tracking || '') + '_DP',
       };

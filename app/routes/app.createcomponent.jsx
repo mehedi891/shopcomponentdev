@@ -27,6 +27,7 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
+import { ADD_TO_CART_TYPE, APPLIES_TO, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
 
 
 
@@ -134,19 +135,19 @@ const CreateComponent = () => {
         defaultValues: {
             title: '',
             description: '',
-            appliesTo: 'product',
+            appliesTo: APPLIES_TO.byproduct,
             addToCartType: {
-                type: 'individual',
+                type: ADD_TO_CART_TYPE.individual,
                 products: []
             },
             enableQtyField: false,
-            layout: 'grid',
-            status: 'activate',
+            layout: LAYOUT.grid,
+            status: STATUS.activate,
             componentSettings: {
                 fullView: false,
-                cartBehavior: 'checkout',
+                cartBehavior: CART_BEHAVIOR.checkout,
                 customCss: '',
-                showComponentTitle: 'yes'
+                showComponentTitle: SHOW_COMPONENT_TITLE.yes
             },
             shoppingCartSettings: {
                 heading: 'Shopping cart',
@@ -182,7 +183,7 @@ const CreateComponent = () => {
             tracking: trackingCode || '',
             customerTracking: '',
             shopId: shopData?.id,
-            compHtml: ''
+            compHtml: 'EmptyHtml'
         }
     });
     const watchedValues = watch();
@@ -195,20 +196,20 @@ const CreateComponent = () => {
 
 
     useEffect(() => {
-        if (watchedValues.appliesTo === 'product') {
-            if (watchedValues.addToCartType.type === 'individual') {
+        if (watchedValues.appliesTo === APPLIES_TO.byproduct) {
+            if (watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual) {
                 setValue('addToCartType.products', selectedProductsInd, { shouldDirty: true, shouldValidate: true });
-            } else if (watchedValues.addToCartType.type === 'bulk') {
+            } else if (watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk) {
                 setValue('addToCartType.products', selectedProductsBulk, { shouldDirty: true, shouldValidate: true });
             }
-        } else if (watchedValues.appliesTo === 'collection') {
+        } else if (watchedValues.appliesTo === APPLIES_TO.bycollection) {
             setValue('addToCartType.products', selectedCollection, { shouldDirty: true, shouldValidate: true });
         }
 
     }, [selectedProductsInd, selectedCollection, watchedValues.appliesTo, selectedProductsBulk, watchedValues.addToCartType.type]);
 
     const formHandleSubmit = (data) => {
-        if (data.componentSettings.cartBehavior === "cart" && !shopData?.headlessAccessToken) {
+        if (data.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !shopData?.headlessAccessToken) {
             setError("componentSettings.cartBehavior", {
                 type: "manual",
                 message: t("headless_token_required_msg"),
@@ -216,7 +217,7 @@ const CreateComponent = () => {
             shopify.toast.show(t("headless_token_required_msg"), { duration: 2000 });
             return;
         }
-        const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings), compHtml: embedPHtmlCode };
+        const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings) };
         //console.log(updatedData);
         submit(updatedData, { method: 'post' });
     };
@@ -423,13 +424,13 @@ const CreateComponent = () => {
 
 
     useEffect(() => {
-        if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
+        if (watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk) {
             setValue('componentSettings.fullView', false, { shouldValidate: true });
         }
     }, [watchedValues.appliesTo, watchedValues.addToCartType.type]);
 
     useEffect(() => {
-        if (watchedValues.componentSettings.cartBehavior === "cart" && !shopData?.headlessAccessToken) {
+        if (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !shopData?.headlessAccessToken) {
             setToogleBtnDisabled(true);
         } else {
             setToogleBtnDisabled(false);
@@ -528,7 +529,7 @@ const CreateComponent = () => {
                 line-height: 24px;
                 letter-spacing: -0.2px; 
                 margin-bottom: 10px;
-                display: ${watchedValues.componentSettings.showComponentTitle === 'no' ? 'none' : 'block'}             
+                display: ${watchedValues.componentSettings.showComponentTitle === SHOW_COMPONENT_TITLE.no ? 'none' : 'block'}             
             }
             .shopcomponent_description{
                 font-family: Inter;
@@ -721,7 +722,7 @@ const CreateComponent = () => {
         }
     }, [selectedViewMDF.id, selectedViewMDF.view]);
 
-    const pdAddToCartHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
+    const pdAddToCartHtml = watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk ? `
              <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${watchedValues.tracking}"
                 onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
@@ -743,7 +744,7 @@ const CreateComponent = () => {
               </button>
     ` ;
 
-    const pdCheckoutBtnHtml = watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk' ? `
+    const pdCheckoutBtnHtml = watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk ? `
              <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${watchedValues.tracking}"
                  onclick="addToCartNcheckoutBulkProduct(event,'${shopData.scAccessToken}','${shopData.shopifyDomain}','${watchedValues.tracking}','${watchedValues.customerTracking}','${watchedValues.componentSettings.cartBehavior}',${watchedValues.enableQtyField})"
@@ -902,7 +903,7 @@ const CreateComponent = () => {
               <shopify-variant-selector class="product-card__variant-selector" shopify-attr--data-variant-id="product.selectedOrFirstAvailableVariant.id"></shopify-variant-selector>
 
               <div class="product-modal__buttons product-card__buttons">
-                    ${watchedValues.componentSettings.cartBehavior === 'cart' ? pdAddToCartHtml : pdCheckoutBtnHtml}
+                    ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? pdAddToCartHtml : pdCheckoutBtnHtml}
               </div>
               <div class="product-modal__description">
                 <span class="product-modal__description-text">
@@ -967,7 +968,7 @@ const CreateComponent = () => {
               <!-- Add behavior to an existing button -->
                
               ${!watchedValues.componentSettings.fullView
-            ? (watchedValues.componentSettings.cartBehavior === 'cart'
+            ? (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart
                 ? pdAddToCartHtml
                 : pdCheckoutBtnHtml)
             : pdViewBtnHtml
@@ -994,7 +995,7 @@ const CreateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1100,7 +1101,7 @@ const CreateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1135,7 +1136,7 @@ const CreateComponent = () => {
               <!-- Add behavior to an existing button -->
                
               ${!watchedValues.componentSettings.fullView
-            ? (watchedValues.componentSettings.cartBehavior === 'cart'
+            ? (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart
                 ? pdAddToCartHtml
                 : pdCheckoutBtnHtml)
             : pdViewBtnHtml
@@ -1198,7 +1199,7 @@ const CreateComponent = () => {
               <!-- Add behavior to an existing button -->
                
               ${!watchedValues.componentSettings.fullView
-            ? (watchedValues.componentSettings.cartBehavior === 'cart'
+            ? (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart
                 ? pdAddToCartHtml
                 : pdCheckoutBtnHtml)
             : pdQuickViewBtnCollectionHtml
@@ -1227,7 +1228,7 @@ const CreateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === 'cart' ? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1268,12 +1269,12 @@ const CreateComponent = () => {
     `;
 
     useEffect(() => {
-        if (watchedValues.appliesTo === 'collection') {
+        if (watchedValues.appliesTo === APPLIES_TO.bycollection) {
             setEmbedPHtmlCode(collectionLayoutIndHtml)
         } else {
-            if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'individual') {
+            if (watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual) {
                 setEmbedPHtmlCode(productLayoutIndHtml)
-            } else if (watchedValues.appliesTo === 'product' && watchedValues.addToCartType.type === 'bulk') {
+            } else if (watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk) {
                 setEmbedPHtmlCode(productLayoutBulkHtml)
             }
         }
@@ -1540,15 +1541,15 @@ const CreateComponent = () => {
                                                                     name="componentSettings.cartBehavior"
                                                                     // label={t("checkout")}
                                                                     label="Buy Now (Checkout)"
-                                                                    checked={field.value === 'checkout'}
-                                                                    onChange={() => field.onChange('checkout')}
+                                                                    checked={field.value === CART_BEHAVIOR.checkout}
+                                                                    onChange={() => field.onChange(CART_BEHAVIOR.checkout)}
 
                                                                 />
                                                                 <RadioButton
                                                                     name="componentSettings.cartBehavior"
                                                                     label={t("open_to_cart")}
-                                                                    checked={field.value === 'cart'}
-                                                                    onChange={() => field.onChange('cart')}
+                                                                    checked={field.value === CART_BEHAVIOR.cart}
+                                                                    onChange={() => field.onChange(CART_BEHAVIOR.cart)}
 
                                                                 />
                                                             </BlockStack>
@@ -1557,7 +1558,7 @@ const CreateComponent = () => {
 
 
                                                 </BlockStack>
-                                                {watchedValues.componentSettings.cartBehavior === 'cart' && !shopData?.headlessAccessToken &&
+                                                {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !shopData?.headlessAccessToken &&
                                                     <Box paddingBlockStart={'200'}>
                                                         <HeadlessVerify />
                                                     </Box>
@@ -1598,20 +1599,20 @@ const CreateComponent = () => {
                                                     <Controller
                                                         name="appliesTo"
                                                         control={control}
-                                                        defaultValue="product"
+                                                        defaultValue={APPLIES_TO.byproduct}
                                                         render={({ field }) => (
                                                             <>
                                                                 <RadioButton
                                                                     name="appliesTo"
                                                                     label={t("applies_to_collection")}
                                                                     checked={field.value === 'collection'}
-                                                                    onChange={() => field.onChange('collection')}
+                                                                    onChange={() => field.onChange(APPLIES_TO.bycollection)}
                                                                 />
                                                                 <RadioButton
                                                                     name="appliesTo"
                                                                     label={t("applies_to_product")}
                                                                     checked={field.value === 'product'}
-                                                                    onChange={() => field.onChange('product')}
+                                                                    onChange={() => field.onChange(APPLIES_TO.byproduct)}
                                                                 />
                                                             </>
                                                         )}
@@ -1621,7 +1622,7 @@ const CreateComponent = () => {
                                                 </BlockStack>
                                             </Box>
 
-                                            {watchedValues.appliesTo === "collection" &&
+                                            {watchedValues.appliesTo === APPLIES_TO.bycollection &&
                                                 <Box>
                                                     <Box padding={'300'}>
                                                         <InlineStack blockAlign="center" align="space-between">
@@ -1696,17 +1697,17 @@ const CreateComponent = () => {
                                                     </Box>
                                                 </Box>
                                             }
-                                            {watchedValues.appliesTo === "product" &&
+                                            {watchedValues.appliesTo === APPLIES_TO.byproduct &&
                                                 <Box paddingBlockStart={'100'} paddingInline={'300'} paddingBlockEnd={'300'}>
                                                     <Controller
                                                         name="addToCartType.type"
                                                         control={control}
                                                         render={({ field }) => (
                                                             <Select
-                                                                label={watchedValues.componentSettings.cartBehavior === 'cart' ? t("add_to_cart_type") : 'Checkout type'}
+                                                                label={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? t("add_to_cart_type") : 'Checkout type'}
                                                                 options={[
-                                                                    { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("individual_add_to_cart") : 'Individual Checkout', value: 'individual' },
-                                                                    { label: watchedValues.componentSettings.cartBehavior === 'cart' ? t("bulk_add_to_cart") : 'Bulk checkout', value: 'bulk', disabled: disabledContentByPlan }]}
+                                                                    { label: watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? t("individual_add_to_cart") : 'Individual Checkout', value: ADD_TO_CART_TYPE.individual },
+                                                                    { label: watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? t("bulk_add_to_cart") : 'Bulk checkout', value: ADD_TO_CART_TYPE.bulk, disabled: disabledContentByPlan }]}
                                                                 selected={field.value}
                                                                 onChange={field.onChange}
                                                                 value={field.value}
@@ -1716,7 +1717,7 @@ const CreateComponent = () => {
                                                 </Box>
 
                                             }
-                                            {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "individual" &&
+                                            {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual &&
                                                 <Box>
                                                     <Box padding={'300'}>
                                                         <InlineStack blockAlign="center" align="space-between">
@@ -1795,7 +1796,7 @@ const CreateComponent = () => {
                                                 </Box>
 
                                             }
-                                            {watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk" &&
+                                            {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk &&
                                                 <Box>
                                                     <Box padding={'300'}>
                                                         <InlineStack blockAlign="center" align="space-between">
@@ -1997,29 +1998,29 @@ const CreateComponent = () => {
                                                     <Controller
                                                         name="layout"
                                                         control={control}
-                                                        defaultValue="list"
+                                                        defaultValue={LAYOUT.grid}
                                                         render={({ field }) => (
                                                             <>
                                                                 <RadioButton
                                                                     name="layout"
                                                                     label={t("list")}
-                                                                    checked={field.value === 'list'}
-                                                                    onChange={() => field.onChange('list')}
+                                                                    checked={field.value === LAYOUT.list}
+                                                                    onChange={() => field.onChange(LAYOUT.list)}
 
                                                                 />
                                                                 <RadioButton
                                                                     name="layout"
                                                                     label={t("grid")}
-                                                                    checked={field.value === 'grid'}
-                                                                    onChange={() => field.onChange('grid')}
+                                                                    checked={field.value === LAYOUT.grid}
+                                                                    onChange={() => field.onChange(LAYOUT.grid)}
 
                                                                 />
                                                                 <InlineStack align="start" blockAlign="center" gap={'150'}>
                                                                     <RadioButton
                                                                         name="layout"
                                                                         label={t("grid_slider")}
-                                                                        checked={field.value === 'gridSlider'}
-                                                                        onChange={() => field.onChange('gridSlider')}
+                                                                        checked={field.value === LAYOUT.grid_slider}
+                                                                        onChange={() => field.onChange(LAYOUT.grid_slider)}
                                                                         disabled={disabledContentByPlan}
                                                                     />
                                                                     {disabledContentByPlan &&
@@ -2066,21 +2067,21 @@ const CreateComponent = () => {
                                                     <Controller
                                                         name="status"
                                                         control={control}
-                                                        defaultValue="active"
+                                                        defaultValue={STATUS.activate}
                                                         render={({ field }) => (
                                                             <>
                                                                 <RadioButton
                                                                     name="status"
                                                                     label={t("activate")}
-                                                                    checked={field.value === 'activate'}
-                                                                    onChange={() => field.onChange('activate')}
+                                                                    checked={field.value === STATUS.activate}
+                                                                    onChange={() => field.onChange(STATUS.activate)}
 
                                                                 />
                                                                 <RadioButton
                                                                     name="status"
                                                                     label={t("deactivate")}
-                                                                    checked={field.value === 'deactivate'}
-                                                                    onChange={() => field.onChange('deactivate')}
+                                                                    checked={field.value === STATUS.deactivate}
+                                                                    onChange={() => field.onChangeSTATUS.deactivate}
 
                                                                 />
                                                             </>
@@ -2121,7 +2122,7 @@ const CreateComponent = () => {
                                             <Box padding={'300'}>
                                                 <BlockStack gap={'300'}>
                                                     <BlockStack gap={'300'}>
-                                                        {watchedValues.componentSettings.cartBehavior === 'cart' &&
+                                                        {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart &&
                                                             <Controller
                                                                 name="buttonStyleSettings.addToCartBtnTxt"
                                                                 control={control}
@@ -2139,7 +2140,7 @@ const CreateComponent = () => {
                                                                 )}
                                                             />
                                                         }
-                                                        {watchedValues.componentSettings.cartBehavior === 'checkout' &&
+                                                        {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout &&
                                                             <Controller
                                                                 name="buttonStyleSettings.checkoutBtnTxt"
                                                                 control={control}
@@ -2283,8 +2284,8 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout' ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === 'checkout'}
-                                    aria-hidden={watchedValues.componentSettings.cartBehavior === 'checkout'}
+                                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
+                                    aria-hidden={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
                                 >
                                     <Box background="bg-fill" borderRadius="200">
                                         <Box minHeight="50px">
@@ -2463,7 +2464,7 @@ const CreateComponent = () => {
                                                     {settingsTabSelected === 0 &&
                                                         <Box paddingInline={'300'} paddingBlock={'200'}>
                                                             <BlockStack gap={'300'}>
-                                                                <Box visuallyHidden={watchedValues.appliesTo === "product" && watchedValues.addToCartType.type === "bulk"}>
+                                                                <Box visuallyHidden={watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk}>
                                                                     <BlockStack gap={'100'}>
                                                                         {/* <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text> */}
                                                                         <Text variant="bodyMd" fontWeight="regular">Enable "quick view" option</Text>
@@ -2500,21 +2501,21 @@ const CreateComponent = () => {
                                                                         <Controller
                                                                             name="componentSettings.showComponentTitle"
                                                                             control={control}
-                                                                            defaultValue="active"
+                                                                            defaultValue={SHOW_COMPONENT_TITLE.yes}
                                                                             render={({ field }) => (
                                                                                 <InlineStack gap={'400'} blockAlign="center">
                                                                                     <RadioButton
                                                                                         name="componentSettings.showComponentTitle"
                                                                                         label={t("yes")}
-                                                                                        checked={field.value === 'yes'}
-                                                                                        onChange={() => field.onChange('yes')}
+                                                                                        checked={field.value === SHOW_COMPONENT_TITLE.yes}
+                                                                                        onChange={() => field.onChange(SHOW_COMPONENT_TITLE.yes)}
 
                                                                                     />
                                                                                     <RadioButton
                                                                                         name="componentSettings.showComponentTitle"
                                                                                         label={t("no")}
-                                                                                        checked={field.value === 'no'}
-                                                                                        onChange={() => field.onChange('no')}
+                                                                                        checked={field.value === SHOW_COMPONENT_TITLE.no}
+                                                                                        onChange={() => field.onChange(SHOW_COMPONENT_TITLE.no)}
 
                                                                                     />
                                                                                 </InlineStack>

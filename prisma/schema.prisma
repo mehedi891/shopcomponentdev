@@ -13,6 +13,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum APPLIES_TO {
+  product
+  collection
+}
+
+enum LAYOUT {
+  grid
+  list
+  gridSlider
+}
+
+enum STATUS {
+  actived
+  deactived
+}
+
+enum PLAN_TYPE {
+  monthly
+  yearly
+}
+
+enum PLAN_NAME {
+  Free
+  Growth
+}
+
+enum PLAN_STATUS {
+  ACTIVE
+  CANCELLED
+  DECLINED
+  EXPIRED
+  FROZEN
+  PENDING
+}
+
 model Session {
   id            String    @id
   shop          String
@@ -46,7 +82,7 @@ model Component {
   buttonStyleSettings   Json?
   tracking              String?    @unique
   customerTracking      String?
-  compHtml              String
+  compHtml              String?    @default("empty")
   shopId                Int
   softDelete            Boolean    @default(false)
   shop                  Shop       @relation(fields: [shopId], references: [id])
@@ -97,16 +133,18 @@ model Shop {
 }
 
 model Plan {
-  id         Int      @id @default(autoincrement())
-  planId     String?  @unique
-  planName   String?
-  price      Float?   @default(0.00)
-  planType   String?
-  planStatus String?  @default("deactived")
-  shopId     Int      @unique
-  shop       Shop     @relation(fields: [shopId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  planId       String?  @unique
+  planName     String?
+  price        Float?   @default(0.00)
+  planType     String?
+  chargeId     String?
+  isTestCharge Boolean?  @default(true)
+  planStatus   String?  @default("deactived")
+  shopId       Int      @unique
+  shop         Shop     @relation(fields: [shopId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Order {

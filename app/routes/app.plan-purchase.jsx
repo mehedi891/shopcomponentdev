@@ -6,6 +6,7 @@ import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
 import PageTitle from '../components/PageTitle/PageTitle';
+import { MAX_ALLOWED_COMPONENTS, PLAN_STATUS } from '../constants/constants';
 
 export const loader = async ({ request }) => {
 
@@ -44,12 +45,14 @@ export const loader = async ({ request }) => {
   const isFirstInstall = url.searchParams.get('isFirstInstall');
   const upgrade = url.searchParams.get('upgrade');
   const downgrade = url.searchParams.get('downgrade');
+  const planType = url.searchParams.get('planType');
+  const chargeId = url.searchParams.get('charge_id');
 
   if (appSubscriptions?.length > 0 && shopData?.plan?.planId !== appSubscriptions[0]?.id) {
     shopData = await db.shop.update({
       where: { id: Number(shopData.id) },
       data: {
-        maxAllowedComponents: 10,
+        maxAllowedComponents: MAX_ALLOWED_COMPONENTS.growth,
         appPlan: appSubscriptions[0].name,
         trialDays: appSubscriptions[0].trialDays,
         planActivatedAt: isFirstInstall === 'true' ? appSubscriptions[0]?.createdAt : shopData?.planActivatedAt,
@@ -58,13 +61,20 @@ export const loader = async ({ request }) => {
             create: {
               planId: appSubscriptions[0].id,
               planName: appSubscriptions[0].name,
-              price: 29.0,
-              planStatus: 'active',
+              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+              planStatus: appSubscriptions[0].status,
+              isTestCharge:appSubscriptions[0].test,
+              planType,
+              chargeId,
             },
             update: {
               planId: appSubscriptions[0].id,
               planName: appSubscriptions[0].name,
-              price: 29.00,
+              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+              planStatus: appSubscriptions[0].status,
+              isTestCharge:appSubscriptions[0].test,
+              planType,
+              chargeId,
             },
           },
         },
@@ -78,7 +88,7 @@ export const loader = async ({ request }) => {
   }
 
 
-  if (upgrade === 'true' && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions?.length > 0 && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions[0]?.status === 'ACTIVE') {
+  if (upgrade === 'true' && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions?.length > 0 && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions[0]?.status === PLAN_STATUS.active) {
    
     await db.component.updateMany({
       where: {

@@ -1,13 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "f96d7136a6d4dd93b083a85e08ec9221"
-name = "embedupdev - sell anywhere"
-handle = "embedupdev"
+client_id = "0ac116b91c73391637da3d654209487a"
+name = "EmbedUp - Sell anywhere"
+handle = "embedup"
 application_url = "https://app.shopcomponent.com/"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
+include_config_on_deploy = true
 
 [webhooks]
 api_version = "2025-07"

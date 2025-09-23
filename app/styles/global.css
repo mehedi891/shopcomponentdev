@@ -40,6 +40,11 @@
     cursor: pointer;
 }
 
+.Polaris-Box.spc_videoThumbnail .Polaris-VideoThumbnail__Thumbnail{
+    border-radius: 10px;
+    background-size: contain;
+} 
+
 .spc-footer-img{
     max-height: 25px;
 }

@@ -4,7 +4,7 @@ import { authenticate, FREE_PLAN, MONTHLY_PLAN } from "../shopify.server"
 export const loader = async ({ request }) => {
   const { session, billing } = await authenticate.admin(request);
 
-  const returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/headless`;
+  const returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/headless`;
 
   // const subscription = await billing.require({
   //   plans: [MONTHLY_PLAN],

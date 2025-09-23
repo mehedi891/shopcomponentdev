@@ -1,5 +1,5 @@
 import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
-import { BlockStack, Box, Button, Card, Icon, InlineStack, Layout, Page, Text } from "@shopify/polaris";
+import { BlockStack, Box, Button, ButtonGroup, Card, Icon, InlineStack, Layout, Page, Text } from "@shopify/polaris";
 import {
   CheckCircleIcon
 } from '@shopify/polaris-icons';
@@ -8,6 +8,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
+import { ADD_TO_CART_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {
@@ -42,8 +43,12 @@ export const loader = async ({ request }) => {
     where: {
       shopifyDomain: session.shop
     },
-    include: {
-      plan: true
+    select: {
+      id: true,
+      planActivatedAt: true,
+      plan: true,
+      isFirstInstall:true,
+      scAccessToken: true
     }
   });
 
@@ -82,9 +87,7 @@ export const loader = async ({ request }) => {
         shopifyDomain: session.shop,
       },
       update: {
-        installationCount: {
-          increment: 1,
-        },
+        shopifyDomain: session.shop,
       },
       create: {
         shopifyDomain: session.shop,
@@ -92,9 +95,13 @@ export const loader = async ({ request }) => {
         installationCount: 1,
         shopifyShopGid: shop.data.shop.id,
       },
-      include: {
+      select: {
+        id: true,
+        planActivatedAt: true,
         plan: true,
-      },
+        isFirstInstall:true,
+        scAccessToken: true
+      }
     });
   }
 
@@ -154,6 +161,7 @@ const Plans = () => {
   const navigate = useNavigate();
   const [remainTrialDays, setRemainTrialDays] = useState(0);
   const [isLoading, setIsLoading] = useState(null);
+  const [isMonthlyPlanShow, setIsMonthlyPlanShow] = useState(true);
 
   useEffect(() => {
     setRemainTrialDays(getRemainingTrialDays(shopData?.planActivatedAt, trialDaysOffer))
@@ -187,8 +195,16 @@ const Plans = () => {
 
 
 
+  useEffect(() => {
+    if (shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly) {
+      setIsMonthlyPlanShow(false);
+    } else {
+      setIsMonthlyPlanShow(true);
+    }
+  }, [shopData?.plan?.planName, shopData?.plan?.planType]);
 
-
+  //console.log(shopData);
+  
   const handleCancelSubscription = () => {
     fetcher.submit('', { method: 'get', action: '/api/plancancel' });
   }
@@ -219,219 +235,392 @@ const Plans = () => {
             </BlockStack>
           </Box>
         </Layout.Section>
-        <Layout.Section variant="oneHalf">
-          <Box>
-            <Card padding={"500"}>
-              <Box>
-                <BlockStack gap={'300'}>
-                  <Text variant="headingLg">Starter Plan</Text>
-                  <Text variant="headingLg" tone="subdued" fontWeight="regular">Basic features for new businesses.</Text>
-                </BlockStack>
+        {/* <Layout.Section>
+          <Box paddingBlock={'300'}>
+            <BlockStack inlineAlign="center">
+              <Box
+                maxWidth="max-content"
+                borderWidth="100"
+                borderColor="input-border-active"
+                paddingBlock={'100'}
+                paddingInline={'100'}
+                borderRadius="400"
+              >
+                <ButtonGroup>
+
+                  <Button
+                    size="large"
+                    variant={isMonthlyPlanShow ? 'primary' : 'tertiary'}
+                    onClick={() => setIsMonthlyPlanShow(true)}
+                  >
+                    <Box paddingBlock={'100'}><Text variant="headingMd">Monthly plan</Text></Box>
+                  </Button>
+
+                  <Box>
+                    <Button
+                      size="large"
+                      variant={!isMonthlyPlanShow ? 'primary' : 'tertiary'}
+                      onClick={() => setIsMonthlyPlanShow(false)}
+                    >
+                      <Box paddingBlock={'100'}><Text variant="headingMd">Annual Plan (Get 20% discount)</Text></Box>
+                    </Button>
+                  </Box>
+                </ButtonGroup>
               </Box>
-              <Box paddingBlock={'600'}>
-                <Text variant="heading2xl">Free</Text>
-              </Box>
-              <Box>
-                <Button
-                  fullWidth
-                  variant="secondary"
-                  size="large"
-                  loading={fetcher.state === 'submitting' && isLoading === 'freeBtn'}
-                  onClick={() => { handleSubscriptionPlan('Free', 'monthly'); setIsLoading('freeBtn') }}
-                  disabled={shopData?.plan?.planName === 'Free'}
-                >
-                  <Box padding={'150'}><Text>{shopData?.plan?.planName === 'Free' ? 'Subscribed' : 'Get Started'}</Text></Box>
-                </Button>
-              </Box>
-
-              <Box paddingBlock={'400'}>
-                {/* <Text variant="headingXl" fontWeight="medium">FEATURES</Text> */}
-              </Box>
-              <Box>
-                <BlockStack gap={"300"}>
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">1 component with max 3 products</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Basic customization</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Copy embed code</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Individual product add to cart/ checkout</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Edit/update component</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Email support</Text>
-                  </InlineStack>
-                </BlockStack>
-
-              </Box>
-            </Card>
+            </BlockStack>
           </Box>
+        </Layout.Section> */}
+
+
+        <Layout.Section variant="fullWidth">
+          {isMonthlyPlanShow &&
+            <InlineStack gap={'300'} align="center" blockAlign="start">
+              <Box>
+                <Card padding={"500"}>
+                  <Box>
+                    <BlockStack gap={'300'}>
+                      <Text variant="headingLg">Starter Plan</Text>
+                      <Text variant="headingLg" tone="subdued" fontWeight="regular">Basic features for new businesses.</Text>
+                    </BlockStack>
+                  </Box>
+                  <Box paddingBlock={'600'}>
+                    <Text variant="heading2xl">Free</Text>
+                  </Box>
+                  <Box>
+                    <Button
+                      fullWidth
+                      variant="secondary"
+                      size="large"
+                      loading={fetcher.state === 'submitting' && isLoading === 'freeBtn'}
+                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.free, PLAN_TYPE.monthly); setIsLoading('freeBtn') }}
+                      disabled={shopData?.plan?.planName === PLAN_NAME.free}
+                    >
+                      <Box padding={'150'}><Text>{shopData?.plan?.planName === PLAN_NAME.free ? 'Current' : 'Get Started'}</Text></Box>
+                    </Button>
+                  </Box>
+
+                  <Box paddingBlock={'400'}>
+                    {/* <Text variant="headingXl" fontWeight="medium">FEATURES</Text> */}
+                  </Box>
+                  <Box>
+                    <BlockStack gap={"300"}>
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">1 component with max 3 products</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Basic customization</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Copy embed code</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Individual product add to cart/ checkout</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Edit/update component</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Email support</Text>
+                      </InlineStack>
+                    </BlockStack>
+
+                  </Box>
+                </Card>
+              </Box>
+
+              <Box>
+                <Card padding={"500"}>
+                  <Box>
+                    <BlockStack gap={'300'}>
+                      <Text variant="headingLg">Growth Plan</Text>
+                      <Text variant="headingLg" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
+                    </BlockStack>
+                  </Box>
+                  <Box paddingBlock={'600'}>
+                    <InlineStack align="start" blockAlign="center" gap={"100"}>
+                      <Text variant="heading2xl">$29.00</Text>
+                      <Text variant="headingLg" fontWeight="regular" tone="subdued">/per month</Text>
+                    </InlineStack>
+                  </Box>
+                  <Box>
+                    <Button
+                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.growth, PLAN_TYPE.monthly); setIsLoading('growthBtn') }}
+                      fullWidth
+                      variant="primary"
+                      size="large"
+                      loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
+                      disabled={shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly}
+                    >
+                      <Box padding={'150'}><Text> {shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</Text></Box>
+                    </Button>
+                  </Box>
+
+                  <Box paddingBlock={'400'}>
+                    {/* <Text variant="headingXl" fontWeight="medium">FEATURES</Text> */}
+                  </Box>
+                  <Box>
+                    <BlockStack gap={"300"}>
+                      <InlineStack gap={"200"} align="start" blockAlign="start">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Box maxWidth="90%">
+                          <Text variant="bodyLg">10 component with max 10 product variant limit per component.</Text>
+                        </Box>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Inventory tracking before order</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Email component code</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Implement restrictions</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Add all products to cart at a single click</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Preset qty per product/variant</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Layout customization</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Custom CSS</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Layout customization</Text>
+                      </InlineStack>
+
+
+                    </BlockStack>
+
+                  </Box>
+                </Card>
+              </Box>
+            </InlineStack>
+          }
+          {!isMonthlyPlanShow &&
+            <InlineStack align="center">
+              <Box>
+                <Card padding={"500"}>
+                  <Box>
+                    <BlockStack gap={'300'}>
+                      <Text variant="headingLg">Growth Plan</Text>
+                      <Text variant="headingLg" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
+                    </BlockStack>
+                  </Box>
+                  <Box paddingBlock={'600'}>
+                    <InlineStack align="start" blockAlign="center" gap={"100"}>
+                      <Text variant="heading2xl"><Text as="span" textDecorationLine="line-through" tone="subdued">$348.00</Text> $278.40</Text>
+                      <Text variant="headingLg" fontWeight="regular" tone="subdued">/per month</Text>
+                    </InlineStack>
+                  </Box>
+                  <Box>
+                    <Button
+                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.growth, PLAN_TYPE.yearly); setIsLoading('growthBtn') }}
+                      fullWidth
+                      variant="primary"
+                      size="large"
+                      loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
+                      disabled={shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly}
+                    >
+                      <Box padding={'150'}><Text> {
+                        shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</Text></Box>
+                    </Button>
+                  </Box>
+
+                  <Box paddingBlock={'400'}>
+                    {/* <Text variant="headingXl" fontWeight="medium">FEATURES</Text> */}
+                  </Box>
+
+
+                  <Box>
+                    <BlockStack gap={"300"}>
+                      <InlineStack gap={"200"} align="start" blockAlign="start">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Box maxWidth="90%">
+                          <Text variant="bodyLg">10 component with max 10 product variant limit per component.</Text>
+                        </Box>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Inventory tracking before order</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Email component code</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Implement restrictions</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Add all products to cart at a single click</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Preset qty per product/variant</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Layout customization</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Custom CSS</Text>
+                      </InlineStack>
+
+                      <InlineStack gap={"200"} align="start" blockAlign="center">
+                        <Box maxWidth="30px" >
+                          <Icon
+                            source={CheckCircleIcon}
+                          />
+                        </Box>
+                        <Text variant="bodyLg">Layout customization</Text>
+                      </InlineStack>
+
+
+                    </BlockStack>
+
+                  </Box>
+                </Card>
+              </Box>
+            </InlineStack>
+          }
         </Layout.Section>
 
-        <Layout.Section variant="oneHalf">
-          <Box>
-            <Card padding={"500"}>
-              <Box>
-                <BlockStack gap={'300'}>
-                  <Text variant="headingLg">Growth Plan</Text>
-                  <Text variant="headingLg" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
-                </BlockStack>
-              </Box>
-              <Box paddingBlock={'600'}>
-                <InlineStack blockAlign="center" gap={"100"}>
-                  <Text variant="heading2xl">$29</Text>
-                  <Text variant="headingLg" fontWeight="regular" tone="subdued">/per month</Text>
-                </InlineStack>
-              </Box>
-              <Box>
-                <Button
-                  onClick={() => { handleSubscriptionPlan('Growth', 'monthly'); setIsLoading('growthBtn') }}
-                  fullWidth
-                  variant="primary"
-                  size="large"
-                  loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
-                  disabled={shopData?.plan?.planName === 'Growth'}
-                >
-                  <Box padding={'150'}><Text> {shopData?.plan?.planName === 'Growth' ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Subscribe'}</Text></Box>
-                </Button>
-              </Box>
-
-              <Box paddingBlock={'400'}>
-                {/* <Text variant="headingXl" fontWeight="medium">FEATURES</Text> */}
-              </Box>
-              <Box>
-                <BlockStack gap={"300"}>
-                  <InlineStack gap={"200"} align="start" blockAlign="start">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Box maxWidth="90%">
-                      <Text variant="bodyLg">10 component with max 10 product variant limit per component.</Text>
-                    </Box>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Inventory tracking before order</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Email component code</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Implement restrictions</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Add all products to cart at a single click</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Preset qty per product/variant</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Layout customization</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Custom CSS</Text>
-                  </InlineStack>
-
-                  <InlineStack gap={"200"} align="start" blockAlign="center">
-                    <Box maxWidth="30px" >
-                      <Icon
-                        source={CheckCircleIcon}
-                      />
-                    </Box>
-                    <Text variant="bodyLg">Layout customization</Text>
-                  </InlineStack>
 
 
-                </BlockStack>
 
-              </Box>
-            </Card>
-          </Box>
-        </Layout.Section>
+
+
       </Layout>
       <Box paddingBlockEnd={'600'}></Box>
     </Page>
@@ -448,13 +637,13 @@ export const action = async ({ request }) => {
 
 
 
-  if (data.planName === 'Growth') {
-    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/plan-purchase/?upgrade=true`;
+  if (data.planName === PLAN_NAME.growth) {
+    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}`;
 
     if (data?.isFirstInstall === 'false') {
-      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/plan-purchase/?upgrade=true`;
+      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}`;
     } else if (data?.isFirstInstall === 'true') {
-      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_NAME}/app/?isFirstInstall=true`;
+      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/?isFirstInstall=true&planType=${data.planType}`;
     }
 
     //console.log('returnURL:', returnURL);
@@ -504,7 +693,9 @@ export const action = async ({ request }) => {
     //     },
     //   );
 
-    const priceAmount = 29.0;
+    const priceAmount = data.planType === PLAN_TYPE.monthly ? 29 : data.planType === PLAN_TYPE.yearly ? 278.40 : 29.00;
+    const interval = data.planType === PLAN_TYPE.monthly ? "EVERY_30_DAYS" : data.planType === PLAN_TYPE.yearly ? "ANNUAL" : "EVERY_30_DAYS";
+
     const currencyCode = "USD";
 
 
@@ -512,7 +703,7 @@ export const action = async ({ request }) => {
 
     const appRecurringPricingDetails = {
       price: { amount: priceAmount, currencyCode },
-      interval: "EVERY_30_DAYS",
+      interval: interval,
       ...(discountPercent > 0 && {
         discount: {
           value: { percentage: discountPercent },
@@ -580,7 +771,7 @@ export const action = async ({ request }) => {
 
 
     }
-  } else if (data.planName === 'Free') {
+  } else if (data.planName === PLAN_NAME.free) {
     const { appSubscriptions } = await billing.check();
     if (appSubscriptions?.length > 0) {
 
@@ -599,7 +790,7 @@ export const action = async ({ request }) => {
       where: { id: Number(data.shopId) },
       data: {
         appPlan: data.planName,
-        maxAllowedComponents: 1,
+        maxAllowedComponents: MAX_ALLOWED_COMPONENTS.free,
         isFirstInstall: data?.isFirstInstall === 'true' ? false : JSON.parse(data?.isFirstInstall),
         plan: {
           upsert: {
@@ -607,7 +798,7 @@ export const action = async ({ request }) => {
               planId: null,
               planName: data.planName,
               price: 0.0,
-              planStatus: 'active',
+              planStatus: PLAN_STATUS.active,
             },
             update: {
               planId: null,
@@ -621,14 +812,14 @@ export const action = async ({ request }) => {
     });
 
     if (shopData?.components?.length > 0) {
-      if (shopData?.components[0]?.addToCartType?.type === 'bulk') {
+      if (shopData?.components[0]?.addToCartType?.type === ADD_TO_CART_TYPE.bulk) {
         await db.component.update({
           where: {
             id: shopData?.components[0]?.id
           },
           data: {
             addToCartType: {
-              type: 'individual',
+              type: ADD_TO_CART_TYPE.individual,
               products: shopData?.components[0]?.addToCartType?.products
             }
           }
@@ -645,10 +836,10 @@ export const action = async ({ request }) => {
       });
     }
 
-    if (data?.isFirstInstall === 'true' && shopData?.plan?.planName === 'Free') {
+    if (data?.isFirstInstall === 'true' && shopData?.plan?.planName === PLAN_NAME.free) {
       //console.log('from ifBlock');
       throw redirect('/app');
-    } else if (data?.isFirstInstall === 'false' && shopData?.plan?.planName === 'Free') {
+    } else if (data?.isFirstInstall === 'false' && shopData?.plan?.planName === PLAN_NAME.free) {
       throw redirect('/app/plan-purchase?downgrade=true');
     }
 

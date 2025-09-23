@@ -26,6 +26,8 @@ import db from "../db.server";
 import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
+import Instruction from "../components/Instruction/Instruction";
+
 
 export const loader = async ({ request }) => {
 
@@ -121,8 +123,10 @@ export const loader = async ({ request }) => {
 
   const url = new URL(request.url);
   const isFirstInstall = url.searchParams.get('isFirstInstall');
+  const planType = url.searchParams.get('planType');
+  const chargeId = url.searchParams.get('charge_id');
 
-
+  
   if (isFirstInstall && appSubscriptions?.length > 0) {
     shopData = await db.shop.update({
       where: {
@@ -139,12 +143,18 @@ export const loader = async ({ request }) => {
               planId: appSubscriptions[0].id,
               planName: appSubscriptions[0].name,
               price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
-              planStatus: 'active',
+              planStatus: appSubscriptions[0].status,
+              isTestCharge:appSubscriptions[0].test,
+              planType,
+              chargeId,
             },
             update: {
               planId: appSubscriptions[0].id,
               planName: appSubscriptions[0].name,
               price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+              isTestCharge:appSubscriptions[0].test,
+              planType,
+              chargeId,
             },
           },
         },
@@ -280,14 +290,15 @@ export const loader = async ({ request }) => {
     totalPd: totalproduct?.data?.productsCount?.count ?? 0,
     totalPublishProduct: totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0,
     cataglogId: shopData?.appCatalogId ? shopData?.appCatalogId.replace('gid://shopify/AppCatalog/', '') : '',
-    success: true
+    success: true,
+    appSubscriptions:appSubscriptions[0]
   };
 };
 
 export default function Index() {
   const shopify = useAppBridge();
   const { shopData, components, totalPd, totalPublishProduct, cataglogId } = useLoaderData();
-  //console.log('components', components);
+  //console.log('components:', components);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -553,6 +564,9 @@ export default function Index() {
 
 
         <Layout>
+          <Layout.Section variant="fullWidth">
+            <Instruction />
+          </Layout.Section>
           <Layout.Section>
             <Box>
               <Card>

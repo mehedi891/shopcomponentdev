@@ -9,7 +9,7 @@ import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
 import { useEffect, useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
 export const loader = async ({ request }) => {
-    const { session, redirect, admin } = await authenticate.admin(request);
+    const { session, redirect } = await authenticate.admin(request);
 
     const shop = await db.shop.findUnique({
         where: {
@@ -23,143 +23,16 @@ export const loader = async ({ request }) => {
         throw redirect('/app/plans')
     }
 
-    //     const totalPdJson = await admin.graphql(
-    //         `#graphql
-    //             query {
-    //                 productsCount(query:null) {
-    //                 count
-    //                 }
-    //             }`,
-    //     );
-    //     const totalproduct = await totalPdJson.json();
 
-    //     const totalPublishSpc = await admin.graphql(
-    //         `#graphql
-    //   query PublishedProductCount($publicationId: ID!) {
-    //     publishedProductsCount(publicationId: $publicationId) {
-    //       count
-    //       precision
-    //     }
-    //   }`,
-
-    //         {
-    //             variables: {
-    //                 "publicationId": `gid://shopify/Publication/${process.env.PUBLICATION_ID}`
-    //             },
-    //         },
-    //     );
-    //     const totalPublishSpcJson = await totalPublishSpc.json();
-
-
-    //     const response = await admin.graphql(
-    //   `#graphql
-    //   mutation ShopResourceFeedbackCreate($input: ResourceFeedbackCreateInput!) {
-    //     shopResourceFeedbackCreate(input: $input) {
-    //       feedback {
-    //         messages {
-    //           message
-    //         }
-    //         feedbackGeneratedAt
-    //         state
-    //       }
-    //       userErrors {
-    //         field
-    //         message
-    //       }
-    //     }
-    //   }`,
-    //   {
-    //     variables: {
-    //         "input": {
-    //             "messages": [
-    //                 "is not connected. Connect your account to use this sales channel."
-    //             ],
-    //             "state": "REQUIRES_ACTION",
-    //             "feedbackGeneratedAt": new Date().toISOString()
-    //         }
-    //     },
-    //   },
-    // );
-
-    // const data = await response.json();
-
-    // const response = await admin.graphql(
-    //   `#graphql
-    //   query publication($id: ID!) {
-    //     publication(id: $id) {
-    //       name
-    //       id
-    //       catalog{
-    //         id
-    //       }
-    //     }
-    //   }`,
-    //   {
-    //     variables: {
-    //         "id": `gid://shopify/Publication/${process.env.PUBLICATION_ID}`
-    //     },
-    //   },
-    // );
-    //     const totalproduct = await response.json();
-
-    //console.log('totalproduct:::',totalproduct);
-
-
-
-// const appResponse = await admin.graphql(
-//         `#graphql
-//   query ($apiKey: String!) {
-//     appByKey(apiKey: $apiKey) {
-//       id
-//       title
-//       installation {
-//         publication {
-//           id
-//         }
-//       }
-//     }
-//   }
-//   `,
-//         {
-//             variables: { apiKey: process.env.SHOPIFY_API_KEY },
-//         }
-//     );
-
-//     const appResponseJson = await appResponse.json();
-
-//     const publication = await admin.graphql(
-//         `#graphql
-//   query publication($id: ID!) {
-//     publication(id: $id) {
-//       id
-//     catalog{
-//       id
-//     }
-//     }
-//   }`,
-//         {
-//             variables: {
-//                 "id": appResponseJson?.data?.appByKey?.installation?.publication?.id
-//             },
-//         },
-//     );
-
-//     const publicationjson = await publication.json();
-
-
-
-//     console.log('publicationjsonID:::', publicationjson?.data?.publication?.id);
-//     console.log('categlogId:::', publicationjson?.data?.publication?.catalog?.id);
-   
 
     return {
         shopData: shop,
-        totalproduct:  {}
+        
     };
 }
 
 const Settings = () => {
-    const { shopData, totalproduct } = useLoaderData();
+    const { shopData } = useLoaderData();
     const shopify = useAppBridge();
     const navigation = useNavigation();
     const fetcher = useFetcher();
