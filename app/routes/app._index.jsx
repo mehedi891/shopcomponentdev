@@ -378,7 +378,7 @@ export default function Index() {
         </IndexTable.Cell>
 
 
-        {/* <IndexTable.Cell className="sc-addToCartType">
+        <IndexTable.Cell className="sc-addToCartType">
           <Box paddingInlineStart={'400'}><Text>{totalOrderCount}</Text></Box>
         </IndexTable.Cell>
 
@@ -401,7 +401,7 @@ export default function Index() {
               totalOrderValue
             }
           </Text></Box>
-        </IndexTable.Cell> */}
+        </IndexTable.Cell>
 
         <IndexTable.Cell className="sc-addToCartType">
           {status === 'activate' ? <Badge tone="success">{t("activate")}</Badge> : <Badge tone="critical-strong">{t("deactivate")}</Badge>
@@ -619,8 +619,8 @@ export default function Index() {
                         { title: 'Component Name' },
                         { title: 'Applies to' },
                         { title: 'Add to cart type' },
-                        // { title: 'Total orders', alignment: 'start' },
-                        // { title: 'Value', alignment: 'start' },
+                        { title: 'Total orders', alignment: 'start' },
+                        { title: 'Value', alignment: 'start' },
                         { title: 'Status' },
                         { title: 'Actions', alignment: 'center' },
                       ]}
