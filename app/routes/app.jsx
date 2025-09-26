@@ -34,13 +34,13 @@ export default function App() {
   const { t } = useTranslation();
 
 
-  // useEffect(() => {
-  //   (function (c, l, a, r, i, t, y) {
-  //     c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-  //     t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-  //     y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-  //   })(window, document, "clarity", "script", "t2ssobpnf1");
-  // }, []);
+  useEffect(() => {
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+      t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, "clarity", "script", "t2ssobpnf1");
+  }, []);
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
@@ -62,7 +62,7 @@ export default function App() {
         </div>
         <div style={{ flexFlow: 1 }}>
           <SpcFooter planName={shopData?.plan?.planName || ''} />
-          {/* <TwakTo/> */}
+          <TwakTo/>
         </div>
       </div>
 
