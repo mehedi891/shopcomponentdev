@@ -379,7 +379,7 @@ export default function Index() {
 
 
         <IndexTable.Cell className="sc-addToCartType">
-          <Box paddingInlineStart={'400'}><Text>{totalOrderCount}</Text></Box>
+          <Box paddingInlineStart={'400'}><Text>{totalOrderCount ?? 0}</Text></Box>
         </IndexTable.Cell>
 
         <IndexTable.Cell className="sc-addToCartType">
@@ -398,7 +398,7 @@ export default function Index() {
               // }, 0)
               //   .toFixed(2)
 
-              totalOrderValue
+              totalOrderValue ?? 0
             }
           </Text></Box>
         </IndexTable.Cell>
