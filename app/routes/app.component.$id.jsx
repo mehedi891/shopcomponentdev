@@ -1708,7 +1708,7 @@ const UpdateComponent = () => {
                       {watchedValues.appliesTo === APPLIES_TO.bycollection &&
                         <Box>
                           <Box padding={'300'}>
-                            <InlineStack blockAlign="center" align="space-between">
+                            <InlineStack blockAlign="center" align="start" gap={'300'}>
                               <Controller
                                 name="addToCartType.products"
                                 control={control}
@@ -1728,7 +1728,7 @@ const UpdateComponent = () => {
                                 )}
                               />
 
-                              <Box width="78%">
+                              <Box width="76%">
                                 <TextField
                                   type="text"
                                   autoSize
@@ -1803,7 +1803,7 @@ const UpdateComponent = () => {
                       {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual &&
                         <Box className="Polaris-Box Individual">
                           <Box padding={'300'}>
-                            <InlineStack blockAlign="center" align="space-between">
+                            <InlineStack blockAlign="center" align="start" gap={'300'}>
                               <Controller
                                 name="addToCartType.products"
                                 control={control}
@@ -1823,7 +1823,7 @@ const UpdateComponent = () => {
                                 )}
                               />
 
-                              <Box width="78%">
+                              <Box width="76%">
                                 <TextField
                                   type="text"
                                   autoSize
@@ -1882,7 +1882,7 @@ const UpdateComponent = () => {
                       {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk &&
                         <Box className="Polaris-Box Bulk">
                           <Box padding={'300'}>
-                            <InlineStack blockAlign="center" align="space-between">
+                            <InlineStack blockAlign="center" align="start" gap={'300'}>
                               <Controller
                                 name="addToCartType.products"
                                 control={control}
@@ -1902,7 +1902,7 @@ const UpdateComponent = () => {
                                 )}
                               />
 
-                              <Box width="78%">
+                              <Box width="76%">
                                 <TextField
                                   type="text"
                                   autoSize
