@@ -235,7 +235,7 @@ const Plans = () => {
             </BlockStack>
           </Box>
         </Layout.Section>
-        {/* <Layout.Section>
+        <Layout.Section>
           <Box paddingBlock={'300'}>
             <BlockStack inlineAlign="center">
               <Box
@@ -269,7 +269,7 @@ const Plans = () => {
               </Box>
             </BlockStack>
           </Box>
-        </Layout.Section> */}
+        </Layout.Section>
 
 
         <Layout.Section variant="fullWidth">
