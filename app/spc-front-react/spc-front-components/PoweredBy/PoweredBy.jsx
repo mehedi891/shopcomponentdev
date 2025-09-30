@@ -2,7 +2,7 @@
 const PoweredBy = ({ shop }) => {
   const host = typeof window !== "undefined" ? window.location.host : "unknown-host";
 
-  const href = `https://shopcomponent.com/?utm_source=${encodeURIComponent(host)}&utm_medium=${encodeURIComponent(shop ?? "unknown-shop")}&utm_campaign=pby`;
+  const href = `https://embedup.com/?utm_source=${encodeURIComponent(host)}&utm_medium=${encodeURIComponent(shop ?? "unknown-shop")}&utm_campaign=pby`;
 
   return (
     <div
@@ -26,7 +26,7 @@ const PoweredBy = ({ shop }) => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        ShopComponent
+        EmbedUp
       </a>
     </div>
   );
