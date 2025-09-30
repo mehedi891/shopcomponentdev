@@ -2081,7 +2081,7 @@ const CreateComponent = () => {
                                                                     name="status"
                                                                     label={t("deactivate")}
                                                                     checked={field.value === STATUS.deactivate}
-                                                                    onChange={() => field.onChangeSTATUS.deactivate}
+                                                                    onChange={() => field.onChange(STATUS.deactivate)}
 
                                                                 />
                                                             </>
