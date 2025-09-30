@@ -19,11 +19,11 @@ const SpcFooter = ({plan}) => {
 
         <Box>
           <InlineStack gap={'200'} blockAlign="center">
+            <Text>Plan - <Text as="span" fontWeight="bold">{plan?.planName} ({capitalizeFirstCaracter(plan?.planType) + ' plan'})</Text></Text>
+            <Text>|</Text>
             <Button variant="tertiary" url="https://efoli.com" target="_blank"><InlineStack gap={'100'}>
               <Text>Powered By</Text><img className="spc-footer-img" src="/images/efoli_logo.svg" alt="efoli" />
             </InlineStack></Button>
-            <Text>|</Text>
-            <Text>Plan - <Text as="span" fontWeight="bold">{plan?.planName} ({capitalizeFirstCaracter(plan?.planType) + ' plan'})</Text></Text>
           </InlineStack>
         </Box>
       </InlineStack>

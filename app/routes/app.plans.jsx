@@ -253,7 +253,7 @@ const Plans = () => {
                     variant={isMonthlyPlanShow ? 'primary' : 'tertiary'}
                     onClick={() => setIsMonthlyPlanShow(true)}
                   >
-                    <Box paddingBlock={'100'}><Text variant="headingMd">Monthly plan</Text></Box>
+                    <Box paddingBlock={'100'}><Text variant="headingMd">Monthly</Text></Box>
                   </Button>
 
                   <Box>
@@ -262,7 +262,7 @@ const Plans = () => {
                       variant={!isMonthlyPlanShow ? 'primary' : 'tertiary'}
                       onClick={() => setIsMonthlyPlanShow(false)}
                     >
-                      <Box paddingBlock={'100'}><Text variant="headingMd">Annual Plan (Get 20% discount)</Text></Box>
+                      <Box paddingBlock={'100'}><Text variant="headingMd">Save 20% (Yearly)</Text></Box>
                     </Button>
                   </Box>
                 </ButtonGroup>
@@ -280,7 +280,7 @@ const Plans = () => {
                   <Box>
                     <BlockStack gap={'300'}>
                       <Text variant="headingLg">Starter Plan</Text>
-                      <Text variant="headingLg" tone="subdued" fontWeight="regular">Basic features for new businesses.</Text>
+                      <Text variant="headingMd" tone="subdued" fontWeight="regular">Basic features for new businesses.</Text>
                     </BlockStack>
                   </Box>
                   <Box paddingBlock={'600'}>
@@ -368,7 +368,7 @@ const Plans = () => {
                   <Box>
                     <BlockStack gap={'300'}>
                       <Text variant="headingLg">Growth Plan</Text>
-                      <Text variant="headingLg" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
+                      <Text variant="headingMd" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
                     </BlockStack>
                   </Box>
                   <Box paddingBlock={'600'}>
@@ -493,13 +493,13 @@ const Plans = () => {
                   <Box>
                     <BlockStack gap={'300'}>
                       <Text variant="headingLg">Growth Plan</Text>
-                      <Text variant="headingLg" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
+                      <Text variant="headingMd" tone="subdued" fontWeight="regular">Advanced tools to boost sales and AOV.</Text>
                     </BlockStack>
                   </Box>
                   <Box paddingBlock={'600'}>
                     <InlineStack align="start" blockAlign="center" gap={"100"}>
                       <Text variant="heading2xl"><Text as="span" textDecorationLine="line-through" tone="subdued">$348.00</Text> $278.40</Text>
-                      <Text variant="headingLg" fontWeight="regular" tone="subdued">/per month</Text>
+                      <Text variant="headingLg" fontWeight="regular" tone="subdued">/per year</Text>
                     </InlineStack>
                   </Box>
                   <Box>
@@ -799,11 +799,13 @@ export const action = async ({ request }) => {
               planName: data.planName,
               price: 0.0,
               planStatus: PLAN_STATUS.active,
+              planType: PLAN_TYPE.monthly
             },
             update: {
               planId: null,
               planName: data.planName,
               price: 0.0,
+              planType: PLAN_TYPE.monthly
             },
           },
         },

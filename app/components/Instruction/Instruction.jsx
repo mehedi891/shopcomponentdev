@@ -1,5 +1,5 @@
 import { Modal, TitleBar, useAppBridge } from "@shopify/app-bridge-react"
-import { BlockStack, Box, Card, InlineStack, Link, List, Text, VideoThumbnail } from "@shopify/polaris"
+import { BlockStack, Box, Card, InlineStack, Link, List, Text, Image } from "@shopify/polaris"
 
 const Instruction = () => {
   const shopify = useAppBridge();
@@ -18,9 +18,11 @@ const Instruction = () => {
         </Box>
       </Modal>
       <Card>
-        <Text variant="headingMd">How to Create & Embed Your Component</Text>
-        <InlineStack align="space-between" gap={'200'} blockAlign="center">
-          <Box minWidth="49%">
+        <Box paddingBlockEnd={'200'}>
+          <Text variant="headingMd">How to Create & Embed Your Component</Text>
+        </Box>
+        <InlineStack align="start" gap={'400'} blockAlign="center">
+          <Box className="Polaris-Box howToEmbedBox">
             <Card background="bg-surface-secondary">
               <Box paddingBlock={'300'}>
                 <List type="number" gap="loose">
@@ -53,21 +55,30 @@ const Instruction = () => {
                       <Text variant="headingSm">Embed anywhere</Text>
                       <Text variant="bodyMd">Paste the code into your external website, blog, or landing page.
                         {/* <Text as="span"><Link url="#" target="_blank"> See Guideline</Link></Text> */}
-                        </Text>
+                      </Text>
                     </BlockStack>
                   </List.Item>
                 </List>
               </Box>
             </Card>
           </Box>
-          <Box className="Polaris-Box spc_videoThumbnail" minWidth="49%">
 
-            <VideoThumbnail
+
+
+          <Box className="Polaris-Box spc_videoThumbnail" minWidth="49%" maxWidth="500px">
+
+            {/* <VideoThumbnail
               // videoLength={222}
               onClick={handleInstructionModal}
               thumbnailUrl={"/images/demo_video.webp"}
-            />
+            /> */}
+            <Link onClick={handleInstructionModal}>
+              <img src={"/images/demo_video.webp"} alt="Demo" height="275px" width="auto" loading="lazy" />
+
+            </Link>
           </Box>
+
+
         </InlineStack>
 
       </Card>

@@ -1625,7 +1625,7 @@ const CreateComponent = () => {
                                             {watchedValues.appliesTo === APPLIES_TO.bycollection &&
                                                 <Box>
                                                     <Box padding={'300'}>
-                                                        <InlineStack blockAlign="center" align="space-between">
+                                                        <InlineStack blockAlign="center" align="start" gap={'300'}>
                                                             <Controller
                                                                 name="addToCartType.products"
                                                                 control={control}
@@ -1645,7 +1645,7 @@ const CreateComponent = () => {
                                                                 )}
                                                             />
 
-                                                            <Box width="78%">
+                                                            <Box width="76%">
                                                                 <TextField
                                                                     type="text"
                                                                     autoSize
@@ -1670,7 +1670,7 @@ const CreateComponent = () => {
                                                         </Box>
                                                     )}
 
-                                                    <Box paddingBlock={'400'} paddingInline={'300'}>
+                                                    <Box paddingBlockStart={'400'} paddingBlockEnd={'0'} paddingInline={'300'}>
                                                         <BlockStack gap={'300'}>
                                                             {selectedCollection?.length > 0 && selectedCollection?.map((item) => {
                                                                 return <InlineStack key={item.id} blockAlign="center" align="space-between">
@@ -1720,7 +1720,7 @@ const CreateComponent = () => {
                                             {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.individual &&
                                                 <Box>
                                                     <Box padding={'300'}>
-                                                        <InlineStack blockAlign="center" align="space-between">
+                                                        <InlineStack blockAlign="center" align="start" gap={'200'}>
                                                             <Controller
                                                                 name="addToCartType.products"
                                                                 control={control}
@@ -1740,7 +1740,7 @@ const CreateComponent = () => {
                                                                 )}
                                                             />
 
-                                                            <Box width="78%">
+                                                            <Box width="76%">
                                                                 <TextField
                                                                     type="text"
                                                                     autoSize
@@ -1799,7 +1799,7 @@ const CreateComponent = () => {
                                             {watchedValues.appliesTo === APPLIES_TO.byproduct && watchedValues.addToCartType.type === ADD_TO_CART_TYPE.bulk &&
                                                 <Box>
                                                     <Box padding={'300'}>
-                                                        <InlineStack blockAlign="center" align="space-between">
+                                                        <InlineStack blockAlign="center" align="start" gap={'300'}>
                                                             <Controller
                                                                 name="addToCartType.products"
                                                                 control={control}
@@ -1819,7 +1819,7 @@ const CreateComponent = () => {
                                                                 )}
                                                             />
 
-                                                            <Box width="78%">
+                                                            <Box width="76%">
                                                                 <TextField
                                                                     type="text"
                                                                     autoSize

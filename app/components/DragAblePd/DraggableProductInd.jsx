@@ -69,7 +69,7 @@ const DraggableProductInd = ({ selectedProductsInd, setSelectedProductsInd, hand
   };
 
   return (
-    <Box paddingBlock="400"  paddingInline="300">
+    <Box paddingBlock="150"  paddingInline="300">
       <BlockStack gap={'300'}>
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={selectedProductsInd} strategy={verticalListSortingStrategy}>

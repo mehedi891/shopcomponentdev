@@ -42,9 +42,13 @@
     cursor: pointer;
 }
 
-.Polaris-Box.spc_videoThumbnail .Polaris-VideoThumbnail__Thumbnail {
-    border-radius: 10px;
-    background-size: 100% 276px;
+.Polaris-Box.howToEmbedBox {
+    min-width: 49%;
+}
+@media screen and (min-width: 1300px) {
+    .Polaris-Box.howToEmbedBox {
+        min-width: 35%;
+    }
 }
 
 .spc-footer-img {
