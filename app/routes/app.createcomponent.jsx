@@ -27,7 +27,7 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
-import { ADD_TO_CART_TYPE, APPLIES_TO, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
+import { ADD_TO_CART_TYPE, APPLIES_TO, CART_BEHAVIOR, LAYOUT, PLAN_NAME, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
 
 
 
@@ -411,7 +411,7 @@ const CreateComponent = () => {
         if (isDirty) {
             if (disabledContentByPlan && shopData?.components?.length > 0) {
                 shopify.saveBar.hide('spc-save-bar');
-            } else if (shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === 'Growth') {
+            } else if (shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === PLAN_NAME.growth) {
                 shopify.saveBar.hide('spc-save-bar');
             } else {
                 shopify.saveBar.show('spc-save-bar');
@@ -1397,7 +1397,7 @@ const CreateComponent = () => {
                             </Layout.Section>
                         }
 
-                        {shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === 'Growth' &&
+                        {shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === PLAN_NAME.growth &&
                             <Layout.Section variant="fullWidth">
                                 <Banner
                                     title={"Maximum Component Limit (10)"}
@@ -1440,7 +1440,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                                                 <BlockStack gap={'300'}>
                                                     <Controller
                                                         name="title"
@@ -1528,7 +1528,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box paddingInlineEnd={'300'} paddingInlineStart={'300'} paddingBlockEnd={'300'}>
+                                            <Box paddingInlineEnd={'300'} paddingBlockEnd={'300'}>
                                                 <BlockStack gap={'100'}>
                                                     {/* <Text variant="bodyMd" fontWeight="regular">{t("cart_behavior")}</Text> */}
                                                     <Controller
@@ -1594,7 +1594,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="appliesTo"
@@ -1993,7 +1993,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="layout"
@@ -2062,7 +2062,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="status"
@@ -2119,7 +2119,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                                                 <BlockStack gap={'300'}>
                                                     <BlockStack gap={'300'}>
                                                         {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart &&
@@ -2313,7 +2313,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
 
                                                 <BlockStack gap={'300'}>
                                                     <Controller
@@ -2454,7 +2454,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                                                 <Tabs
                                                     selected={settingsTabSelected}
                                                     onSelect={handleSettingsTabChange}
@@ -2688,7 +2688,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="componentSettings.customCss"
@@ -2748,7 +2748,7 @@ const CreateComponent = () => {
                                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                             expandOnPrint
                                         >
-                                            <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                                                 <BlockStack gap={'100'}>
                                                     <Controller
                                                         name="customerTracking"
@@ -2791,7 +2791,7 @@ const CreateComponent = () => {
                                     </InlineStack>
                                 </InlineStack>
 
-                                : shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === 'Growth' ?
+                                : shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === PLAN_NAME.growth ?
                                     <InlineStack align="end" blockAlign="center" gap={'150'}>
                                         {/* <UpgradeTooltip /> */}
 

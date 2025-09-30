@@ -1521,7 +1521,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                         <BlockStack gap={'300'}>
                           <Controller
                             name="title"
@@ -1677,7 +1677,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="appliesTo"
@@ -2073,7 +2073,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="layout"
@@ -2143,7 +2143,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="status"
@@ -2201,7 +2201,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
                         <BlockStack gap={'300'}>
                           <BlockStack gap={'300'}>
                             {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart &&
@@ -2395,7 +2395,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
 
                         <BlockStack gap={'300'}>
                           <Controller
@@ -2537,7 +2537,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'}>
 
 
                         <Tabs
@@ -2771,7 +2771,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="componentSettings.customCss"
@@ -2830,7 +2830,7 @@ const UpdateComponent = () => {
                       transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                       expandOnPrint
                     >
-                      <Box padding={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
+                      <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
                         <BlockStack gap={'100'}>
                           <Controller
                             name="customerTracking"

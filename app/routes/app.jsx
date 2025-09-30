@@ -25,16 +25,18 @@ export const loader = async ({ request }) => {
 
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
-    shopData: shopData || {}
+    shopData: shopData || {},
+    isDev: process.env.NODE_ENV || "production"
   };
 };
 
 export default function App() {
-  const { apiKey, shopData } = useLoaderData();
+  const { apiKey, shopData, isDev } = useLoaderData();
   const { t } = useTranslation();
 
 
   useEffect(() => {
+    if (isDev === 'developemt') return;
     (function (c, l, a, r, i, t, y) {
       c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
       t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
@@ -61,8 +63,11 @@ export default function App() {
           <Outlet />
         </div>
         <div style={{ flexFlow: 1 }}>
-          <SpcFooter planName={shopData?.plan?.planName || ''} />
-          <TwakTo/>
+          <SpcFooter plan={shopData?.plan || ''} />
+          { isDev !== 'development' &&
+            <TwakTo />
+          }
+
         </div>
       </div>
 

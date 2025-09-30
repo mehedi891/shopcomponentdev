@@ -26,39 +26,42 @@
     user-select: none;
 }
 
-.btncollapsibleHidden[aria-hidden="true"]{
+.btncollapsibleHidden[aria-hidden="true"] {
     display: none;
 }
 
-.supportIcon > span {
+.supportIcon>span {
     display: unset !important;
 }
-.supportIcon > span > svg {
+
+.supportIcon>span>svg {
     width: 20% !important;
 }
+
 #supportEmailDescription {
     cursor: pointer;
 }
 
-.Polaris-Box.spc_videoThumbnail .Polaris-VideoThumbnail__Thumbnail{
+.Polaris-Box.spc_videoThumbnail .Polaris-VideoThumbnail__Thumbnail {
     border-radius: 10px;
-    background-size: contain;
-} 
+    background-size: 100% 276px;
+}
 
-.spc-footer-img{
+.spc-footer-img {
     max-height: 25px;
 }
 
 .spc_iframe {
-    box-shadow: 
-  rgba(0, 0, 0, 0.1) 0px 1px 2px 0px,
-  rgba(0, 0, 0, 0.1) 0px -1px 2px 0px; 
+    box-shadow:
+        rgba(0, 0, 0, 0.1) 0px 1px 2px 0px,
+        rgba(0, 0, 0, 0.1) 0px -1px 2px 0px;
     margin: 0 auto;
     display: flex;
     margin-top: 10px;
     transition: all 0.5s ease-in-out;
 }
-.spc-iframeModal{
+
+.spc-iframeModal {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
 }
 
@@ -70,6 +73,6 @@
     max-width: 450px;
 }
 
-.Polaris-Box.hideSection{
+.Polaris-Box.hideSection {
     display: none !important;
 }

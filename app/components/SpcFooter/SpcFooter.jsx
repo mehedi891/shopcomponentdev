@@ -1,6 +1,7 @@
 import { Box, Button, InlineStack, Text } from "@shopify/polaris"
+import { capitalizeFirstCaracter } from "../../spc-front-react/spc-front-components/utilities/utilisFnc"
 
-const SpcFooter = ({planName}) => {
+const SpcFooter = ({plan}) => {
   return (
 
     <Box paddingInline={'300'} paddingBlockStart={'600'} className="spc-footer Polaris-Box">
@@ -22,7 +23,7 @@ const SpcFooter = ({planName}) => {
               <Text>Powered By</Text><img className="spc-footer-img" src="/images/efoli_logo.svg" alt="efoli" />
             </InlineStack></Button>
             <Text>|</Text>
-            <Text>Plan - <Text as="span" fontWeight="bold">{planName}</Text></Text>
+            <Text>Plan - <Text as="span" fontWeight="bold">{plan?.planName} ({capitalizeFirstCaracter(plan?.planType) + ' plan'})</Text></Text>
           </InlineStack>
         </Box>
       </InlineStack>
