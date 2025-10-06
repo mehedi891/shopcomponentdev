@@ -1,12 +1,16 @@
 import esbuild from "esbuild";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isDev = process.env.NODE_ENV !== "production";
+const envObj = {
+  VITE_SHOPIFY_APP_URL: process.env.SHOPIFY_APP_URL || "",
+};
 
 const config = {
   entryPoints: ["app/spc-front-react/entryPoints/index.jsx"],
@@ -16,6 +20,10 @@ const config = {
   platform: "browser",
   minify: true,
   sourcemap: false,
+    define: {
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
+    "import.meta.env": JSON.stringify(envObj),
+  },
   loader: {
     ".js": "jsx",
     // ".svg": "asset",

@@ -126,7 +126,7 @@ if (!window.spc_shoppingCartOnlyUpdate) {
 
 setTimeout(() => {
   console.log(
-    "%c ShopComponent app loaded.. ",
+    "%c EmbedUp app loaded.. ",
     `background: linear-gradient(
     135deg,
     #FDDDE6 0%,

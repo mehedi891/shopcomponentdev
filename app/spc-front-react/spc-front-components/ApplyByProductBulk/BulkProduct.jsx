@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import GlobalStyle from "../Styles/GlobalStyle/GlobalStyle";
 import BulkProductCard from "./BulkProductCard/BulkProductCard";
 import addToCartBulk from "../utilities/addToCartBulk";

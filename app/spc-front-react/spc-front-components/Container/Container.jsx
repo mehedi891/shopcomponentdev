@@ -6,12 +6,16 @@ import BulkProduct from "../ApplyByProductBulk/BulkProduct";
 const Container = ({ id, token, store }) => {
   const [componentData, setComponentData] = useState({});
   const [loading, setLoading] = useState(false);
+
+const baseApiUrl = import.meta.env.VITE_SHOPIFY_APP_URL;
+
+
   useEffect(() => {
     setLoading(true)
     const fetchData = async () => {
 
       try {
-        const url = `https://app.embedup.com/api/getcomponent?id=${id}`;
+        const url = `${baseApiUrl}/api/getcomponent?id=${id}`;
         const response = await fetch(url);
         const result = await response.json();
 

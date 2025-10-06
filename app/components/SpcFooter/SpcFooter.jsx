@@ -1,5 +1,6 @@
 import { Box, Button, InlineStack, Text } from "@shopify/polaris"
-import { capitalizeFirstCaracter } from "../../spc-front-react/spc-front-components/utilities/utilisFnc"
+import { capitalizeFirstCaracter } from "../../utilis/generalUtils"
+
 
 const SpcFooter = ({plan}) => {
   return (
