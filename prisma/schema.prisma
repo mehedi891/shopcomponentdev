@@ -13,7 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum APPLIES_TO {
   product
   collection
@@ -122,6 +121,8 @@ model Shop {
   appCatalogId         String?
   publicationId        String?
   isInstalled          Boolean?    @default(false)
+  coupon               String?
+  isAppliedCoupon      Boolean?    @default(true)
   plan                 Plan?
   components           Component[]
   affiliates           Affiliate[]
@@ -139,7 +140,7 @@ model Plan {
   price        Float?   @default(0.00)
   planType     String?
   chargeId     String?
-  isTestCharge Boolean?  @default(true)
+  isTestCharge Boolean? @default(true)
   planStatus   String?  @default("deactived")
   shopId       Int      @unique
   shop         Shop     @relation(fields: [shopId], references: [id])

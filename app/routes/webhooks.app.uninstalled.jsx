@@ -29,6 +29,7 @@ export const action = async ({ request }) => {
           headlessAccessToken: null,
           scAccessToken: null,
           isInstalled: false,
+          coupon:'',
         },
       });
     } else {
@@ -43,6 +44,7 @@ export const action = async ({ request }) => {
           isInstalled: false,
           headlessAccessToken: null,
           scAccessToken: null,
+          coupon:'',
         },
       });
     }

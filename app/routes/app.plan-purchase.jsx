@@ -56,6 +56,7 @@ export const loader = async ({ request }) => {
         appPlan: appSubscriptions[0].name,
         trialDays: appSubscriptions[0].trialDays,
         planActivatedAt: isFirstInstall === 'true' ? appSubscriptions[0]?.createdAt : shopData?.planActivatedAt,
+        isAppliedCoupon: true,
         plan: {
           upsert: {
             create: {
@@ -65,7 +66,7 @@ export const loader = async ({ request }) => {
               planStatus: appSubscriptions[0].status,
               isTestCharge:appSubscriptions[0].test,
               planType,
-              chargeId,
+              chargeId
             },
             update: {
               planId: appSubscriptions[0].id,
@@ -74,7 +75,7 @@ export const loader = async ({ request }) => {
               planStatus: appSubscriptions[0].status,
               isTestCharge:appSubscriptions[0].test,
               planType,
-              chargeId,
+              chargeId
             },
           },
         },

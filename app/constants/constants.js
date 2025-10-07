@@ -53,6 +53,24 @@ const PLAN_STATUS = {
   pending: 'PENDING',
 }
 
+const PLAN_PRICE = {
+  growth_monthly: {
+    price: 29.00,
+  },
+  growth_yearly: {
+    price: 348,
+    discountValue: 20,
+    discountedPrice: 278.4,
+    discountType: 'percentage',
+    discountDuration: null,
+  }
+}
+
+const DISCOUNT_TYPE = {
+  percentage: 'percentage',
+  fixed: 'fixed'
+}
+
 export {
   APPLIES_TO,
   ADD_TO_CART_TYPE,
@@ -63,5 +81,7 @@ export {
   PLAN_TYPE,
   PLAN_NAME,
   PLAN_STATUS,
-  MAX_ALLOWED_COMPONENTS
+  PLAN_PRICE,
+  MAX_ALLOWED_COMPONENTS,
+  DISCOUNT_TYPE
 }

@@ -137,6 +137,7 @@ export const loader = async ({ request }) => {
         maxAllowedComponents: 10,
         appPlan: appSubscriptions[0].name,
         trialDays: appSubscriptions[0].trialDays,
+        isAppliedCoupon: true,
         plan: {
           upsert: {
             create: {

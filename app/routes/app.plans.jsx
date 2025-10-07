@@ -1,5 +1,6 @@
 import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
-import { BlockStack, Box, Button, ButtonGroup, Card, Icon, InlineStack, Layout, Page, Text } from "@shopify/polaris";
+import { BlockStack, Box, Button, ButtonGroup, Card, Icon, InlineError, InlineStack, Layout, Link, Page, Text, TextField } from "@shopify/polaris";
+import crypto from "crypto";
 import {
   CheckCircleIcon
 } from '@shopify/polaris-icons';
@@ -8,7 +9,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
-import { ADD_TO_CART_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
+import { ADD_TO_CART_TYPE, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {
@@ -47,8 +48,11 @@ export const loader = async ({ request }) => {
       id: true,
       planActivatedAt: true,
       plan: true,
-      isFirstInstall:true,
-      scAccessToken: true
+      isFirstInstall: true,
+      scAccessToken: true,
+      coupon: true,
+      trialDays: true,
+      isAppliedCoupon: true,
     }
   });
 
@@ -99,8 +103,11 @@ export const loader = async ({ request }) => {
         id: true,
         planActivatedAt: true,
         plan: true,
-        isFirstInstall:true,
-        scAccessToken: true
+        isFirstInstall: true,
+        scAccessToken: true,
+        coupon: true,
+        trialDays: true,
+        isAppliedCoupon: true,
       }
     });
   }
@@ -141,6 +148,41 @@ export const loader = async ({ request }) => {
 
 
 
+  // coupon code get details
+
+  let couponData = {};
+  const code = shopData.coupon || "";
+  if (code && code != "") {
+    // Create canonical string for signing
+    const timestamp = Date.now().toString();
+
+    const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"EmbedUp"}:${session.shop}`;
+    const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
+    const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
+
+    const inputFormData = new FormData();
+    inputFormData.set("target", "GET_COUPON_OFFER");
+    inputFormData.set("code", code);
+    inputFormData.set("app", "EmbedUp");
+    inputFormData.set("shop", session.shop);
+
+    const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
+
+    try {
+      const couponResponse = await fetch(url, {
+        method: "POST",
+        headers: {
+          "x-api-signature": signature,
+          "x-api-timestamp": timestamp,
+        },
+        body: inputFormData,
+      });
+      if (couponResponse.ok) {
+        couponData = await couponResponse.json();
+      }
+    } catch (error) { }
+  }
+
 
 
 
@@ -149,26 +191,71 @@ export const loader = async ({ request }) => {
     appSubscriptions: appSubscriptions?.length > 0 ? appSubscriptions[0] : {},
     shopInfo: shop?.data?.shop || {},
     paidRedirectInfo: { isFirstInstall, upgrade },
-    trialDaysOffer: process.env.TRIAL_DAYS ? parseInt(process.env.TRIAL_DAYS) : 5,
+    trialDaysOffer: shopData?.trialDays ? shopData?.trialDays : parseInt(process.env.TRIAL_DAYS),
     node_env: process.env.NODE_ENV || '',
+    couponData,
   }
 }
 const Plans = () => {
-  const { shopData, shopInfo, appSubscriptions, trialDaysOffer, node_env } = useLoaderData();
+  const { shopData, shopInfo, appSubscriptions, trialDaysOffer, couponData, node_env } = useLoaderData();
   const fetcher = useFetcher();
   //console.log('appSubscriptions:', appSubscriptions);
   const navigation = useNavigation();
   const navigate = useNavigate();
+  const [planPriceAndDiscount, setPlanPriceAndDiscount] = useState({
+    growth_monthly: {
+      price: PLAN_PRICE.growth_monthly.price,
+      discountedPrice: null,
+      discountType: null,
+      discountValue: null,
+      discountDuration: null
+    },
+    growth_yearly: {
+      price: PLAN_PRICE.growth_yearly.price,
+      discountedPrice: PLAN_PRICE.growth_yearly.discountedPrice,
+      discountType: PLAN_PRICE.growth_yearly.discountType,
+      discountValue: PLAN_PRICE.growth_yearly.discountValue,
+      discountDuration: PLAN_PRICE.growth_yearly.discountDuration,
+    }
+  });
   const [remainTrialDays, setRemainTrialDays] = useState(0);
   const [isLoading, setIsLoading] = useState(null);
   const [isMonthlyPlanShow, setIsMonthlyPlanShow] = useState(true);
+  const [showCouponApplySection, setShowCouponApplySection] = useState(false);
+  const [couponCodeInpValue, setCouponCodeInpValue] = useState('');
+
 
   useEffect(() => {
     setRemainTrialDays(getRemainingTrialDays(shopData?.planActivatedAt, trialDaysOffer))
   }, [shopData, trialDaysOffer]);
 
 
-  const handleSubscriptionPlan = (planName, planType) => {
+  useEffect(() => {
+    const offerType = ["discount-on-app-sub", "revenue-and-sub-discount"];
+    if (couponData?.offer?.option && offerType.includes(couponData?.offer?.option)) {
+      setPlanPriceAndDiscount(prevState => {
+        return {
+          ...prevState,
+          growth_monthly: {
+            ...prevState.growth_monthly,
+            discountType: DISCOUNT_TYPE.percentage,
+            discountValue: couponData?.offer?.value?.subDiscount,
+            discountDuration: couponData?.offer?.value?.subDurationType === "recurring" ? couponData?.offer?.value?.subDiscountDuration : null,
+            discountedPrice: (prevState.growth_monthly.price * (1 - (couponData?.offer?.value?.subDiscount / 100)))
+          },
+          growth_yearly: {
+            ...prevState.growth_yearly,
+            discountType: DISCOUNT_TYPE.percentage,
+            discountValue: couponData?.offer?.value?.subDiscount,
+            discountDuration: couponData?.offer?.value?.subDurationType === "recurring" ? couponData?.offer?.value?.subDiscountDuration : null,
+            discountedPrice: (prevState.growth_yearly.price * (1 - (couponData?.offer?.value?.subDiscount / 100)))
+          }
+        }
+      })
+    }
+  }, [couponData])
+
+  const handleSubscriptionPlan = (planName, planType, planPriceAndDiscount) => {
     const data = {
       planName: planName,
       planType: planType,
@@ -176,15 +263,16 @@ const Plans = () => {
       isFirstInstall: `${shopData?.isFirstInstall}`,
       partnerDevelopment: shopInfo?.plan?.partnerDevelopment || false,
       remaingTrialDays: remainTrialDays,
-      discountPercent: 0
+      planPriceAndDiscount: JSON.stringify(planPriceAndDiscount)
     }
 
-    // console.log('data:', data);
+    //console.log('data:', data);
 
     fetcher.submit(data, { method: 'post' });
 
   }
 
+  //console.log("couponData:", couponData);
 
 
   useEffect(() => {
@@ -204,12 +292,29 @@ const Plans = () => {
   }, [shopData?.plan?.planName, shopData?.plan?.planType]);
 
   //console.log(shopData);
-  
+
   const handleCancelSubscription = () => {
     fetcher.submit('', { method: 'get', action: '/api/plancancel' });
   }
 
-  //console.log('featcherData', fetcher.data);
+  const handleShowCouponApplySection = () => {
+    setShowCouponApplySection(prev => !prev);
+  }
+
+  const handleApplyCoupon = () => {
+    //console.log('couponCodeInpValue', couponCodeInpValue);
+    fetcher.submit({ couponCode: couponCodeInpValue }, { method: 'post', action: '/api/applycoupon' });
+  }
+
+  useEffect(() => {
+    if (fetcher.data?.data?.offer) {
+      shopify.toast.show('Applied coupon successfully', { duration: 2000 });
+      setShowCouponApplySection(false);
+      setCouponCodeInpValue('');
+    }
+  }, [fetcher.data?.data?.offer]);
+
+  console.log('featcherData', fetcher.data);
 
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -262,7 +367,7 @@ const Plans = () => {
                       variant={!isMonthlyPlanShow ? 'primary' : 'tertiary'}
                       onClick={() => setIsMonthlyPlanShow(false)}
                     >
-                      <Box paddingBlock={'100'}><Text variant="headingMd">Save 20% (Yearly)</Text></Box>
+                      <Box paddingBlock={'100'}><Text variant="headingMd">Save {planPriceAndDiscount.growth_monthly.discountValue ?? 20}% (Yearly)</Text></Box>
                     </Button>
                   </Box>
                 </ButtonGroup>
@@ -292,7 +397,7 @@ const Plans = () => {
                       variant="secondary"
                       size="large"
                       loading={fetcher.state === 'submitting' && isLoading === 'freeBtn'}
-                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.free, PLAN_TYPE.monthly); setIsLoading('freeBtn') }}
+                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.free, PLAN_TYPE.monthly, {}); setIsLoading('freeBtn') }}
                       disabled={shopData?.plan?.planName === PLAN_NAME.free}
                     >
                       <Box padding={'150'}><Text>{shopData?.plan?.planName === PLAN_NAME.free ? 'Current' : 'Get Started'}</Text></Box>
@@ -373,20 +478,37 @@ const Plans = () => {
                   </Box>
                   <Box paddingBlock={'600'}>
                     <InlineStack align="start" blockAlign="center" gap={"100"}>
-                      <Text variant="heading2xl">$29.00</Text>
+                      {planPriceAndDiscount.growth_monthly.discountedPrice ?
+                        <Text variant="heading2xl" textDecorationLine="line-through" tone="subdued">${planPriceAndDiscount.growth_monthly.price.toFixed(2)}</Text>
+                        :
+                        <Text variant="heading2xl">${planPriceAndDiscount.growth_monthly.price.toFixed(2)}</Text>
+                      }
+
+                      {planPriceAndDiscount.growth_monthly.discountedPrice &&
+                        <Text variant="heading2xl">${planPriceAndDiscount.growth_monthly.discountedPrice.toFixed(2)}</Text>
+                      }
+
                       <Text variant="headingLg" fontWeight="regular" tone="subdued">/per month</Text>
                     </InlineStack>
+
+
                   </Box>
                   <Box>
                     <Button
-                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.growth, PLAN_TYPE.monthly); setIsLoading('growthBtn') }}
+                      onClick={() => {
+                        handleSubscriptionPlan(
+                          PLAN_NAME.growth,
+                          PLAN_TYPE.monthly,
+                          planPriceAndDiscount.growth_monthly
+                        ); setIsLoading('growthBtn')
+                      }}
                       fullWidth
                       variant="primary"
                       size="large"
                       loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
-                      disabled={shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly}
+                      disabled={shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly && shopData?.isAppliedCoupon}
                     >
-                      <Box padding={'150'}><Text> {shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</Text></Box>
+                      <Box padding={'150'}><Text> {shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly && shopData?.isAppliedCoupon ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</Text></Box>
                     </Button>
                   </Box>
 
@@ -498,21 +620,37 @@ const Plans = () => {
                   </Box>
                   <Box paddingBlock={'600'}>
                     <InlineStack align="start" blockAlign="center" gap={"100"}>
-                      <Text variant="heading2xl"><Text as="span" textDecorationLine="line-through" tone="subdued">$348.00</Text> $278.40</Text>
+                      {planPriceAndDiscount.growth_yearly.discountedPrice ?
+                        <Text variant="heading2xl" textDecorationLine="line-through" tone="subdued">${planPriceAndDiscount.growth_yearly.price.toFixed(2)}</Text>
+                        :
+                        <Text variant="heading2xl">${planPriceAndDiscount.growth_yearly.price.toFixed(2)}</Text>
+                      }
+
+                      {planPriceAndDiscount.growth_yearly.discountedPrice &&
+                        <Text variant="heading2xl">${planPriceAndDiscount.growth_yearly.discountedPrice.toFixed(2)}</Text>
+                      }
+
                       <Text variant="headingLg" fontWeight="regular" tone="subdued">/per year</Text>
                     </InlineStack>
                   </Box>
                   <Box>
                     <Button
-                      onClick={() => { handleSubscriptionPlan(PLAN_NAME.growth, PLAN_TYPE.yearly); setIsLoading('growthBtn') }}
+                      onClick={() => {
+                        handleSubscriptionPlan(
+                          PLAN_NAME.growth,
+                          PLAN_TYPE.yearly,
+                          planPriceAndDiscount.growth_yearly
+                        );
+                        setIsLoading('growthBtn')
+                      }}
                       fullWidth
                       variant="primary"
                       size="large"
                       loading={fetcher.state === 'submitting' && isLoading === 'growthBtn'}
-                      disabled={shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly}
+                      disabled={shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly && shopData?.isAppliedCoupon}
                     >
                       <Box padding={'150'}><Text> {
-                        shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</Text></Box>
+                        shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.yearly && shopData?.isAppliedCoupon ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</Text></Box>
                     </Button>
                   </Box>
 
@@ -617,11 +755,45 @@ const Plans = () => {
         </Layout.Section>
 
 
-
-
-
+        <Layout.Section variant="fullWidth">
+          <InlineStack align="center">
+            <Box paddingBlock={"500"}>
+              <BlockStack inlineAlign="center">
+                <Box>
+                  <Button variant="plain" onClick={handleShowCouponApplySection}>
+                    <Text fontWeight="semibold" variant="bodyLg">Have a coupon code?</Text>
+                  </Button>
+                </Box>
+                {showCouponApplySection &&
+                  <Box paddingBlock={'400'} minWidth="350px">
+                    <Card>
+                      <InlineStack gap={'200'}>
+                        <Box minWidth="75%">
+                          <TextField
+                            name="couponCode"
+                            value={couponCodeInpValue}
+                            onChange={(value) => { setCouponCodeInpValue(value) }}
+                            autoComplete="off"
+                            label="Coupon Code"
+                            labelHidden
+                            placeholder="Enter your coupon code"
+                          />
+                        </Box>
+                        <Button loading={fetcher.state === 'submitting'} variant="primary" onClick={handleApplyCoupon}>Apply</Button>
+                      </InlineStack>
+                      <Box paddingBlockStart={"200"} paddingInlineStart={"100"}>
+                        <InlineError message={fetcher?.data?.data?.errorCode === 77 ? 'Invalid Coupon Code' : fetcher?.data?.data?.errorCode === 66 ? 'Alreay Applied Coupon' : ''} />
+                      </Box>
+                    </Card>
+                  </Box>
+                }
+              </BlockStack>
+            </Box>
+          </InlineStack>
+        </Layout.Section>
 
       </Layout>
+
       <Box paddingBlockEnd={'600'}></Box>
     </Page>
 
@@ -632,12 +804,43 @@ export default Plans
 
 export const action = async ({ request }) => {
   const { session, admin, billing, redirect } = await authenticate.admin(request);
+  const { appSubscriptions } = await billing.check();
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
 
 
   if (data.planName === PLAN_NAME.growth) {
+
+    if (appSubscriptions?.length > 0) {
+      for (let i = 0; i < appSubscriptions.length; i++) {
+        const subscription = appSubscriptions[i];
+        await billing.cancel({
+          subscriptionId: subscription.id,
+          isTest: data.partnerDevelopment === 'true',
+          prorate: true,
+        });
+      }
+
+    }
+
+    const { price, discountType, discountValue, discountDuration } = JSON.parse(data?.planPriceAndDiscount);
+
+    let discountObj = {}
+    if (discountType === DISCOUNT_TYPE.percentage) {
+      discountObj = {
+        value: { percentage: discountValue / 100 },
+        ...(discountDuration > 0 && { durationLimitInIntervals: discountDuration })
+      }
+
+    } else if (discountType === DISCOUNT_TYPE.fixed) {
+      discountObj = {
+        value: { amount: discountValue },
+        ...(discountDuration > 0 && { durationLimitInIntervals: discountDuration })
+      }
+    }
+
+
     let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}`;
 
     if (data?.isFirstInstall === 'false') {
@@ -693,24 +896,31 @@ export const action = async ({ request }) => {
     //     },
     //   );
 
-    const priceAmount = data.planType === PLAN_TYPE.monthly ? 29 : data.planType === PLAN_TYPE.yearly ? 278.40 : 29.00;
+    // const priceAmount = data.planType === PLAN_TYPE.monthly ? 29 : data.planType === PLAN_TYPE.yearly ? 278.40 : 29.00;
+
+    const priceAmount = price;
+    console.log('priceAmount:', priceAmount);
+
     const interval = data.planType === PLAN_TYPE.monthly ? "EVERY_30_DAYS" : data.planType === PLAN_TYPE.yearly ? "ANNUAL" : "EVERY_30_DAYS";
 
     const currencyCode = "USD";
 
 
-    const discountPercent = Number(data?.discountPercent ?? 0);
+    const isDiscount = Number(discountValue ?? 0);
 
     const appRecurringPricingDetails = {
       price: { amount: priceAmount, currencyCode },
       interval: interval,
-      ...(discountPercent > 0 && {
-        discount: {
-          value: { percentage: discountPercent },
-          durationLimitInIntervals: 1,
-        },
+      ...(isDiscount > 0 && {
+        discount: discountObj,
       }),
     };
+
+    console.log("appRecurringPricingDetails", appRecurringPricingDetails,
+      JSON.stringify(appRecurringPricingDetails)
+    );
+
+    console.log("isDiscount:", isDiscount, "discountValue:", discountValue);
 
     const variables = {
       name: data.planName,
@@ -772,9 +982,7 @@ export const action = async ({ request }) => {
 
     }
   } else if (data.planName === PLAN_NAME.free) {
-    const { appSubscriptions } = await billing.check();
     if (appSubscriptions?.length > 0) {
-
       for (let i = 0; i < appSubscriptions.length; i++) {
         const subscription = appSubscriptions[i];
         await billing.cancel({
