@@ -170,13 +170,17 @@ const GlobalStyle = ({ buttonStyleSettings, componentSettings, productLayoutSett
             }
 
 
-          .product-card__add-button.loading {
+          .product-card__add-button.loading,
+          .spc_embedup_cart_total_amount_container.loading,
+          .spc_embedup_discount_apply_button.loading {
             position: relative;
             color: transparent;    
             pointer-events: none;       
           }
 
-          .product-card__add-button.loading::after {
+          .product-card__add-button.loading::after,
+          .spc_embedup_cart_total_amount_container.loading::after,
+          .spc_embedup_discount_apply_button.loading::after {
             content: "";
             position: absolute;
             top: 50%;
@@ -553,7 +557,9 @@ const GlobalStyle = ({ buttonStyleSettings, componentSettings, productLayoutSett
                     align-items: center;
                     
                 }
+
               
+
 
             ${customCss}
         

@@ -27,7 +27,6 @@ export default function Main() {
   }, []);
 
 
-
   return (
     <>
       {targets.map(({ el, props, key }) =>

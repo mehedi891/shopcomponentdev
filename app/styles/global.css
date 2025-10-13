@@ -45,6 +45,7 @@
 .Polaris-Box.howToEmbedBox {
     min-width: 49%;
 }
+
 @media screen and (min-width: 1300px) {
     .Polaris-Box.howToEmbedBox {
         min-width: 35%;

@@ -1,5 +1,5 @@
 import { useActionData, useLoaderData, useLocation, useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react";
-import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Divider, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail, Tooltip } from "@shopify/polaris"
+import { Banner, BlockStack, Box, Button, Card, Checkbox, Collapsible, Icon, InlineError, InlineStack, Layout, Link, Page, RadioButton, RangeSlider, Select, Tabs, Text, TextField, Thumbnail, Tooltip } from "@shopify/polaris"
 import {
   DeleteIcon,
   DesktopIcon,
@@ -7,7 +7,6 @@ import {
   MobileIcon,
   SearchIcon,
   ViewportWideIcon,
-  XIcon
 } from '@shopify/polaris-icons';
 import { useTranslation } from "react-i18next"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
@@ -22,7 +21,6 @@ import { emptyStateHtml } from "../webcomponentsHtml/emptyState";
 import { stylesPdT1 } from "../webcomponentsHtml/stylesProduct";
 import { floatingCartCountBuble } from "../webcomponentsHtml/generalHTML";
 import db from "../db.server";
-import HeadlessVerify from "../components/HeadlessVerify/HeadlessVerify";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
@@ -73,7 +71,6 @@ const UpdateComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [toogleBtnDisabled, setToogleBtnDisabled] = useState(false);
   const [toogleOpen, setToogleOpen] = useState({
     titleAndDescToggleOpen: true,
     cartBehaviorOpen: true,
@@ -233,14 +230,7 @@ const UpdateComponent = () => {
   }, [selectedProductsInd, selectedCollection, watchedValues.appliesTo, selectedProductsBulk, watchedValues.addToCartType.type]);
 
   const formHandleSubmit = (data) => {
-    if (data.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken) {
-      setError("componentSettings.cartBehavior", {
-        type: "manual",
-        message: t("headless_token_required_msg"),
-      });
-      shopify.toast.show(t("headless_token_required_msg"), { duration: 2000 });
-      return;
-    }
+    
     const updatedData = { ...data, addToCartType: JSON.stringify(data.addToCartType), buttonStyleSettings: JSON.stringify(data.buttonStyleSettings), productLayoutSettings: JSON.stringify(data.productLayoutSettings), shoppingCartSettings: JSON.stringify(data.shoppingCartSettings), componentSettings: JSON.stringify(data.componentSettings)};
     //console.log(updatedData);
     submit(updatedData, { method: 'patch' });
@@ -470,13 +460,7 @@ const UpdateComponent = () => {
     });
   }
 
-  useEffect(() => {
-    if (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken) {
-      setToogleBtnDisabled(true);
-    } else {
-      setToogleBtnDisabled(false);
-    }
-  }, [watchedValues, component]);
+
 
 
   useEffect(() => {
@@ -1348,7 +1332,7 @@ const UpdateComponent = () => {
    const copyCode = `
     <!-------------- EmbedUp [https://embedup.com/] ------------>
 
-  <div id="shopcomponent-${watchedValues.tracking}" class="spc_rootElement" data-props='{"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com",'')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"
+  <div id="embedup-${watchedValues.tracking}" class="spc_rootElement" data-props='{"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com",'')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"
 }'></div>
   <script type="module">
     window.addEventListener('DOMContentLoaded', async () => {
@@ -1483,7 +1467,7 @@ const UpdateComponent = () => {
                     </Button>
                     <Button variant="plain" onClick={() => navigate(`/app`)}><Link>Component list</Link>
                     </Button>
-                    <Button variant="plain" disabled={isDirty || watchedValues.status === STATUS.deactivate || (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken)} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
+                    <Button variant="plain" disabled={isDirty || watchedValues.status === STATUS.deactivate} onClick={handleCopyHtmlCode}><Link>Copy code</Link>
                     </Button>
 
                   </InlineStack>
@@ -1494,7 +1478,7 @@ const UpdateComponent = () => {
 
             <Layout.Section variant="oneThird">
               <BlockStack>
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -1583,7 +1567,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className="Polaris-Box hideSection">
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -1640,17 +1624,12 @@ const UpdateComponent = () => {
 
 
                         </BlockStack>
-                        {watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken &&
-                          <Box paddingBlockStart={'200'}>
-                            <HeadlessVerify />
-                          </Box>
-                        }
                       </Box>
                     </Collapsible>
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2046,7 +2025,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2116,7 +2095,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2174,7 +2153,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2366,7 +2345,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled || watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
+                <Box paddingBlockEnd={'400'} className={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
                   aria-hidden={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}
                 >
                   <Box background="bg-fill" borderRadius="200">
@@ -2510,7 +2489,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2735,7 +2714,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2795,7 +2774,7 @@ const UpdateComponent = () => {
                   </Box>
                 </Box>
 
-                <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+                <Box paddingBlockEnd={'400'}>
                   <Box background="bg-fill" borderRadius="200">
                     <Box minHeight="50px">
                       <div className="collapsibleButtonDiv">
@@ -2862,7 +2841,7 @@ const UpdateComponent = () => {
 
               </BlockStack>
 
-              <Box paddingBlockEnd={'400'} className={toogleBtnDisabled ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={toogleBtnDisabled}>
+              <Box paddingBlockEnd={'400'}>
 
                 <InlineStack align="end" gap={'200'}>
                   <Button variant="secondary" tone="critical" onClick={() => {
@@ -2931,7 +2910,7 @@ const UpdateComponent = () => {
                             />
                           </Box>
                         </Tooltip>
-                        <Button disabled={isDirty || watchedValues.status === STATUS.deactivate || (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken)} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                        <Button disabled={isDirty || watchedValues.status === STATUS.deactivate} variant="primary" size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                       </InlineStack>
                     </Box>
 
@@ -2987,7 +2966,7 @@ const UpdateComponent = () => {
                   </Modal>
                   <Box paddingBlock={'200'} paddingInlineEnd={'400'}>
                     <InlineStack align="end">
-                      <Button variant="primary" disabled={isDirty || watchedValues.status === STATUS.deactivate || (watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart && !component?.shop?.headlessAccessToken)} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
+                      <Button variant="primary" disabled={isDirty || watchedValues.status === STATUS.deactivate} size="large" onClick={handleCopyHtmlCode}>Copy code</Button>
                     </InlineStack>
                   </Box>
                 </Card>

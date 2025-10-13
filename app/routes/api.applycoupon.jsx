@@ -22,6 +22,8 @@ export const action = async ({ request }) => {
 
             const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
 
+            console.log("API URL", process.env.COUPON_CODE_API_URL);
+
             const response = await fetch(url, {
                 method: "POST",
                 headers: {

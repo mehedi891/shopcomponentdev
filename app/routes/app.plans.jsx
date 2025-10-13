@@ -168,6 +168,8 @@ export const loader = async ({ request }) => {
 
     const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
 
+    console.log("API URL Plans:", url);
+
     try {
       const couponResponse = await fetch(url, {
         method: "POST",
@@ -314,7 +316,7 @@ const Plans = () => {
     }
   }, [fetcher.data?.data?.offer]);
 
-  console.log('featcherData', fetcher.data);
+  //console.log('featcherData', fetcher.data);
 
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :

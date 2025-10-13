@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebComp</title>
+</head>
+<body>
+  <link
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+  rel="stylesheet"
+/>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<!-- Provide the token and set the market context -->
+<shopify-store store-domain="fastdev891.myshopify.com" public-access-token="92fd323ddcd4b161c1a50c5c4c5bb03f" country="US" language="en"></shopify-store>
+
+<!-- Navigation -->
+<div class="navigation-layout">
+  <div class="navigation">
+    <div class="navigation__title">
+      <span class="navigation__title-bold">MOCK<span class="navigation__title-light">SHOP</span></span>
+    </div>
+    <a onclick="document.querySelector('shopify-cart').showModal()"
+      ><div class="navigation__view-cart">
+        <shopify-context type="cart"
+          ><template><shopify-data query="cart.totalQuantity" class="navigation__view-cart__quantity"></shopify-data></template
+        ></shopify-context>
+        <span> View Cart </span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Collection hero -->
+<div class="hero-layout">
+  <div class="hero">
+    <shopify-context type="collection" handle="accessories">
+      <template
+        ><h1><shopify-data query="collection.title"></shopify-data></h1>
+        <h2>Enhance Your Style with Our Curated Collection</h2>
+      </template>
+    </shopify-context>
+  </div>
+</div>
+
+<!-- Set collection you want to display -->
+<shopify-context type="collection" handle="automated-collection">
+  <template>
+    <div class="collection-layout">
+      <div class="collection-grid">
+        <!-- Define a new context for the products within the collection -->
+        <shopify-list-context type="product" query="collection.products" first="12">
+          <!-- This template is repeated for each product in the collection -->
+          <template>
+            <div shopify-attr--disabled="!product.availableForSale" class="product-card">
+              <div class="product-card__image-container">
+                <button
+                  shopify-attr--disabled="!product.availableForSale"
+                  class="product-card__hover-button"
+                  onclick="getElementById('cart').addLine(event).showModal();"
+                >
+                  <span class="product-card__hover-button__button__text">Quick Add</span>
+                </button>
+                <a
+                  shopify-attr--disabled="!product.availableForSale"
+                  class="product__link"
+                  onclick="getElementById('product-modal').showModal(); getElementById('product-modal-context').update(event);"
+                  ><shopify-media
+                    max-images="1"
+                    width="320"
+                    height="320"
+                    query="product.selectedOrFirstAvailableVariant.image"
+                  ></shopify-media
+                ></a>
+              </div>
+              <a
+                shopify-attr--disabled="!product.availableForSale"
+                class="product__link"
+                onclick="getElementById('product-modal').showModal(); getElementById('product-modal-context').update(event);"
+              >
+                <!-- Product information on the card -->
+                <div class="product-card__details">
+                  <div class="product-card__info">
+                    <p class="product-card__category">
+                      <shopify-data query="product.selectedOrFirstAvailableVariant.product.category.name"></shopify-data>
+                    </p>
+                    <h3 class="product-card__title">
+                      <span>
+                        <shopify-data query="product.title"></shopify-data>
+                      </span>
+                    </h3>
+                  </div>
+                  <p class="product-card__price">
+                    <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                  </p>
+                </div>
+              </a>
+            </div>
+          </template>
+        </shopify-list-context>
+      </div>
+    </div>
+  </template>
+</shopify-context>
+
+<shopify-cart id="cart"></shopify-cart>
+
+<dialog id="product-modal" class="product-modal">
+  <!-- The handle of this context is automatically set when the dialog is opened -->
+  <shopify-context id="product-modal-context" type="product" wait-for-update>
+    <template>
+      <div class="product-modal__container">
+        <div class="product-modal__close-container">
+          <button class="product-modal__close" onclick="getElementById('product-modal').close();">&#10005;</button>
+        </div>
+        <div class="product-modal__content">
+          <div class="product-modal__layout">
+            <div class="product-modal__media">
+              <shopify-media max-images="1" width="400" height="500" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+            </div>
+            <div class="product-modal__details">
+              <div class="product-modal__header">
+                <div>
+                  <span class="product-modal__vendor">
+                    <shopify-data query="product.vendor"></shopify-data>
+                  </span>
+                </div>
+                <h1 class="product-modal__title">
+                  <shopify-data query="product.title"></shopify-data>
+                </h1>
+                <div class="product-modal__price-container">
+                  <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                  <shopify-money
+                    class="product-modal__compare-price"
+                    query="product.selectedOrFirstAvailableVariant.compareAtPrice"
+                  ></shopify-money>
+                </div>
+                <div class="product-modal__description">
+                  <span class="product-modal__description-text">
+                    <shopify-data query="product.descriptionHtml"></shopify-data>
+                  </span>
+                </div>
+              </div>
+              <shopify-variant-selector></shopify-variant-selector>
+
+              <div class="product-modal__buttons">
+                <button
+                  class="product-modal__add-button"
+                  onclick="getElementById('cart').addLine(event).showModal();getElementById('product-modal').close();"
+                  shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+                >
+                  Add to cart
+                </button>
+                <button
+                  class="product-modal__buy-button"
+                  onclick="document.querySelector('shopify-store').buyNow(event)"
+                  class="product-buy-now__button"
+                  shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+                >
+                  Buy now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </shopify-context>
+</dialog>
+
+<style>
+  body {
+    background: #eeecec;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0 0 2rem 0;
+  }
+  /** Navigation style **/
+  .navigation-layout {
+    background: #ffffff;
+    padding: 1rem;
+  }
+  .navigation {
+    display: flex;
+    flex-direction: row;
+    margin: 0 0.5rem;
+  }
+  .navigation__title {
+    width: 100%;
+  }
+  .navigation__title-bold {
+    font-weight: 800;
+  }
+  .navigation__title-light {
+    color: #6b7280;
+    font-weight: 400;
+  }
+  .navigation__view-cart {
+    position: relative;
+  }
+  .navigation__view-cart__quantity {
+    color: #fff;
+    font-size: 25%;
+    background-color: #000000;
+    position: absolute;
+    bottom: -20%;
+    right: 5%;
+    padding: 3% 7%;
+    border-radius: 1000px;
+    cursor: pointer;
+    display: block;
+  }
+  .navigation__view-cart__quantity:empty {
+    display: none;
+  }
+  .navigation__view-cart span {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    font-size: 0.875rem;
+    gap: 0.5rem;
+    justify-content: center;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .navigation__view-cart span::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 45'><path d='M 23 2 C 18.385291 2 14.559689 5.5140788 14.058594 10 L 12 10 C 9.688 10 7.7634375 11.733203 7.5234375 14.033203 L 5.0234375 38.033203 C 4.8914375 39.298203 5.30425 40.566672 6.15625 41.513672 C 7.00825 42.458672 8.228 43 9.5 43 L 38.5 43 C 39.772 43 40.99175 42.458672 41.84375 41.513672 C 42.69575 40.567672 43.106609 39.298203 42.974609 38.033203 L 40.476562 14.033203 C 40.236562 11.733203 38.312 10 36 10 L 33.953125 10 C 33.984125 10.33 34 10.664 34 11 L 34 13 L 36 13 C 36.771 13 37.412187 13.578703 37.492188 14.345703 L 39.992188 38.345703 C 40.036187 38.767703 39.898234 39.189906 39.615234 39.503906 C 39.331234 39.818906 38.924 40 38.5 40 L 9.5 40 C 9.076 40 8.6697188 39.819859 8.3867188 39.505859 C 8.1027187 39.190859 7.9638125 38.767703 8.0078125 38.345703 L 10.507812 14.345703 C 10.587813 13.578703 11.229 13 12 13 L 14 13 L 14 16.5 A 1.50015 1.50015 0 1 0 17 16.5 L 17 11 C 17 7.6687195 19.668719 5 23 5 C 25.989762 5 28.439942 7.1510842 28.912109 10 L 19.132812 10 C 19.048812 10.32 19 10.654 19 11 L 19 13 L 29 13 L 29 16.5 A 1.50015 1.50015 0 1 0 32 16.5 L 32 11 C 32 6.0472805 27.952719 2 23 2 z' /></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 15px;
+  }
+  .navigation__view-cart span:hover {
+    text-decoration: underline;
+  }
+  /** Hero style **/
+  .hero-layout {
+    align-items: center;
+    background-image: url('hero-image.avif');
+    background-position: center;
+    background-size: cover;
+    color: #ffffff;
+    display: flex;
+    height: 25vh;
+    justify-content: center;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 400;
+    margin: 0;
+  }
+  .hero h2 {
+    font-size: 1rem;
+    font-weight: 400;
+    margin: 0;
+  }
+  /** Product Collection style **/
+  .collection-layout {
+    margin: 0 0.5rem;
+    padding: 1rem;
+  }
+  .collection-grid {
+    margin: 0 auto;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    justify-items: center;
+    align-items: start;
+  }
+  .product-card {
+    background: #fff;
+    border: 1px solid #c5c4c4;
+    border-radius: 0.625rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    overflow: hidden;
+    padding: 0.5rem;
+    position: relative;
+    transition: box-shadow 0.2s ease-in-out;
+  }
+  .product-card:is([disabled]) {
+    cursor: not-allowed;
+    position: relative;
+  }
+  .product-card:is([disabled])::before {
+    background-color: rgba(255, 255, 255, 0.5);
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+  }
+  .product-card:is([disabled])::after {
+    content: 'Sold out';
+    position: absolute;
+    top: 40%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #000000;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-align: center;
+    z-index: 2;
+  }
+  .product-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  .product-card[disabled] .product-card__hover-button {
+    display: none;
+  }
+  .product-card__image-container {
+    border-radius: 0.625rem;
+    min-height: 300px;
+    overflow: hidden;
+    width: 100%;
+  }
+  @media (min-width: 1024px) {
+    .product-card__image-container {
+      aspect-ratio: auto;
+      height: 20rem;
+    }
+  }
+  .product-card__image-container img {
+    border-radius: 8px;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+    transition: transform 0.3s ease-in-out;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+  .product-card:hover .product-card__image-container img {
+    transform: scale(1.1);
+    opacity: 0.75;
+    max-width: 100%;
+    height: auto;
+  }
+  .product-card__details {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  .product-card__title {
+    color: #405047;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+  .product-card__title:hover {
+    text-decoration: underline;
+  }
+  .product-card__category {
+    color: #6b7280;
+    font-size: 0.75rem;
+    margin: 0 0 0.25rem 0;
+  }
+  .product-card__price {
+    color: #111827;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  button {
+    background: #fff;
+    border-radius: 50px;
+    color: #000;
+    cursor: pointer;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  button:hover {
+    background: #000;
+    color: #fff;
+  }
+  .product-card__hover-button {
+    align-items: center;
+    background-color: #000;
+    border: 2px solid #000;
+    bottom: 27%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    font-size: 1.5rem;
+    gap: 0;
+    justify-content: center;
+    outline: none;
+    opacity: 0;
+    padding: 0.5rem;
+    pointer-events: auto;
+    position: absolute;
+    right: 7%;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+  }
+  .product-card__hover-button::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .product-card:is([disabled]) .product-card__hover-button {
+    opacity: 0;
+  }
+  .product-card__hover-button[disabled]:hover {
+    cursor: not-allowed;
+  }
+  .product-card__hover-button svg {
+    filter: invert(95%) sepia(67%) saturate(1%) hue-rotate(326deg) brightness(116%) contrast(101%);
+    height: 16px;
+    width: 16px;
+  }
+  .product-card__hover-button span {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+  .product-card:hover .product-card__hover-button {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .product-card__hover-button:hover .product-card__hover-button__button__text {
+    margin: 0 0.5rem;
+    max-width: 15rem;
+    transition: max-width 0.5s ease, margin-left 0.2s ease;
+  }
+  .product-card__hover-button__button__text {
+    max-width: 0;
+    overflow: hidden;
+    transition: max-width 0.5s ease, margin-left 0.2s ease 0.3s;
+    white-space: nowrap;
+  }
+  /** Product Modal style **/
+  .product-modal {
+    border: 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 0;
+    outline: none;
+  }
+  @media (max-width: 768px) {
+    .product-modal {
+      width: 100%;
+    }
+  }
+  .product-modal::backdrop {
+    background-color: rgba(156, 163, 175, 0.5);
+  }
+  .product-modal__container {
+    overflow-x: hidden;
+    padding: 0;
+    position: relative;
+  }
+  .product-modal__close-container {
+    display: grid;
+    justify-content: end;
+    justify-items: end;
+    padding: 2rem;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+  }
+  .product-modal__close {
+    border: 1px solid #cccccc;
+    border-radius: 12px;
+    cursor: pointer;
+    height: 32px;
+    width: 32px;
+  }
+  .product-modal__content {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    max-width: 56rem;
+    width: 100%;
+  }
+  .product-modal__layout {
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .product-modal__layout {
+      flex-direction: row;
+    }
+  }
+  .product-modal__media {
+    align-items: center;
+    background: #f3f3f3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 400px;
+    padding: 1rem;
+  }
+  .product-modal__media img {
+    border-radius: 4px;
+    height: 100%;
+    width: 100%;
+    height: auto;
+  }
+  .product-modal__details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  .product-modal__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .product-modal__vendor {
+    opacity: 0.5;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+  .product-modal__title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .product-modal__price-container {
+    display: flex;
+    gap: 0.5rem;
+    font-weight: 500;
+    font-size: 1.25rem;
+  }
+  .product-modal__compare-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+  .product-modal__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .product-modal__buttons button {
+    font-size: 0.875rem;
+    font-weight: 800;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    border: 2px solid black;
+    text-transform: uppercase;
+  }
+  .product-modal__add-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 18px;
+    font-weight: 500;
+    width: 100%;
+  }
+  .product-modal__add-button:hover {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid black;
+  }
+  .product-modal__add-button:disabled {
+    opacity: 0.3;
+  }
+  .product-modal__buy-button {
+    background-color: #ffffff;
+    color: #000000;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 18px;
+    font-weight: 500;
+    width: 100%;
+  }
+  .product-modal__buy-button:disabled {
+    opacity: 0.3;
+  }
+  .product-modal__buy-button:hover {
+    opacity: 0.3;
+  }
+  .product-modal__description {
+    display: flex;
+    justify-content: space-between;
+  }
+  .product-modal__description-text {
+    font-weight: 400;
+    color: #717171;
+    font-size: 0.875rem;
+  }
+  .product-modal__description-text p {
+    margin: 0;
+  }
+</style>
+
+</body>
+</html>

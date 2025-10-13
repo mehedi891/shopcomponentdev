@@ -1,4 +1,7 @@
-const cartLineAddFnc = async (isExistCart,selectedVariant,store,token) => {
+import { CART_FIELDS } from "./fragments/cartPlayLoad";
+
+const cartLineAddFnc = async (isExistCart, selectedVariant, store, token) => {
+  console.log({ isExistCart, selectedVariant, store, token });
   const mutation = `#graphql
    mutation cartLinesAdd(
   $cartId: ID!
@@ -7,42 +10,11 @@ const cartLineAddFnc = async (isExistCart,selectedVariant,store,token) => {
   $language: LanguageCode!
 ) @inContext(country: $country, language: $language) {
   cartLinesAdd(cartId: $cartId, lines: $lines) {
-    cart {
-      updatedAt
-      id
-      appliedGiftCards{
-        id lastCharacters
-      }
-      checkoutUrl
-      totalQuantity
-      lines(first: 250) {
-          nodes{
-            id 
-            quantity 
-            attributes{
-              key value
-            }
-        }
-      }
-      cost{
-        subtotalAmount{currencyCode amount}
-        totalAmount{currencyCode amount}
-        totalDutyAmount{currencyCode amount}
-        totalTaxAmount{currencyCode amount}
-      }
-      note
-      attributes{
-        key
-        value
-      }
-      discountCodes{
-        code
-      }
-    }
+    cart { ...CartFields }
     userErrors { field message }
   }
 }
-
+${CART_FIELDS}
 `;
 
   const variables = {
@@ -53,7 +25,7 @@ const cartLineAddFnc = async (isExistCart,selectedVariant,store,token) => {
   };
 
 
-    try {
+  try {
     const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
       method: 'POST',
       headers: {
@@ -66,9 +38,11 @@ const cartLineAddFnc = async (isExistCart,selectedVariant,store,token) => {
     const data = await res.json();
     //console.log(data);
     if (data.data.cartLinesAdd.userErrors.length) {
-      //console.log("error:", data.data.cartLinesAdd.userErrors);
-      
+      console.log("error:", data.data.cartLinesAdd.userErrors);
+
       //CartId error handled here
+
+      //localStorage.setItem('embedup_cart_data', JSON.stringify(data.data.cartLinesAdd.cart));
       return {
         cartData: {},
         error: data.data.cartLinesAdd.userErrors,
@@ -78,6 +52,12 @@ const cartLineAddFnc = async (isExistCart,selectedVariant,store,token) => {
 
       localStorage.setItem('__shopify:cartId', data.data.cartLinesAdd.cart.id);
       localStorage.setItem('shopcomponent_cartId', data.data.cartLinesAdd.cart.id);
+      localStorage.setItem('embedup_cart_data', JSON.stringify(data.data.cartLinesAdd.cart));
+
+       localStorage.setItem("embedup_store_info", JSON.stringify({
+        store: store,
+        token: token
+      }));
 
       return {
         cartData: data.data.cartLinesAdd.cart,
@@ -97,6 +77,6 @@ const cartLineAddFnc = async (isExistCart,selectedVariant,store,token) => {
     }
   }
 
-} 
+}
 
 export default cartLineAddFnc;

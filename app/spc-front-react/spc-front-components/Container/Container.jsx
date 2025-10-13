@@ -8,7 +8,7 @@ const Container = ({ id, token, store }) => {
   const [loading, setLoading] = useState(false);
 
 const baseApiUrl = import.meta.env.VITE_SHOPIFY_APP_URL;
-
+//console.log(baseApiUrl);
 
   useEffect(() => {
     setLoading(true)

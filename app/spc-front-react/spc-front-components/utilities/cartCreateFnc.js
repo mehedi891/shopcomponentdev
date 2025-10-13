@@ -1,46 +1,27 @@
-const cartCreateFnc = async(selectedVariant,store,token,tracking,customerTracking) => {
-   const mutation = `#graphql
-      mutation cartCreate($input: CartInput) {
+import { CART_FIELDS } from "./fragments/cartPlayLoad";
+
+const cartCreateFnc = async (selectedVariant, store, token, tracking, customerTracking) => {
+  const mutation = `#graphql
+      mutation cartCreate(
+         $input: CartInput
+         $country: CountryCode!
+         $language: LanguageCode!
+        ) 
+       @inContext(country: $country, language: $language){
         cartCreate(input: $input) {
-    cart {
-      updatedAt
-      id
-      appliedGiftCards{
-        id lastCharacters
-      }
-      checkoutUrl
-      totalQuantity
-      lines(first: 250) {
-          nodes{
-            id 
-            quantity 
-            attributes{
-              key value
-            }
-        }
-      }
-      cost{
-        subtotalAmount{currencyCode amount}
-        totalAmount{currencyCode amount}
-        totalDutyAmount{currencyCode amount}
-        totalTaxAmount{currencyCode amount}
-      }
-      note
-      attributes{
-        key
-        value
-      }
-      discountCodes{
-        code
-      }
-    }
-    userErrors { field message }
-  }
-      }
+   cart { ...CartFields }
+       userErrors { field message }
+     }
+   }
+   ${CART_FIELDS}
+      
     `;
   const variables = {
     "input": {
       "lines": selectedVariant,
+      // "buyerIdentity": {
+      //   "countryCode": "US"
+      // },
       "attributes": [
         {
           "key": "SC_custom_tracking",
@@ -51,7 +32,9 @@ const cartCreateFnc = async(selectedVariant,store,token,tracking,customerTrackin
           "value": tracking
         }
       ]
-    }
+    },
+    country: 'US',
+    language: 'EN',
   };
   try {
     const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
@@ -71,9 +54,16 @@ const cartCreateFnc = async(selectedVariant,store,token,tracking,customerTrackin
         success: false
       }
     } else {
-     
+
       localStorage.setItem('__shopify:cartId', data.data.cartCreate.cart.id);
       localStorage.setItem('shopcomponent_cartId', data.data.cartCreate.cart.id);
+      localStorage.setItem('embedup_cart_data', JSON.stringify(data.data.cartCreate.cart));
+
+      localStorage.setItem("embedup_store_info", JSON.stringify({
+        store: store,
+        token: token
+      }));
+
 
       return {
         cartData: data.data.cartCreate.cart,

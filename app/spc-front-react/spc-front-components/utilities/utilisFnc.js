@@ -1,27 +1,3 @@
-const dispatchCartUpdate = (cart) => {
-  const shoppingCart = document.querySelectorAll('shopify-cart');
-  const qtyCount = document.querySelectorAll('.shopcomponent_cart_count_qty');
-  const evt = new CustomEvent('shopify:cartData', {
-    detail: cart,
-  });
-
-  //console.log('cart dispact');
-
-  if (shoppingCart) {
-    shoppingCart.forEach(shoppingCart => {
-      shoppingCart.dispatchEvent(evt);
-      const cloneShoppingCart = shoppingCart.cloneNode(true);
-      cloneShoppingCart.dispatchEvent(evt);
-      shoppingCart.parentNode.replaceChild(cloneShoppingCart, shoppingCart);
-    });
-  }
-  if (qtyCount) {
-    qtyCount.forEach(qtyCount => {
-      qtyCount.innerHTML = cart.totalQuantity;
-    });
-  }
-
-}
 
 const getSelectedVariantId = (targetElement,appliesTo,fullView)=>{
    let variantId = '';
@@ -74,7 +50,6 @@ const resetSelectedQuantity = (container) => {
 
 
 export {
-  dispatchCartUpdate,
   showLoading,
   getSelectedVariantId,
   updateQuantity,

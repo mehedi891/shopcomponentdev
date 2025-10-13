@@ -1,11 +1,19 @@
 import GlobalStyle from "../Styles/GlobalStyle/GlobalStyle";
 import BulkProductCard from "./BulkProductCard/BulkProductCard";
-import addToCartBulk from "../utilities/addToCartBulk";
-import addToCheckoutBulk from "../utilities/addToCheckoutBulk";
 import PoweredBy from "../PoweredBy/PoweredBy";
+import CartCountBuble from "../ShoppingCart/CartCountBuble/CartCountBuble";
+import ShoppingCart from "../ShoppingCart/ShoppingCart";
+import { useContext } from "react";
+import { ContextComponent } from "../../entryPoints/ContextWrapper/ContextWrapper";
+import { resetSelectedQuantity, showLoading } from "../utilities/utilisFnc";
+import cartLineAddFnc from "../utilities/cartLineAddFnc";
+import cartCreateFnc from "../utilities/cartCreateFnc";
 
 const BulkProduct = ({ componentData, token, store }) => {
   const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, customCss, tracking, layout, shop, enableQtyField, customerTracking, addToCartType } = componentData;
+
+  const { cartModal, cartRef } = useContext(ContextComponent);
+  const { setCartData, setCartTotalCount } = cartRef.current;
 
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
@@ -14,35 +22,132 @@ const BulkProduct = ({ componentData, token, store }) => {
   }
 
 
-  const handleAddToCartBulk = (event, token, store, tracking, customerTracking, enableQtyField, products) => {
-    return addToCartBulk(event, token, store, tracking, customerTracking, enableQtyField, products);
+  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products) => {
+    event.preventDefault();
+
+    const target = event.target;
+    const mostParentContainer = target.closest('.shopcomponent_pd_container');
+
+    const isExistCart = localStorage.getItem('shopcomponent_cartId') ? localStorage.getItem('shopcomponent_cartId') : null;
+
+    let selectedVariants = [];
+
+    if (!enableQtyField) {
+      selectedVariants = (products ?? []).flatMap(product =>
+        (product.variants ?? [])
+          .filter(variant => Number(variant.quantity ?? 0) > 0)
+          .map(variant => ({ merchandiseId: variant.id, quantity: Number(variant.quantity) }))
+      );
+    } else {
+      const quantityInputs = mostParentContainer.querySelectorAll('.shopcomponent_variants_bulk_enable_quantity_input');
+      quantityInputs.forEach(input => {
+        const quantity = Number(input.value);
+        if (quantity > 0) {
+          selectedVariants.push({ merchandiseId: input.getAttribute('data-variant-id'), quantity });
+        }
+      });
+      if (selectedVariants.length === 0) {
+        alert('Please select at least one product with quantity greater than zero.');
+        return;
+      }
+    }
+
+
+    showLoading(target, true);
+
+
+    if (isExistCart) {
+      try {
+        const cartAdd = await cartLineAddFnc(isExistCart, selectedVariants, store, token);
+        if (cartAdd?.success) {
+
+          setCartData({ ...cartAdd.cartData });
+          setCartTotalCount(cartAdd.cartData.totalQuantity);
+
+          if (enableQtyField) resetSelectedQuantity(mostParentContainer);
+
+        } else if (cartAdd?.error) {
+          if (cartAdd.error[0]?.field[0] === "cartId") {
+            const createCart = await cartCreateFnc(selectedVariants, store, token, tracking, customerTracking);
+            if (createCart?.success) {
+              setCartData({ ...createCart.cartData });
+              setCartTotalCount(createCart.cartData.totalQuantity);
+              if (enableQtyField) resetSelectedQuantity(mostParentContainer);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Existing Add to cart error:", error);
+      } finally {
+        showLoading(target, false);
+        cartModal?.current?.showModal();
+      }
+    } else {
+      try {
+        const createCart = await cartCreateFnc(selectedVariants, store, token, tracking, customerTracking);
+        if (createCart?.success) {
+          setCartData({ ...createCart.cartData });
+          setCartTotalCount(createCart.cartData.totalQuantity);
+          if (enableQtyField) resetSelectedQuantity(mostParentContainer);
+        }
+      } catch (error) {
+        console.error("Create cart error:", error);
+      } finally {
+        showLoading(target, false);
+        cartModal?.current?.showModal();
+      }
+    }
   }
 
   const handleAddToCheckoutBulk = (event, token, store, tracking, customerTracking, enableQtyField, products) => {
-    return addToCheckoutBulk(event, token, store, tracking, customerTracking, enableQtyField, products)
+    event.preventDefault();
+
+    const target = event.target;
+    const mostParentContainer = target.closest('.shopcomponent_pd_container');
+
+    let selectedVariants = [];
+
+
+    if (!enableQtyField) {
+      selectedVariants = (products ?? []).flatMap(product =>
+        (product.variants ?? [])
+          .filter(variant => Number(variant.quantity ?? 0) > 0)
+          .map(variant => `${[variant.id.replace('gid://shopify/ProductVariant/', '')]}:${Number(variant.quantity)}`)
+      )
+    } else {
+      const quantityInputs = mostParentContainer.querySelectorAll('.shopcomponent_variants_bulk_enable_quantity_input');
+      selectedVariants = quantityInputs?.length > 0 ? Array.from(quantityInputs)
+        .filter(item => Number(item.value) > 0)
+        .map(variant => `${[variant.getAttribute('data-variant-id').replace('gid://shopify/ProductVariant/', '')]}:${Number(variant.value)}`)
+        : [];
+      if (selectedVariants.length === 0) {
+        alert('Please select at least one product with quantity greater than zero.');
+        return;
+      }
+    }
+
+    showLoading(event.target, true);
+
+    try {
+      const checkoutUrl = `https://${store}/cart/${selectedVariants.join(',')}?access_token=${token}&attributes[SC_custom_tracking]=${customerTracking}&attributes[shopcomponent_tracking]=${tracking}&ref=shopcomponent`;
+
+      window.open(checkoutUrl, '_top');
+
+      //Open new tab
+      //window.open(checkoutUrl, '_blank');
+
+      setTimeout(() => {
+        showLoading(event.target, false);
+      }, 500);
+    } catch (error) {
+      console.log("Checkout redirection error:", error);
+    } finally {
+      showLoading(event.target, false);
+    }
+
   }
 
-  const floatingCartCountBuble = `
-    <div class="shopcomponent_cart_btn" onclick="document.querySelector('shopify-cart').showModal()">
-                <div class="shopcomponent_cart_icon">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M2 3.66669C2 3.1144 2.44772 2.66669 3 2.66669H5.14932C6.3119 2.66669 7.29387 3.52176 7.45873 4.66669H20.3333C20.6119 4.66669 20.8778 4.78286 21.0671 4.98724C21.2563 5.19161 21.3518 5.46566 21.3304 5.74338L20.8531 11.9479C20.7062 13.8582 19.1132 15.3334 17.1973 15.3334H8.72928L8.85302 16.3728C8.87298 16.5404 9.01517 16.6667 9.18402 16.6667H17.6667C18.219 16.6667 18.6667 17.1144 18.6667 17.6667C18.6667 18.219 18.219 18.6667 17.6667 18.6667H9.18402C8.00205 18.6667 7.00677 17.7829 6.86705 16.6092L5.48031 4.96062C5.46035 4.79295 5.31817 4.66669 5.14932 4.66669H3C2.44772 4.66669 2 4.21897 2 3.66669ZM8.49119 13.3334H17.1973C18.0681 13.3334 18.7922 12.6628 18.859 11.7945L19.2535 6.66669H7.69754L8.49119 13.3334Z" fill="white"/>
-                        <path d="M12 21.3334C12 22.0697 11.403 22.6667 10.6667 22.6667C9.93029 22.6667 9.33333 22.0697 9.33333 21.3334C9.33333 20.597 9.93029 20 10.6667 20C11.403 20 12 20.597 12 21.3334Z" fill="white"/>
-                        <path d="M18.6667 21.3334C18.6667 22.0697 18.0697 22.6667 17.3333 22.6667C16.597 22.6667 16 22.0697 16 21.3334C16 20.597 16.597 20 17.3333 20C18.0697 20 18.6667 20.597 18.6667 21.3334Z" fill="white"/>
-                        </svg>
-                            <div class="shopcomponent_cart_count">
-                            <shopify-context id="cart_modal_context" type="cart" wait-for-update>
-                              <template>
-                                <shopify-data class="shopcomponent_cart_count_qty" query="cart.totalQuantity"></shopify-data>
-                          
-                              </template>
-                            </shopify-context>
-                           
-                          </div>
-                </div>
-            </div>
 
-`;
 
   return (
     <div className="shopcomponent_pd_container">
@@ -58,7 +163,9 @@ const BulkProduct = ({ componentData, token, store }) => {
       />
 
       <div>
-        {componentSettings.cartBehavior === 'cart' && <div dangerouslySetInnerHTML={{ __html: floatingCartCountBuble }} />}
+
+        {componentSettings.cartBehavior === 'cart' && <CartCountBuble />}
+
         <div className="shopcomponent_title_N_description">
           <div className="shopcomponent_title">{title}</div>
           <div className="shopcomponent_description">{description}</div>
@@ -81,17 +188,12 @@ const BulkProduct = ({ componentData, token, store }) => {
         </div>
 
 
-        <shopify-cart id="cart" className="shopcomponent_cart">
-          <div slot="header" className="shopcomponent_cart_header">
-            {shoppingCartSettings.heading}
-          </div>
-          <div className="shopcomponent_discount_title" slot="discounts-title">
-            {shoppingCartSettings.additionalInfo}
-          </div>
-          <div className="shopcomponent_empty_cart_txt" slot="empty">
-            {shoppingCartSettings.emptyCartText}
-          </div>
-        </shopify-cart>
+        <ShoppingCart
+          cartModal={cartModal}
+          cartRef={cartRef}
+          store={shop?.shopifyDomain}
+          token={token}
+        />
       </div>
 
 
@@ -122,10 +224,10 @@ const BulkProduct = ({ componentData, token, store }) => {
       }
 
       {shop?.plan?.planName === 'Free' &&
-          <PoweredBy
-            shop={shop.shopifyDomain.replace('.myshopify.com', '')}
-          />
-        }
+        <PoweredBy
+          shop={shop.shopifyDomain.replace('.myshopify.com', '')}
+        />
+      }
 
     </div>
   )

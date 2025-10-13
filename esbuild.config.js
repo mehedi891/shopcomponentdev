@@ -18,7 +18,7 @@ const config = {
   outfile: "public/shopcomponent/js/spceflmain.js",
   format: "esm",
   platform: "browser",
-  minify: true,
+  minify: isDev ? false : true,
   sourcemap: false,
     define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),

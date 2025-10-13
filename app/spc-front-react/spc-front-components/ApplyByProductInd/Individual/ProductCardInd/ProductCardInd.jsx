@@ -1,28 +1,8 @@
-import { useEffect } from "react";
-import addToCartIndFnc from "../../../utilities/addToCartInd";
-import addToCheckoutInd from "../../../utilities/addToCheckoutInd";
+
 
 const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout }) => {
 
-  useEffect(() => {
-    // Define the function globally only once
-    if ( window && !window.spcAddToCartIndFnc) {
-      window.spcAddToCartIndFnc = function(event, token, store, tracking, customerTracking,appliesTo,fullView) {
-        event.preventDefault();
-        return addToCartIndFnc(event, token, store, tracking, customerTracking,appliesTo,fullView);
-      };
-    }
-  }, []);
 
-    useEffect(() => {
-    // Define the function globally only once
-    if ( window && !window.spcCheckoutIndFnc) {
-      window.spcCheckoutIndFnc = function(event, token, store, tracking, customerTracking,appliesTo,fullView) {
-        event.preventDefault();
-        return addToCheckoutInd(event, token, store, tracking, customerTracking,appliesTo,fullView);
-      };
-    }
-  }, []);
 
   const pdAddToCartBtnHtml = `
                 <button
@@ -40,7 +20,7 @@ const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token
   const pdCheckoutBtnHtml = `
    <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}"
-                onclick="spcCheckoutIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}')"
+                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
                   <span class="spcBtn_txt">${checkoutBtnTxt}</span>
