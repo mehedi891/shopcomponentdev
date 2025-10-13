@@ -62,6 +62,7 @@ export const loader = async ({ request }) => {
         throw redirect('/app/plans')
     }
 
+    console.log("Shop PublicationId:", shop?.publicationId);
 
     const totalPublishSpc = await admin.graphql(
         `#graphql
@@ -80,7 +81,7 @@ export const loader = async ({ request }) => {
     );
     const totalPublishSpcJson = await totalPublishSpc.json();
 
-    let isPublished = {};
+   console.log("TotalCount:", totalPublishSpcJson?.data?.publishedProductsCount);
 
     if (totalPublishSpcJson?.data?.publishedProductsCount?.count === 0) {
         const fiftyPdIdsRes = await admin.graphql(
@@ -127,7 +128,9 @@ export const loader = async ({ request }) => {
                 }
             );
 
-            isPublished = await publishToSpc.json();
+            const publishToSpcJson = await publishToSpc.json();
+
+            console.log("publishToSpcJson:", publishToSpcJson);
 
 
         }
@@ -140,7 +143,6 @@ export const loader = async ({ request }) => {
     return {
         trackingCode: trackingCode,
         shopData: shop,
-        isPublished: isPublished?.data ?? {},
     }
 }
 
