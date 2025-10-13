@@ -31,6 +31,20 @@ export const loader = async ({ request }) => {
 
   const shop = await shopResponse.json();
 
+  //  const appId = await admin.graphql(
+  //   `#graphql
+  // query {
+  //   appByHandle(handle: "embedupdev2") {
+  //     title
+  //     id
+  //   }
+  // }`,
+  // );
+  // const appIdJson = await appId.json();
+
+  // console.log("AppId:", appIdJson?.data?.appByHandle?.id);
+
+
   const url = new URL(request.url);
   const isFirstInstall = url.searchParams.get('isFirstInstall');
   const upgrade = url.searchParams.get('upgrade');

@@ -31,7 +31,7 @@ import { ADD_TO_CART_TYPE, APPLIES_TO, CART_BEHAVIOR, LAYOUT, PLAN_NAME, SHOW_CO
 
 
 export const loader = async ({ request }) => {
-    const { session, redirect } = await authenticate.admin(request);
+    const { session, redirect, admin } = await authenticate.admin(request);
     // const shopResponse = await admin.graphql(
     //     `#graphql
     //             query shopInfo{
@@ -62,16 +62,91 @@ export const loader = async ({ request }) => {
         throw redirect('/app/plans')
     }
 
+
+    const totalPublishSpc = await admin.graphql(
+        `#graphql
+  query PublishedProductCount($publicationId: ID!) {
+    publishedProductsCount(publicationId: $publicationId) {
+      count
+      precision
+    }
+  }`,
+
+        {
+            variables: {
+                "publicationId": shop?.publicationId
+            },
+        },
+    );
+    const totalPublishSpcJson = await totalPublishSpc.json();
+
+    let isPublished = {};
+
+    if (totalPublishSpcJson?.data?.publishedProductsCount?.count === 0) {
+        const fiftyPdIdsRes = await admin.graphql(
+            `#graphql
+            query GetProducts {
+                products(first: 50) {
+                nodes {
+                    id
+                }
+                }
+            }`,
+        );
+        const fiftyPdIds = await fiftyPdIdsRes.json();
+        
+        let pdArr = [];
+        if (fiftyPdIds?.data?.products?.nodes.length > 0) {
+            pdArr = fiftyPdIds?.data?.products?.nodes?.map(pd => {
+                return `${pd.id}`
+            })
+
+            const publishToSpc = await admin.graphql(
+                `#graphql
+  mutation publicationUpdate($id: ID!, $input: PublicationUpdateInput!) {
+    publicationUpdate(id: $id, input: $input) {
+      publication {
+        id
+        autoPublish
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }`,
+                {
+                    variables: {
+                        id: shop?.publicationId,
+                        input: {
+                            publishablesToAdd: pdArr,      // must be an array of GIDs
+                            publishablesToRemove: [],
+                            autoPublish: true,
+                        },
+                    },
+                }
+            );
+
+            isPublished = await publishToSpc.json();
+
+
+        }
+
+
+    }
+
     const trackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
 
     return {
         trackingCode: trackingCode,
         shopData: shop,
+        isPublished: isPublished?.data ?? {},
     }
 }
 
 const CreateComponent = () => {
     const { trackingCode, shopData } = useLoaderData();
+    //console.log('shopData:', shopData);
     const navigate = useNavigate();
     const actionData = useActionData();
     const [toogleOpen, setToogleOpen] = useState({
@@ -418,7 +493,7 @@ const CreateComponent = () => {
         }
     }, [watchedValues.appliesTo, watchedValues.addToCartType.type]);
 
-  
+
 
 
     const handleDiscard = () => {
@@ -978,7 +1053,7 @@ const CreateComponent = () => {
 
 
         <div class="shopcomponent_pd_container">
-            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart? floatingCartCountBuble : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
                 <div class="shopcomponent_title">${watchedValues.title}</div>
                 <div class="shopcomponent_description">${watchedValues.description}</div>
@@ -1851,9 +1926,9 @@ const CreateComponent = () => {
                                                     }
 
                                                     <Box paddingBlock={'400'} paddingInline={'300'}>
-                                                        
 
-                                                            {/* {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
+
+                                                        {/* {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
                                                                 <Box key={product.id}>
                                                                     <InlineStack align="space-between" blockAlign="center">
                                                                         <InlineStack gap={'200'} blockAlign="center">
@@ -1921,23 +1996,23 @@ const CreateComponent = () => {
                                                             } */}
 
 
-                                                            <DraggableProductBulk
-                                                                handleChangeQuantityDefault={handleChangeQuantityDefault}
-                                                                handleDeleteProductBulk={handleDeleteProductBulk}
-                                                                selectedProductsBulk={selectedProductsBulk}
-                                                                setSelectedProductsBulk={setSelectedProductsBulk}
-                                                                watchedValues={watchedValues}
+                                                        <DraggableProductBulk
+                                                            handleChangeQuantityDefault={handleChangeQuantityDefault}
+                                                            handleDeleteProductBulk={handleDeleteProductBulk}
+                                                            selectedProductsBulk={selectedProductsBulk}
+                                                            setSelectedProductsBulk={setSelectedProductsBulk}
+                                                            watchedValues={watchedValues}
 
-                                                            />
+                                                        />
 
 
 
-                                                            <Box paddingBlockStart={'200'}>
-                                                                <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
-                                                                    <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
-                                                                </Box>
+                                                        <Box paddingBlockStart={'200'}>
+                                                            <Box background="bg-surface-caution" borderRadius="200" padding={'200'}>
+                                                                <Text variant="bodySm">{t("product_max_limit_msg")}</Text>
                                                             </Box>
-                                                       
+                                                        </Box>
+
                                                     </Box>
                                                 </Box>
                                             }

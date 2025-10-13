@@ -666,7 +666,7 @@ export default function Index() {
                         <Text>Product publishing to EmbedUp can take 30 minutes to update. Once your products are successfully published your products will be visible on EmbedUp</Text>
                       </Banner>
                     }
-                    <Text><Text as="span" fontWeight="bold">{totalPd}</Text> products are available to EmbedUp</Text>
+                    <Text><Text as="span" fontWeight="bold">{totalPublishProduct}</Text> products are available to EmbedUp</Text>
 
                     <BlockStack gap={'300'} align="start">
                       <InlineStack gap={'400'} blockAlign="center">
