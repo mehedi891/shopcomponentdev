@@ -532,10 +532,12 @@ const GlobalStyle = ({ buttonStyleSettings, componentSettings, productLayoutSett
                     border-radius: 4px 0 0 4px;
                     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.15);
                     padding: 10px 12px 8px 10px;
-                    position: absolute;
-                    right: -1%;
+                    position: fixed;
+                    right: 0%;
+                    btoom: 50%;
+                    top: 50%;
+                    min-height: 30px;
                     transform: translateY(-10%);
-                    top: 10%;
                     z-index: 999;
                     cursor: pointer;
                 }

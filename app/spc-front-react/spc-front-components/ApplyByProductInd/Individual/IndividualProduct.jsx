@@ -7,7 +7,6 @@ import { ContextComponent } from "../../../entryPoints/ContextWrapper/ContextWra
 import { getSelectedVariantId, showLoading } from "../../utilities/utilisFnc";
 import cartLineAddFnc from "../../utilities/cartLineAddFnc";
 import cartCreateFnc from "../../utilities/cartCreateFnc";
-import CartCountBuble from "../../ShoppingCart/CartCountBuble/CartCountBuble";
 
 
 
@@ -132,7 +131,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
       <div className="shopcomponent_pd_container">
 
-        {componentSettings.cartBehavior === 'cart' && <CartCountBuble />}
+       
 
         <div className="shopcomponent_title_N_description">
           <div className="shopcomponent_title">{title}</div>
@@ -170,6 +169,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
           cartRef={cartRef}
           store={shop?.shopifyDomain}
           token={token}
+          shoppingCartSettings={componentData?.shoppingCartSettings}
         />
 
 

@@ -674,6 +674,8 @@ function showLoading (btn,isLoading) {
 }
 
 
+
+
 console.log(
   "%c ShopComponent app loaded.. ",
   `background: linear-gradient(

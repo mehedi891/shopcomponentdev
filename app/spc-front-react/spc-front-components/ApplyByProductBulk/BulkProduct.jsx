@@ -193,6 +193,7 @@ const BulkProduct = ({ componentData, token, store }) => {
           cartRef={cartRef}
           store={shop?.shopifyDomain}
           token={token}
+          shoppingCartSettings={componentData?.shoppingCartSettings}
         />
       </div>
 

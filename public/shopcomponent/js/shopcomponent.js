@@ -506,6 +506,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
+ function openCartDialogSpcFnc(action) {
+  const dialog = document.querySelector('.spc_embedup_cart_dialog');
+  if (!dialog) return;
+  if (action === 'open') {
+    dialog.showModal();
+    document.body.style.overflow = 'hidden';
+  } else {
+    dialog.close();
+    document.body.style.overflow = 'auto';
+  }
+}
+
+function showHideEmptyState(event) {
+  const target = event.target;
+  const mostParentContainer = target.closest('.spc_embedup_cart_dialog');
+  const lineContainer = mostParentContainer.querySelector('.spc_embedup_line_items');
+  const cartActions = mostParentContainer.querySelector('.spc_embedup_cart_actions');
+  const emptyState = mostParentContainer.querySelector('.spc_embedup_cart_empty');
+  const emptyTxt = mostParentContainer.querySelector('.show_empty_txt');
+  const itemsTxt = mostParentContainer.querySelector('.show_items_txt');
+  
+  if (lineContainer && cartActions && emptyState) {
+    lineContainer.classList.toggle('hide');
+    cartActions.classList.toggle('hide');
+    emptyState.classList.toggle('hide');
+    emptyTxt.classList.toggle('hide');
+    itemsTxt.classList.toggle('hide');
+  }
+
+
+}
+
 
 
 

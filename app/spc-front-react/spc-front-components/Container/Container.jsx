@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import IndividualProduct from "../ApplyByProductInd/Individual/IndividualProduct";
 import IndividualCollection from "../AppplyByCollectionInd/Individual/IndividualCollection";
 import BulkProduct from "../ApplyByProductBulk/BulkProduct";
+import CartCountBuble from "../ShoppingCart/CartCountBuble/CartCountBuble";
+import CartBubleWrapper from "../ShoppingCart/CartCountBuble/CartBubleWrapper";
 
 const Container = ({ id, token, store }) => {
   const [componentData, setComponentData] = useState({});
@@ -70,6 +72,8 @@ const baseApiUrl = import.meta.env.VITE_SHOPIFY_APP_URL;
           <BulkProduct componentData={componentData} token={token} store={store} />
         </div>
       )}
+
+       {componentData?.componentSettings?.cartBehavior === 'cart' && <CartBubleWrapper />}
 
     </div>
   )

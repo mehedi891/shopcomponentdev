@@ -1095,7 +1095,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState6(initialState) {
+        function useState7(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1107,7 +1107,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect8(create, deps) {
+        function useEffect9(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1890,7 +1890,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext6;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect8;
+        exports.useEffect = useEffect9;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -1898,7 +1898,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
         exports.useRef = useRef2;
-        exports.useState = useState6;
+        exports.useState = useState7;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -22624,7 +22624,7 @@ var require_react_dom_development = __commonJS({
           return root2;
         }
         var ReactVersion = "18.3.1";
-        function createPortal2(children, containerInfo, implementation) {
+        function createPortal3(children, containerInfo, implementation) {
           var key = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : null;
           {
             checkKeyStringCoercion(key);
@@ -23481,7 +23481,7 @@ var require_react_dom_development = __commonJS({
           if (!isValidContainer(container)) {
             throw new Error("Target container is not a DOM element.");
           }
-          return createPortal2(children, container, null, key);
+          return createPortal3(children, container, null, key);
         }
         function renderSubtreeIntoContainer(parentComponent, element, containerNode, callback) {
           return unstable_renderSubtreeIntoContainer(parentComponent, element, containerNode, callback);
@@ -24482,10 +24482,10 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx14 = jsxWithValidationDynamic;
+        var jsx15 = jsxWithValidationDynamic;
         var jsxs8 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx14;
+        exports.jsx = jsx15;
         exports.jsxs = jsxs8;
       })();
     }
@@ -24726,16 +24726,16 @@ var import_client = __toESM(require_client(), 1);
 
 // app/spc-front-react/spc-front-components/Main/Main.jsx
 init_define_import_meta_env();
-var import_react9 = __toESM(require_react(), 1);
-var import_react_dom = __toESM(require_react_dom(), 1);
+var import_react10 = __toESM(require_react(), 1);
+var import_react_dom2 = __toESM(require_react_dom(), 1);
 
 // app/spc-front-react/spc-front-components/Container/Container.jsx
 init_define_import_meta_env();
-var import_react8 = __toESM(require_react(), 1);
+var import_react9 = __toESM(require_react(), 1);
 
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/IndividualProduct.jsx
 init_define_import_meta_env();
-var import_react4 = __toESM(require_react(), 1);
+var import_react3 = __toESM(require_react(), 1);
 
 // app/spc-front-react/spc-front-components/PoweredBy/PoweredBy.jsx
 init_define_import_meta_env();
@@ -25312,10 +25312,12 @@ var GlobalStyle = ({ buttonStyleSettings, componentSettings, productLayoutSettin
                     border-radius: 4px 0 0 4px;
                     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.15);
                     padding: 10px 12px 8px 10px;
-                    position: absolute;
-                    right: -1%;
+                    position: fixed;
+                    right: 0%;
+                    btoom: 50%;
+                    top: 50%;
+                    min-height: 30px;
                     transform: translateY(-10%);
-                    top: 10%;
                     z-index: 999;
                     cursor: pointer;
                 }
@@ -26002,7 +26004,7 @@ var resetSelectedQuantity = (container) => {
 
 // app/spc-front-react/spc-front-components/ShoppingCart/ShoppingCart.jsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-var ShoppingCart = ({ cartModal, cartRef, token, store }) => {
+var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) => {
   const { cartData } = (0, import_react2.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = (0, import_react2.useState)(false);
@@ -26230,7 +26232,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store }) => {
 }
 
 .spc_embedup_primary_button {
-    background-color: #000;
+    background-color: ${shoppingCartSettings?.shoppingCartBtnBgColor ? shoppingCartSettings?.shoppingCartBtnBgColor : "#000"};
     color: #fff;
     border: 0;
     cursor: pointer;
@@ -26273,10 +26275,11 @@ var ShoppingCart = ({ cartModal, cartRef, token, store }) => {
     .spc_embedup_cart_title {
     font-size: 30px;
     font-weight: 700;
+    color: ${shoppingCartSettings?.shoppingCartTextColor ? shoppingCartSettings?.shoppingCartTextColor : "#000"};
 }
   .spc_embedup_cart_dialog {
     width: 480px;
-    background-color: #fff;
+    background-color: ${shoppingCartSettings?.shoppingCartBgColor ? shoppingCartSettings?.shoppingCartBgColor : "#000"};
     color: #000;
     top: 32px;
     right: 32px;
@@ -26503,7 +26506,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store }) => {
     gap: 13px;
     position: sticky;
     bottom: 0;
-    background-color: #fff;
+    background-color: ${shoppingCartSettings?.shoppingCartBgColor ? shoppingCartSettings?.shoppingCartBgColor : "#fff"};
 }
 
               .spc_embedup_cart_total_label{
@@ -26682,7 +26685,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store }) => {
   `;
   return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("dialog", { className: "spc_embedup_shadow spc_embedup_cart_dialog", ref: cartModal, children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_cart_head_line", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_cart_title", children: "Shopping cart" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_cart_title", children: shoppingCartSettings.heading }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_closeButton", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: () => cartModal.current.close(), "aria-label": "Close cart dialog", className: "spc_embedup_button spc_embedup_tertiary_button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 20 20", width: "20", height: "20", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         "path",
         {
@@ -26816,12 +26819,12 @@ var ShoppingCart = ({ cartModal, cartRef, token, store }) => {
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_additional_text", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "Note: Shipping and taxes will be added at checkout" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_additional_text", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.additionalInfo }) }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_primary_button_container", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: (e) => {
           handleCheckout(e, addNotes);
         }, className: "spc_embedup_button spc_embedup_primary_button product-card__add-button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "CHECKOUT" }) }) })
       ] })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart-contents", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart_empty", children: "Your cart is empty" }) }),
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart-contents", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart_empty", children: shoppingCartSettings?.emptyCartText }) }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("style", { children: shoppingCartStyle })
   ] });
 };
@@ -26968,36 +26971,19 @@ var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTrac
 };
 var cartCreateFnc_default = cartCreateFnc;
 
-// app/spc-front-react/spc-front-components/ShoppingCart/CartCountBuble/CartCountBuble.jsx
-init_define_import_meta_env();
-var import_react3 = __toESM(require_react(), 1);
-var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
-var CartCountBuble = () => {
-  const { cartModal, cartTotalCount } = (0, import_react3.useContext)(ContextComponent);
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_cart_btn", onClick: () => cartModal?.current?.showModal(), children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_cart_icon", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { width: "30", height: "30", viewBox: "0 0 24 24", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { fillRule: "evenodd", clipRule: "evenodd", d: "M2 3.66669C2 3.1144 2.44772 2.66669 3 2.66669H5.14932C6.3119 2.66669 7.29387 3.52176 7.45873 4.66669H20.3333C20.6119 4.66669 20.8778 4.78286 21.0671 4.98724C21.2563 5.19161 21.3518 5.46566 21.3304 5.74338L20.8531 11.9479C20.7062 13.8582 19.1132 15.3334 17.1973 15.3334H8.72928L8.85302 16.3728C8.87298 16.5404 9.01517 16.6667 9.18402 16.6667H17.6667C18.219 16.6667 18.6667 17.1144 18.6667 17.6667C18.6667 18.219 18.219 18.6667 17.6667 18.6667H9.18402C8.00205 18.6667 7.00677 17.7829 6.86705 16.6092L5.48031 4.96062C5.46035 4.79295 5.31817 4.66669 5.14932 4.66669H3C2.44772 4.66669 2 4.21897 2 3.66669ZM8.49119 13.3334H17.1973C18.0681 13.3334 18.7922 12.6628 18.859 11.7945L19.2535 6.66669H7.69754L8.49119 13.3334Z", fill: "white" }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M12 21.3334C12 22.0697 11.403 22.6667 10.6667 22.6667C9.93029 22.6667 9.33333 22.0697 9.33333 21.3334C9.33333 20.597 9.93029 20 10.6667 20C11.403 20 12 20.597 12 21.3334Z", fill: "white" }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M18.6667 21.3334C18.6667 22.0697 18.0697 22.6667 17.3333 22.6667C16.597 22.6667 16 22.0697 16 21.3334C16 20.597 16.597 20 17.3333 20C18.0697 20 18.6667 20.597 18.6667 21.3334Z", fill: "white" })
-    ] }),
-    cartTotalCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_cart_count", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "shopcomponent_cart_count_qty", children: cartTotalCount }) })
-  ] }) });
-};
-var CartCountBuble_default = CartCountBuble;
-
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/IndividualProduct.jsx
-var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 var IndividualProduct = ({ componentData, token, store }) => {
   const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, customCss, tracking, layout, shop, appliesTo, addToCartType } = componentData;
-  const [selectecTedProducts, setSelectecTedProducts] = (0, import_react4.useState)([]);
-  const { cartModal, cartRef } = (0, import_react4.useContext)(ContextComponent);
+  const [selectecTedProducts, setSelectecTedProducts] = (0, import_react3.useState)([]);
+  const { cartModal, cartRef } = (0, import_react3.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
     slider.scrollBy({ left: btnType === "next" ? slideWidth : -slideWidth, behavior: "smooth" });
   };
-  (0, import_react4.useEffect)(() => {
+  (0, import_react3.useEffect)(() => {
     setSelectecTedProducts(shop?.plan?.planName === "Free" ? addToCartType?.products?.slice(0, 3) : addToCartType?.products);
   }, [addToCartType.products, shop?.plan?.planName]);
   const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
@@ -27063,7 +27049,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
       showLoading(target, false);
     }
   };
-  (0, import_react4.useEffect)(() => {
+  (0, import_react3.useEffect)(() => {
     window.spcAddToCartIndFnc = (event, ...args) => {
       handleAddToCart(event, ...args);
     };
@@ -27071,18 +27057,17 @@ var IndividualProduct = ({ componentData, token, store }) => {
       handleAddToCheckout(event, ...args);
     };
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "shopcomponent_pd_container", children: [
-      componentSettings.cartBehavior === "cart" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(CartCountBuble_default, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "shopcomponent_title_N_description", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "shopcomponent_title", children: title }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "shopcomponent_description", children: description })
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_pd_container", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_title_N_description", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_title", children: title }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_description", children: description })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: `shopcomponent_slider_container_${layout}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "shopcomponent__slider-button next", onClick: () => moveSliderPrevNext("next"), children: "\u276F" }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: `shopcomponent_products_flex shopcomponent_product_layout_${layout}`, children: selectecTedProducts?.length > 0 && selectecTedProducts?.map(
-          (product, index) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: `shopcomponent_slider_container_${layout}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "shopcomponent__slider-button next", onClick: () => moveSliderPrevNext("next"), children: "\u276F" }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: `shopcomponent_products_flex shopcomponent_product_layout_${layout}`, children: selectecTedProducts?.length > 0 && selectecTedProducts?.map(
+          (product, index) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
             ProductCardInd_default,
             {
               product,
@@ -27101,25 +27086,26 @@ var IndividualProduct = ({ componentData, token, store }) => {
             index
           )
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "shopcomponent__slider-button prev", onClick: () => moveSliderPrevNext("prev"), children: "\u276E" })
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "shopcomponent__slider-button prev", onClick: () => moveSliderPrevNext("prev"), children: "\u276E" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         ShoppingCart_default,
         {
           cartModal,
           cartRef,
           store: shop?.shopifyDomain,
-          token
+          token,
+          shoppingCartSettings: componentData?.shoppingCartSettings
         }
       )
     ] }),
-    shop?.plan?.planName === "Free" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    shop?.plan?.planName === "Free" && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       PoweredBy_default,
       {
         shop: shop.shopifyDomain.replace(".myshopify.com", "")
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       GlobalStyle_default,
       {
         buttonStyleSettings,
@@ -27137,6 +27123,25 @@ var IndividualProduct_default = IndividualProduct;
 // app/spc-front-react/spc-front-components/AppplyByCollectionInd/Individual/IndividualCollection.jsx
 init_define_import_meta_env();
 var import_react5 = __toESM(require_react(), 1);
+
+// app/spc-front-react/spc-front-components/ShoppingCart/CartCountBuble/CartCountBuble.jsx
+init_define_import_meta_env();
+var import_react4 = __toESM(require_react(), 1);
+var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+var CartCountBuble = () => {
+  const { cartModal, cartTotalCount } = (0, import_react4.useContext)(ContextComponent);
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "shopcomponent_cart_btn", onClick: () => cartModal?.current?.showModal(), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "shopcomponent_cart_icon", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { width: "30", height: "30", viewBox: "0 0 24 24", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { fillRule: "evenodd", clipRule: "evenodd", d: "M2 3.66669C2 3.1144 2.44772 2.66669 3 2.66669H5.14932C6.3119 2.66669 7.29387 3.52176 7.45873 4.66669H20.3333C20.6119 4.66669 20.8778 4.78286 21.0671 4.98724C21.2563 5.19161 21.3518 5.46566 21.3304 5.74338L20.8531 11.9479C20.7062 13.8582 19.1132 15.3334 17.1973 15.3334H8.72928L8.85302 16.3728C8.87298 16.5404 9.01517 16.6667 9.18402 16.6667H17.6667C18.219 16.6667 18.6667 17.1144 18.6667 17.6667C18.6667 18.219 18.219 18.6667 17.6667 18.6667H9.18402C8.00205 18.6667 7.00677 17.7829 6.86705 16.6092L5.48031 4.96062C5.46035 4.79295 5.31817 4.66669 5.14932 4.66669H3C2.44772 4.66669 2 4.21897 2 3.66669ZM8.49119 13.3334H17.1973C18.0681 13.3334 18.7922 12.6628 18.859 11.7945L19.2535 6.66669H7.69754L8.49119 13.3334Z", fill: "white" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M12 21.3334C12 22.0697 11.403 22.6667 10.6667 22.6667C9.93029 22.6667 9.33333 22.0697 9.33333 21.3334C9.33333 20.597 9.93029 20 10.6667 20C11.403 20 12 20.597 12 21.3334Z", fill: "white" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M18.6667 21.3334C18.6667 22.0697 18.0697 22.6667 17.3333 22.6667C16.597 22.6667 16 22.0697 16 21.3334C16 20.597 16.597 20 17.3333 20C18.0697 20 18.6667 20.597 18.6667 21.3334Z", fill: "white" })
+    ] }),
+    cartTotalCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "shopcomponent_cart_count", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "shopcomponent_cart_count_qty", children: cartTotalCount }) })
+  ] }) });
+};
+var CartCountBuble_default = CartCountBuble;
+
+// app/spc-front-react/spc-front-components/AppplyByCollectionInd/Individual/IndividualCollection.jsx
 var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
 var IndividualCollection = ({ componentData, token, store }) => {
   const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, customCss, tracking, layout, shop, appliesTo } = componentData;
@@ -27234,7 +27239,6 @@ var IndividualCollection = ({ componentData, token, store }) => {
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "shopcomponent_pd_container", children: [
-      componentSettings.cartBehavior === "cart" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(CartCountBuble_default, {}),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "shopcomponent_title_N_description", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "shopcomponent_title", children: title }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "shopcomponent_description", children: description })
@@ -27269,7 +27273,8 @@ var IndividualCollection = ({ componentData, token, store }) => {
           cartModal,
           cartRef,
           store: shop?.shopifyDomain,
-          token
+          token,
+          shoppingCartSettings: componentData?.shoppingCartSettings
         }
       )
     ] }),
@@ -27502,7 +27507,8 @@ var BulkProduct = ({ componentData, token, store }) => {
           cartModal,
           cartRef,
           store: shop?.shopifyDomain,
-          token
+          token,
+          shoppingCartSettings: componentData?.shoppingCartSettings
         }
       )
     ] }),
@@ -27550,13 +27556,48 @@ var BulkProduct = ({ componentData, token, store }) => {
 };
 var BulkProduct_default = BulkProduct;
 
-// app/spc-front-react/spc-front-components/Container/Container.jsx
+// app/spc-front-react/spc-front-components/ShoppingCart/CartCountBuble/CartBubleWrapper.jsx
+init_define_import_meta_env();
+var import_react8 = __toESM(require_react(), 1);
+var import_react_dom = __toESM(require_react_dom(), 1);
 var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
-var Container = ({ id, token, store }) => {
-  const [componentData, setComponentData] = (0, import_react8.useState)({});
-  const [loading, setLoading] = (0, import_react8.useState)(false);
-  const baseApiUrl = define_import_meta_env_default.VITE_SHOPIFY_APP_URL;
+var FLAG = "__EFOLI_CART_BUBBLE_MOUNTED__";
+var ROOT_ID = "efoli-cart-bubble-root";
+function ensureRoot() {
+  let el = document.getElementById(ROOT_ID);
+  if (!el) {
+    el = document.createElement("div");
+    el.id = ROOT_ID;
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function CartBubleWrapper() {
+  const [shouldRender, setShouldRender] = (0, import_react8.useState)(false);
   (0, import_react8.useEffect)(() => {
+    if (typeof window === "undefined") return;
+    if (window[FLAG]) return;
+    window[FLAG] = true;
+    setShouldRender(true);
+    return () => {
+      window[FLAG] = false;
+      const root = document.getElementById(ROOT_ID);
+      if (root && root.childElementCount === 0) {
+        root.remove();
+      }
+    };
+  }, []);
+  if (!shouldRender) return null;
+  return (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime11.jsx)(CartCountBuble_default, {}), ensureRoot());
+}
+
+// app/spc-front-react/spc-front-components/Container/Container.jsx
+var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
+var Container = ({ id, token, store }) => {
+  const [componentData, setComponentData] = (0, import_react9.useState)({});
+  const [loading, setLoading] = (0, import_react9.useState)(false);
+  const baseApiUrl = define_import_meta_env_default.VITE_SHOPIFY_APP_URL;
+  (0, import_react9.useEffect)(() => {
     setLoading(true);
     const fetchData = async () => {
       try {
@@ -27575,7 +27616,7 @@ var Container = ({ id, token, store }) => {
     };
     fetchData();
   }, [id]);
-  (0, import_react8.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     if (componentData?.id) {
       const isExistWebcomJs = document.querySelector('script[src="https://cdn.shopify.com/storefront/web-components.js"]');
       if (!isExistWebcomJs) {
@@ -27586,19 +27627,20 @@ var Container = ({ id, token, store }) => {
       }
     }
   }, [componentData]);
-  if (loading) return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Loader, { label: "Loading component\u2026" });
+  if (loading) return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Loader, { label: "Loading component\u2026" });
   if (!componentData?.id) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { children: [
-    componentData?.appliesTo === "product" && componentData?.addToCartType?.type === "individual" && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(IndividualProduct_default, { componentData, token, store }) }),
-    componentData?.appliesTo === "collection" && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(IndividualCollection_default, { componentData, token, store }) }),
-    componentData?.appliesTo === "product" && componentData?.addToCartType?.type === "bulk" && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(BulkProduct_default, { componentData, token, store }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { children: [
+    componentData?.appliesTo === "product" && componentData?.addToCartType?.type === "individual" && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(IndividualProduct_default, { componentData, token, store }) }),
+    componentData?.appliesTo === "collection" && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(IndividualCollection_default, { componentData, token, store }) }),
+    componentData?.appliesTo === "product" && componentData?.addToCartType?.type === "bulk" && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(BulkProduct_default, { componentData, token, store }) }),
+    componentData?.componentSettings?.cartBehavior === "cart" && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(CartBubleWrapper, {})
   ] });
 };
 var Container_default = Container;
 function Loader({ label = "Loading...", size = 24, thickness = 6 }) {
   const r = 25 - thickness / 2;
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { style: { display: "inline-flex", alignItems: "center", gap: 8 }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { style: { display: "inline-flex", alignItems: "center", gap: 8 }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
       "svg",
       {
         width: size,
@@ -27606,9 +27648,9 @@ function Loader({ label = "Loading...", size = 24, thickness = 6 }) {
         viewBox: "0 0 50 50",
         stroke: "currentColor",
         "aria-hidden": true,
-        children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("g", { fill: "none", strokeWidth: thickness, strokeLinecap: "round", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("circle", { cx: "25", cy: "25", r, opacity: ".25" }),
-          /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("path", { d: `M25 ${25 - r} a ${r} ${r} 0 1 1 0 ${2 * r}`, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("g", { fill: "none", strokeWidth: thickness, strokeLinecap: "round", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("circle", { cx: "25", cy: "25", r, opacity: ".25" }),
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("path", { d: `M25 ${25 - r} a ${r} ${r} 0 1 1 0 ${2 * r}`, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
             "animateTransform",
             {
               attributeName: "transform",
@@ -27622,12 +27664,12 @@ function Loader({ label = "Loading...", size = 24, thickness = 6 }) {
         ] })
       }
     ),
-    label && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("span", { children: label })
+    label && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("span", { children: label })
   ] });
 }
 
 // app/spc-front-react/spc-front-components/Main/Main.jsx
-var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
 var safeParse = (s) => {
   try {
     return JSON.parse(s);
@@ -27636,8 +27678,8 @@ var safeParse = (s) => {
   }
 };
 function Main() {
-  const [targets, setTargets] = (0, import_react9.useState)([]);
-  (0, import_react9.useEffect)(() => {
+  const [targets, setTargets] = (0, import_react10.useState)([]);
+  (0, import_react10.useEffect)(() => {
     const scan = () => {
       const els = Array.from(document.querySelectorAll(".spc_rootElement"));
       const items = els.map((el, i) => ({
@@ -27652,13 +27694,13 @@ function Main() {
     obs.observe(document.documentElement, { childList: true, subtree: true });
     return () => obs.disconnect();
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_jsx_runtime12.Fragment, { children: targets.map(
-    ({ el, props, key }) => (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Container_default, { ...props }), el, key)
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_jsx_runtime13.Fragment, { children: targets.map(
+    ({ el, props, key }) => (0, import_react_dom2.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Container_default, { ...props }), el, key)
   ) });
 }
 
 // app/spc-front-react/entryPoints/index.jsx
-var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
 if (!window.__SPC_BOOTED__) {
   window.__SPC_BOOTED__ = true;
   let host = document.getElementById("embedup-app");
@@ -27684,7 +27726,7 @@ if (!window.__SPC_BOOTED__) {
   border-radius: 6px;`
   );
   (0, import_client.createRoot)(host).render(
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ContextWrapper_default, { children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Main, {}) })
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(ContextWrapper_default, { children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Main, {}) })
   );
 }
 /*! Bundled license information:

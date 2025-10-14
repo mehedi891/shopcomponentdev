@@ -131,7 +131,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
       />
 
       <div className="shopcomponent_pd_container">
-        {componentSettings.cartBehavior === 'cart' && <CartCountBuble />}
+
         <div className="shopcomponent_title_N_description">
           <div className="shopcomponent_title">{title}</div>
           <div className="shopcomponent_description">{description}</div>
@@ -167,6 +167,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
           cartRef={cartRef}
           store={shop?.shopifyDomain}
           token={token}
+          shoppingCartSettings={componentData?.shoppingCartSettings}
         />
 
       </div>

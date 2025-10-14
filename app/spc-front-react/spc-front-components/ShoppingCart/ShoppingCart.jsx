@@ -7,9 +7,8 @@ import cartLinesUpdateFnc from "../utilities/cartLinesUpdateFnc";
 import cartApplyDiscountCodeFnc from "../utilities/cartApplyDiscountCodeFnc";
 import cartNoteUpdateFnc from "../utilities/cartNoteUpdateFnc";
 import { showLoading } from "../utilities/utilisFnc";
-import getExistCart from "../utilities/getExistCart";
 
-const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
+const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings }) => {
   const { cartData } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -254,7 +253,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
 }
 
 .spc_embedup_primary_button {
-    background-color: #000;
+    background-color: ${shoppingCartSettings?.shoppingCartBtnBgColor ? shoppingCartSettings?.shoppingCartBtnBgColor : '#000'};
     color: #fff;
     border: 0;
     cursor: pointer;
@@ -297,10 +296,11 @@ const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
     .spc_embedup_cart_title {
     font-size: 30px;
     font-weight: 700;
+    color: ${shoppingCartSettings?.shoppingCartTextColor ? shoppingCartSettings?.shoppingCartTextColor : '#000'};
 }
   .spc_embedup_cart_dialog {
     width: 480px;
-    background-color: #fff;
+    background-color: ${shoppingCartSettings?.shoppingCartBgColor ? shoppingCartSettings?.shoppingCartBgColor : '#000'};
     color: #000;
     top: 32px;
     right: 32px;
@@ -527,7 +527,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
     gap: 13px;
     position: sticky;
     bottom: 0;
-    background-color: #fff;
+    background-color: ${shoppingCartSettings?.shoppingCartBgColor ? shoppingCartSettings?.shoppingCartBgColor : '#fff'};
 }
 
               .spc_embedup_cart_total_label{
@@ -708,7 +708,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
     return (
       <dialog className="spc_embedup_shadow spc_embedup_cart_dialog" ref={cartModal}>
         <div className="spc_embedup_cart_head_line">
-          <span className="spc_embedup_cart_title">Shopping cart</span>
+          <span className="spc_embedup_cart_title">{shoppingCartSettings.heading}</span>
           <div className="spc_embedup_closeButton">
             <button onClick={() => cartModal.current.close()} aria-label="Close cart dialog" className="spc_embedup_button spc_embedup_tertiary_button">
               <svg viewBox="0 0 20 20" width="20" height="20">
@@ -887,7 +887,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
               </div>
 
               <div className="spc_embedup_additional_text">
-                <span>Note: Shipping and taxes will be added at checkout</span>
+                <span>{shoppingCartSettings?.additionalInfo}</span>
               </div>
 
               <div className="spc_embedup_primary_button_container">
@@ -901,7 +901,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store }) => {
           </div>
           :
           <div className="spc_embedup_cart-contents">
-            <div className="spc_embedup_cart_empty">Your cart is empty</div>
+            <div className="spc_embedup_cart_empty">{shoppingCartSettings?.emptyCartText}</div>
           </div>
         }
 
