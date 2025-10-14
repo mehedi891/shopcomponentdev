@@ -26289,7 +26289,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
     flex-direction: column;
     border: 0;
     border-radius: 12px;
-
+    left: auto;
     margin-right: 0;
     margin-top: 0;
     opacity: 0;
