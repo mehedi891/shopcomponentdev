@@ -521,11 +521,11 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
     height: 20px;
 }
 .spc_embedup_cart_actions {
-    padding: 16px;
+    padding: 0px 16px 0px 16px;
     display: flex;
     flex-direction: column;
     align-items: end;
-    gap: 13px;
+    gap: 0px;
     position: sticky;
     bottom: 0;
     background-color: ${shoppingCartSettings?.shoppingCartBgColor ? shoppingCartSettings?.shoppingCartBgColor : '#fff'};
@@ -551,18 +551,26 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
                 width: 100%;
                 padding:0 12px;
                 padding: 11px 12px 0 12px;
-                border-top: 1px solid #e5e5e5;
+                border-top: 0px solid #e5e5e5;
               }
 .spc_embedup_discount_section {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    border-top: 1px solid #e5e5e5;
-    padding-top: 1rem;
     padding-left: 16px;
     padding-right: 16px;
-    margin-top: 1rem;
     width: 100%;
+}
+.spc_embedup_discount_section_only{
+   border-top: 1px solid #e5e5e5;
+   padding-top: 10px;
+}
+.spc_embedup_notes_section{
+  padding-top: 6px;
+}
+.spc_embedup_additional_text{
+    margin-bottom: 10px;
+    margin-top: 12px;
 }
 .spc_embedup_discount_header_row {
     display: flex;
@@ -810,7 +818,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
 
             {shoppingCartSettings?.showDiscountCodeField === BoleanOptions.yes &&
 
-              <div className="spc_embedup_discount_section">
+              <div className="spc_embedup_discount_section spc_embedup_discount_section_only">
                 <div className="spc_embedup_discount_header_row" onClick={() => setShowDiscountInput(!showDiscountInput)}>
                   <span className="spc_embedup_discount_header">
                     <span>{shoppingCartSettings?.discountCodeTitle ?? 'Discounts'}</span>

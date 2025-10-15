@@ -75,7 +75,7 @@ useEffect(() => {
 }, []);
 
 
-  console.log("cartDataFromContext:", cartData);
+  //console.log("cartDataFromContext:", cartData);
 
   const contextVal = {
     cartModal,

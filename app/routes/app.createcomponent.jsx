@@ -100,43 +100,20 @@ export const loader = async ({ request }) => {
                 return `${pd.id}`
             });
 
-            // const collectionsRes = await admin.graphql(
-            //     `#graphql
-            //   query {
-            //     collections(first: 10) {
-            //       edges {
-            //         node {
-            //           id
-            //         }
-            //       }
-            //     }
-            //   }`,
-            //   );
-            //   const collections = await collectionsRes.json();
-
-
-
-            //   if (collections?.data?.collections?.edges?.length > 0) {
-            //     const clArr = collections?.data?.collections?.edges.map(collection => collection.node.id);
-            //    pdArr = [...pdArr, ...clArr];
-            //   }
-
-
-
-            const publishToSpc = await admin.graphql(
+            await admin.graphql(
                 `#graphql
-  mutation publicationUpdate($id: ID!, $input: PublicationUpdateInput!) {
-    publicationUpdate(id: $id, input: $input) {
-      publication {
-        id
-        autoPublish
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }`,
+                mutation publicationUpdate($id: ID!, $input: PublicationUpdateInput!) {
+                    publicationUpdate(id: $id, input: $input) {
+                    publication {
+                        id
+                        autoPublish
+                    }
+                    userErrors {
+                        field
+                        message
+                    }
+                    }
+                }`,
                 {
                     variables: {
                         id: shop?.publicationId,
@@ -149,15 +126,91 @@ export const loader = async ({ request }) => {
                 }
             );
 
-            const publishToSpcJson = await publishToSpc.json();
-
-
-
 
         }
 
 
     }
+
+//     const pulblicationCollection = await admin.graphql(
+//         `#graphql
+//   query publication($id: ID!) {
+//     publication(id: $id) {
+//       id
+//       collections(first: 40) {
+//         edges {
+//           node {
+//             id
+//           }
+//         }
+//       }
+//     }
+//   }`,
+//         {
+//             variables: {
+//                 "id": shop?.publicationId
+//             },
+//         },
+//     );
+//     const pulblicationCollectionJson = await pulblicationCollection.json();
+
+//     console.log('pulblicationCollectionJson:', pulblicationCollectionJson.data.publication.collections.edges.length);
+
+//     if (pulblicationCollectionJson?.data?.publication?.collections?.edges?.length === 0) {
+//         const collectionsRes = await admin.graphql(
+//             `#graphql
+//               query {
+//                 collections(first: 10) {
+//                   edges {
+//                     node {
+//                       id
+//                     }
+//                   }
+//                 }
+//               }`,
+//         );
+//         const collections = await collectionsRes.json();
+
+//         let collectionArr = [];
+
+//         if (collections?.data?.collections?.edges?.length > 0) {
+//             collectionArr = collections?.data?.collections?.edges.map(collection => `${collection.node.id}`);
+
+//         }
+
+//         console.log('colloecrtionArr:', collectionArr);
+
+
+//      const res =await admin.graphql(
+//     `#graphql
+//   mutation PublishablePublish($collectionId: ID!, $publicationId: ID!) {
+//     publishablePublish(id: $collectionId, input: {publicationId: $publicationId}) {
+//       publishable {
+//         publishedOnPublication(publicationId: $publicationId)
+//       }
+//       userErrors {
+//         field
+//         message
+//       }
+//     }
+//   }`,
+//   {
+//     variables: {
+//         "collectionId": collectionArr,
+//         "publicationId": shop?.publicationId || ""
+//     },
+//   },
+//   );
+
+// const json = await res.json();
+// console.log(JSON.stringify(json, null, 2));
+
+
+
+
+
+//     }
+
 
     const trackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
 
@@ -1220,11 +1273,11 @@ const CreateComponent = () => {
       }
 
       .spc_embedup_cart_actions {
-        padding: 16px;
+        padding: 0px 16px 0px 16px;
         display: flex;
         flex-direction: column;
         align-items: end;
-        gap: 13px;
+        gap: 0px;
         position: sticky;
         bottom: 0;
         background-color: ${watchedValues?.shoppingCartSettings?.shoppingCartBgColor};
@@ -1255,17 +1308,26 @@ const CreateComponent = () => {
         border-top: 1px solid #e5e5e5;
       }
 
-      .spc_embedup_discount_section {
+
+    .spc_embedup_discount_section {
         display: flex;
         flex-direction: column;
         gap: 12px;
-        border-top: 1px solid #e5e5e5;
-        padding-top: 1rem;
         padding-left: 16px;
         padding-right: 16px;
-        margin-top: 1rem;
         width: 100%;
-      }
+    }
+    .spc_embedup_discount_section_only{
+      border-top: 1px solid #e5e5e5;
+      padding-top: 10px;
+    }
+    .spc_embedup_notes_section{
+      padding-top: 6px;
+    }
+    .spc_embedup_additional_text{
+        margin-bottom: 10px;
+        margin-top: 12px;
+    }
 
       .spc_embedup_discount_header_row {
         display: flex;
@@ -2073,8 +2135,6 @@ const CreateComponent = () => {
                                 <Banner
                                     title={"Upgrade to create another component"}
                                     tone="warning"
-
-
                                 >
                                     <BlockStack gap={'300'} inlineAlign="start">
                                         <Text>The Free plan includes 1 component. Upgrade to add more.</Text>
@@ -3137,7 +3197,7 @@ const CreateComponent = () => {
                                                                 render={({ field }) => (
                                                                     <Checkbox
                                                                         label="Show order note field"
-                                                                        checked={field.value === BoleanOptions.yes  ? true : false}
+                                                                        checked={field.value === BoleanOptions.yes ? true : false}
                                                                         onChange={(newValue) => {
                                                                             field.onChange(newValue ? BoleanOptions.yes : BoleanOptions.no);
                                                                         }}

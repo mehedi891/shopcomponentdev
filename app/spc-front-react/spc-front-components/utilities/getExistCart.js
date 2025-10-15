@@ -34,7 +34,7 @@ query cart(
     });
 
     const data = await res.json();
-    console.log("CartExist:",data?.data?.cart);
+    //console.log("CartExist:",data?.data?.cart);
     if (!data?.data?.cart) {
       
       return {

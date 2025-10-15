@@ -6,7 +6,7 @@ const floatingCartCountBuble = `
                     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.15);
                     padding: 10px 12px 8px 10px;
                     position: absolute;
-                    right: -1%;
+                    right: 0%;
                     transform: translateY(-10%);
                     top: 10%;
                     z-index: 999;
