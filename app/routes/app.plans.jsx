@@ -9,7 +9,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
-import { ADD_TO_CART_TYPE, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
+import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {
@@ -1037,8 +1037,16 @@ export const action = async ({ request }) => {
       include: { plan: true, components: true }
     });
 
+
+
     if (shopData?.components?.length > 0) {
-      if (shopData?.components[0]?.addToCartType?.type === ADD_TO_CART_TYPE.bulk) {
+      const shoppingCartSettings = {
+        ...shopData?.components[0]?.shoppingCartSettings,
+        showOrderNote: BoleanOptions.no,
+        showDiscountCodeField: BoleanOptions.no,
+      }
+
+      if (shopData?.components[0]?.addToCartType?.type === ADD_TO_CART_TYPE.bulk || shopData?.components[0]?.shoppingCartSettings?.showOrderNote === BoleanOptions.yes || shopData?.components[0]?.shoppingCartSettings?.showDiscountCodeField === BoleanOptions.yes) {
         await db.component.update({
           where: {
             id: shopData?.components[0]?.id
@@ -1047,7 +1055,8 @@ export const action = async ({ request }) => {
             addToCartType: {
               type: ADD_TO_CART_TYPE.individual,
               products: shopData?.components[0]?.addToCartType?.products
-            }
+            },
+            shoppingCartSettings
           }
         });
       }

@@ -26002,6 +26002,13 @@ var resetSelectedQuantity = (container) => {
   });
 };
 
+// app/constants/constants.js
+init_define_import_meta_env();
+var BoleanOptions = {
+  yes: "yes",
+  no: "no"
+};
+
 // app/spc-front-react/spc-front-components/ShoppingCart/ShoppingCart.jsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
 var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) => {
@@ -26769,17 +26776,17 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
         ] }) }, item?.id || index);
       }) }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_cart_actions", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_section", children: [
+        shoppingCartSettings?.showDiscountCodeField === BoleanOptions.yes && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_section", children: [
           /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_header_row", onClick: () => setShowDiscountInput(!showDiscountInput), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_discount_header", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "Discounts" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_discount_header", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.discountCodeTitle ?? "Discounts" }) }),
             /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "spc_embedup_discount_toggle_button", type: "button", children: showDiscountInput ? "-" : "+" })
           ] }),
           showDiscountInput && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_expanded_ui", children: [
             /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_code_input", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "text", value: discountCode, onChange: (e) => setDiscountCode(e.target.value), className: "spc_embedup_discount_input_field", id: "spc_embedup_discount_code_input", placeholder: "Enter discount code" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "text", value: discountCode, onChange: (e) => setDiscountCode(e.target.value), className: "spc_embedup_discount_input_field", id: "spc_embedup_discount_code_input", placeholder: shoppingCartSettings?.discountCodePlaceholder ?? "Enter discount code" }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: () => {
                 handleApplyDiscount("add");
-              }, className: `spc_embedup_discount_apply_button spc_embedup_tertiary_button ${cartUpdateLoading ? "loading" : ""}`, type: "button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "Apply" }) })
+              }, className: `spc_embedup_discount_apply_button spc_embedup_tertiary_button ${cartUpdateLoading ? "loading" : ""}`, type: "button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.discountApplyBtnTxt ?? "Apply" }) })
             ] }),
             showDiscountError.type === "error" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_discount_error", children: showDiscountError.message }),
             showDiscountError.type === "success" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_discount_success", children: showDiscountError.message }),
@@ -26799,12 +26806,12 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_section spc_embedup_notes_section", children: [
+        shoppingCartSettings?.showOrderNote === BoleanOptions.yes && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_section spc_embedup_notes_section", children: [
           /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_discount_header_row", onClick: () => setShowAddNotes(!showAddNotes), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_discount_header", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "Add Notes" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_discount_header", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.orderNoteTitle ?? "Add Notes" }) }),
             /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { "data-testid": "discount-toggle-button", className: "spc_embedup_discount_toggle_button", type: "button", children: showAddNotes ? "-" : "+" })
           ] }),
-          showAddNotes && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_discount_expanded_ui", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_discount_code_input", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("textarea", { value: addNotes, onChange: (e) => setAddNotes(e.target.value), className: "spc_embedup_discount_input_field", id: "spc_embedup_discount_code_input", placeholder: "Enter Addtional Notes" }) }) })
+          showAddNotes && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_discount_expanded_ui", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_discount_code_input", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("textarea", { value: addNotes, onChange: (e) => setAddNotes(e.target.value), className: "spc_embedup_discount_input_field", id: "spc_embedup_discount_code_input", placeholder: shoppingCartSettings?.orderNotePlaceholder ?? "Enter notes" }) }) })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "spc_embedup_cart_total", children: [
           /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "spc_embedup_cart_total_label", children: "Estimate total " }),
@@ -26822,7 +26829,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_additional_text", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.additionalInfo }) }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_primary_button_container", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: (e) => {
           handleCheckout(e, addNotes);
-        }, className: "spc_embedup_button spc_embedup_primary_button product-card__add-button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "CHECKOUT" }) }) })
+        }, className: "spc_embedup_button spc_embedup_primary_button product-card__add-button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.shoppingCartBtnTxt ?? "Checkout" }) }) })
       ] })
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart-contents", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart_empty", children: shoppingCartSettings?.emptyCartText }) }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("style", { children: shoppingCartStyle })

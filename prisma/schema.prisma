@@ -66,6 +66,7 @@ model Session {
   emailVerified Boolean?  @default(false)
 }
 
+
 model Component {
   id                    Int        @id @default(autoincrement())
   title                 String

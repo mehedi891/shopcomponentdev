@@ -25,7 +25,7 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
-import { ADD_TO_CART_TYPE, APPLIES_TO, CART_BEHAVIOR, LAYOUT, PLAN_NAME, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
+import { ADD_TO_CART_TYPE, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, PLAN_NAME, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
 
 
 
@@ -100,26 +100,26 @@ export const loader = async ({ request }) => {
                 return `${pd.id}`
             });
 
-// const collectionsRes = await admin.graphql(
-//     `#graphql
-//   query {
-//     collections(first: 10) {
-//       edges {
-//         node {
-//           id
-//         }
-//       }
-//     }
-//   }`,
-//   );
-//   const collections = await collectionsRes.json();
- 
+            // const collectionsRes = await admin.graphql(
+            //     `#graphql
+            //   query {
+            //     collections(first: 10) {
+            //       edges {
+            //         node {
+            //           id
+            //         }
+            //       }
+            //     }
+            //   }`,
+            //   );
+            //   const collections = await collectionsRes.json();
 
 
-//   if (collections?.data?.collections?.edges?.length > 0) {
-//     const clArr = collections?.data?.collections?.edges.map(collection => collection.node.id);
-//    pdArr = [...pdArr, ...clArr];
-//   }
+
+            //   if (collections?.data?.collections?.edges?.length > 0) {
+            //     const clArr = collections?.data?.collections?.edges.map(collection => collection.node.id);
+            //    pdArr = [...pdArr, ...clArr];
+            //   }
 
 
 
@@ -141,7 +141,7 @@ export const loader = async ({ request }) => {
                     variables: {
                         id: shop?.publicationId,
                         input: {
-                            publishablesToAdd: pdArr,  
+                            publishablesToAdd: pdArr,
                             publishablesToRemove: [],
                             autoPublish: true,
                         },
@@ -151,7 +151,7 @@ export const loader = async ({ request }) => {
 
             const publishToSpcJson = await publishToSpc.json();
 
-             
+
 
 
         }
@@ -251,6 +251,15 @@ const CreateComponent = () => {
                 shoppingCartBgColor: '#ffffff',
                 shoppingCartTextColor: '#000000',
                 shoppingCartBtnBgColor: '#2563EB',
+
+                shoppingCartBtnTxt: 'CHECKOUT',
+                showOrderNote: BoleanOptions.no,
+                orderNoteTitle: 'Add a note to your order',
+                orderNotePlaceholder: 'Write a note...',
+                showDiscountCodeField: BoleanOptions.no,
+                discountCodeTitle: 'Apply discount code',
+                discountCodePlaceholder: 'Enter your code',
+                discountApplyBtnTxt: 'Apply',
             },
             productLayoutSettings: {
                 productTitleWeight: '600',
@@ -804,7 +813,7 @@ const CreateComponent = () => {
     }, [selectedViewMDF.id, selectedViewMDF.view]);
 
 
-   const shoppingCartHtml = `
+    const shoppingCartHtml = `
     
      <dialog class="spc_embedup_shadow spc_embedup_cart_dialog"${toogleOpen.shoppingCartOpen ? ' open' : ''} aria-modal="true" role="dialog">
     <div class="spc_embedup_cart_head_line">
@@ -861,22 +870,27 @@ const CreateComponent = () => {
         </div>
       </div>
       <div class="spc_embedup_cart_actions">
-        <div class="spc_embedup_discount_section">
-          <div class="spc_embedup_discount_header_row"><span
-              class="spc_embedup_discount_header"><span>Discounts</span></span><button
-              class="spc_embedup_discount_toggle_button" type="button">+</button></div>
-        </div>
-        <div class="spc_embedup_discount_section spc_embedup_notes_section">
-          <div class="spc_embedup_discount_header_row"><span class="spc_embedup_discount_header"><span>Add
-                Notes</span></span><button data-testid="discount-toggle-button"
-              class="spc_embedup_discount_toggle_button" type="button">+</button></div>
-        </div>
+        ${watchedValues?.shoppingCartSettings?.showDiscountCodeField === BoleanOptions.yes ? `<div class="spc_embedup_discount_section">
+           <div class="spc_embedup_discount_header_row"><span
+              class="spc_embedup_discount_header"><span>${watchedValues?.shoppingCartSettings?.discountCodeTitle}</span></span><button
+              class="spc_embedup_discount_toggle_button" type="button">-</button>
+            </div>
+            <div class="spc_embedup_discount_expanded_ui"><div class="spc_embedup_discount_code_input"><input type="text" class="spc_embedup_discount_input_field" id="spc_embedup_discount_code_input" placeholder="${watchedValues?.shoppingCartSettings?.discountCodePlaceholder}" value=""><button class="spc_embedup_discount_apply_button spc_embedup_tertiary_button " type="button"><span>${watchedValues?.shoppingCartSettings?.discountApplyBtnTxt}</span></button></div></div>
+        </div>` : ''
+        }
+        ${watchedValues?.shoppingCartSettings?.showOrderNote === BoleanOptions.yes ? `<div class="spc_embedup_discount_section spc_embedup_notes_section">
+          <div class="spc_embedup_discount_header_row"><span class="spc_embedup_discount_header"><span>${watchedValues?.shoppingCartSettings?.orderNoteTitle}</span></span><button data-testid="discount-toggle-button"
+              class="spc_embedup_discount_toggle_button" type="button">-</button></div>
+              <div class="spc_embedup_discount_expanded_ui"><div class="spc_embedup_discount_code_input"><textarea class="spc_embedup_discount_input_field" id="spc_embedup_discount_code_input" placeholder="${watchedValues?.shoppingCartSettings?.orderNotePlaceholder}"></textarea></div></div>
+        </div>` : ''
+
+        }
         <div class="spc_embedup_cart_total"><span class="spc_embedup_cart_total_label">Estimate total </span><span
             class="spc_embedup_cart_total_amount_container "><span
               class="spc_embedup_cart_total_amount">$9.0</span></span></div>
         <div class="spc_embedup_additional_text"><span>${watchedValues?.shoppingCartSettings?.additionalInfo}</span></div>
         <div class="spc_embedup_primary_button_container"><button
-            class="spc_embedup_button spc_embedup_primary_button product-card__add-button"><span>CHECKOUT</span></button>
+            class="spc_embedup_button spc_embedup_primary_button product-card__add-button"><span>${watchedValues?.shoppingCartSettings?.shoppingCartBtnTxt}</span></button>
         </div>
       </div>
     </div>
@@ -1713,7 +1727,7 @@ const CreateComponent = () => {
           
                  
 
-            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ?shoppingCartHtml : ''}
+            ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? shoppingCartHtml : ''}
         </div>
 
         
@@ -1811,7 +1825,7 @@ const CreateComponent = () => {
                     ${JSON.stringify(watchedValues.addToCartType.products)}
                  </script>
 
-             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ?shoppingCartHtml : ''}
+             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? shoppingCartHtml : ''}
 
               <div class="product-card__buttons shopcomponent_pd_buttons_bulk">
               <!-- Add behavior to an existing button -->
@@ -1926,7 +1940,7 @@ const CreateComponent = () => {
           
                  
         <div class="shopcomponent_cart_container">
-             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ?shoppingCartHtml : ''}
+             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? shoppingCartHtml : ''}
             </div>
         </div>
 
@@ -1939,7 +1953,7 @@ const CreateComponent = () => {
 
     `;
 
-    
+
 
     useEffect(() => {
         if (watchedValues.appliesTo === APPLIES_TO.bycollection) {
@@ -3059,6 +3073,31 @@ const CreateComponent = () => {
                                                         )}
                                                     />
 
+                                                    <Controller
+                                                        name="shoppingCartSettings.shoppingCartBtnTxt"
+                                                        control={control}
+                                                        rules={{
+                                                            required: false,
+                                                            maxLength: {
+                                                                value: 100,
+                                                                message: "Checkout button text should be less than 100 characters"
+                                                            }
+                                                        }}
+                                                        render={({ field, fieldState }) => (
+                                                            <TextField
+                                                                type="text"
+                                                                label={"Checkout button text"}
+                                                                name="shoppingCartSettings.shoppingCartBtnTxt"
+                                                                value={field.value}
+                                                                onChange={field.onChange}
+                                                                error={fieldState.error?.message || actionData?.errors?.shoppingCartSettings?.additionalInfo}
+                                                                autoComplete="off"
+                                                                maxLength={100}
+                                                                showCharacterCount
+                                                            />
+                                                        )}
+                                                    />
+
                                                     <Box>
                                                         <CustomColorPicker
                                                             label={t("shopping_cart_bg_color")}
@@ -3088,6 +3127,197 @@ const CreateComponent = () => {
                                                             }}
                                                         />
                                                     </Box>
+
+
+                                                    <InlineStack gap={'300'} blockAlign="center" align="start">
+                                                        <Box>
+                                                            <Controller
+                                                                name="shoppingCartSettings.showOrderNote"
+                                                                control={control}
+                                                                render={({ field }) => (
+                                                                    <Checkbox
+                                                                        label="Show order note field"
+                                                                        checked={field.value === BoleanOptions.yes  ? true : false}
+                                                                        onChange={(newValue) => {
+                                                                            field.onChange(newValue ? BoleanOptions.yes : BoleanOptions.no);
+                                                                        }}
+                                                                        disabled={disabledContentByPlan}
+                                                                    />
+                                                                )}
+                                                            />
+                                                            {watchedValues.shoppingCartSettings.showOrderNote === BoleanOptions.yes &&
+                                                                <Box paddingBlockStart={'200'}>
+
+                                                                    <BlockStack gap={'300'}>
+
+                                                                        <Controller
+                                                                            name="shoppingCartSettings.orderNoteTitle"
+                                                                            control={control}
+                                                                            rules={{
+                                                                                required: false,
+                                                                                maxLength: {
+                                                                                    value: 100,
+                                                                                    message: "Order note title should be less than 100 characters"
+                                                                                }
+                                                                            }}
+                                                                            render={({ field, fieldState }) => (
+                                                                                <TextField
+                                                                                    type="text"
+                                                                                    label={'Order note title'}
+                                                                                    name="shoppingCartSettings.orderNoteTitle"
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    error={fieldState.error?.message || actionData?.errors?.shoppingCartSettings?.orderNoteTitle}
+                                                                                    autoComplete="off"
+                                                                                    maxLength={100}
+                                                                                    showCharacterCount
+                                                                                />
+                                                                            )}
+                                                                        />
+
+                                                                        <Controller
+                                                                            name="shoppingCartSettings.orderNotePlaceholder"
+                                                                            control={control}
+                                                                            rules={{
+                                                                                required: false,
+                                                                                maxLength: {
+                                                                                    value: 100,
+                                                                                    message: "Order note title should be less than 100 characters"
+                                                                                }
+                                                                            }}
+                                                                            render={({ field, fieldState }) => (
+                                                                                <TextField
+                                                                                    type="text"
+                                                                                    label={'Order note placeholder'}
+                                                                                    name="shoppingCartSettings.orderNotePlaceholder"
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    error={fieldState.error?.message || actionData?.errors?.shoppingCartSettings?.orderNotePlaceholder}
+                                                                                    autoComplete="off"
+                                                                                    maxLength={100}
+                                                                                    showCharacterCount
+                                                                                />
+                                                                            )}
+                                                                        />
+
+                                                                    </BlockStack>
+
+                                                                </Box>
+                                                            }
+
+                                                        </Box>
+
+                                                        {disabledContentByPlan &&
+                                                            <UpgradeTooltip />
+                                                        }
+                                                    </InlineStack>
+
+                                                    <InlineStack gap={'300'} blockAlign="center" align="start">
+                                                        <Box>
+                                                            <Controller
+                                                                name="shoppingCartSettings.showDiscountCodeField"
+                                                                control={control}
+                                                                render={({ field }) => (
+                                                                    <Checkbox
+                                                                        label="Show order discount code field"
+                                                                        checked={field.value === BoleanOptions.yes ? true : false}
+                                                                        onChange={(newValue) => {
+                                                                            field.onChange(newValue ? BoleanOptions.yes : BoleanOptions.no);
+                                                                        }}
+                                                                        disabled={disabledContentByPlan}
+                                                                    />
+                                                                )}
+                                                            />
+                                                            {watchedValues.shoppingCartSettings.showDiscountCodeField === BoleanOptions.yes &&
+                                                                <Box paddingBlockStart={'200'}>
+
+                                                                    <BlockStack gap={'300'}>
+
+                                                                        <Controller
+                                                                            name="shoppingCartSettings.discountCodeTitle"
+                                                                            control={control}
+                                                                            rules={{
+                                                                                required: false,
+                                                                                maxLength: {
+                                                                                    value: 100,
+                                                                                    message: "Discount code title should be less than 100 characters"
+                                                                                }
+                                                                            }}
+                                                                            render={({ field, fieldState }) => (
+                                                                                <TextField
+                                                                                    type="text"
+                                                                                    label={'Discount code title'}
+                                                                                    name="shoppingCartSettings.discountCodeTitle"
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    error={fieldState.error?.message || actionData?.errors?.shoppingCartSettings?.discountCodeTitle}
+                                                                                    autoComplete="off"
+                                                                                    maxLength={100}
+                                                                                    showCharacterCount
+                                                                                />
+                                                                            )}
+                                                                        />
+
+                                                                        <Controller
+                                                                            name="shoppingCartSettings.discountCodePlaceholder"
+                                                                            control={control}
+                                                                            rules={{
+                                                                                required: false,
+                                                                                maxLength: {
+                                                                                    value: 100,
+                                                                                    message: "Discount code placeholder should be less than 100 characters"
+                                                                                }
+                                                                            }}
+                                                                            render={({ field, fieldState }) => (
+                                                                                <TextField
+                                                                                    type="text"
+                                                                                    label={'Discount code placeholder text'}
+                                                                                    name="shoppingCartSettings.discountCodePlaceholder"
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    error={fieldState.error?.message || actionData?.errors?.shoppingCartSettings?.discountCodePlaceholder}
+                                                                                    autoComplete="off"
+                                                                                    maxLength={100}
+                                                                                    showCharacterCount
+                                                                                />
+                                                                            )}
+                                                                        />
+
+                                                                        <Controller
+                                                                            name="shoppingCartSettings.discountApplyBtnTxt"
+                                                                            control={control}
+                                                                            rules={{
+                                                                                required: false,
+                                                                                maxLength: {
+                                                                                    value: 100,
+                                                                                    message: "Discount apply button text should be less than 100 characters"
+                                                                                }
+                                                                            }}
+                                                                            render={({ field, fieldState }) => (
+                                                                                <TextField
+                                                                                    type="text"
+                                                                                    label={'Apply discount button text'}
+                                                                                    name="shoppingCartSettings.discountApplyBtnTxt"
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    error={fieldState.error?.message || actionData?.errors?.shoppingCartSettings?.discountApplyBtnTxt}
+                                                                                    autoComplete="off"
+                                                                                    maxLength={100}
+                                                                                    showCharacterCount
+                                                                                />
+                                                                            )}
+                                                                        />
+
+                                                                    </BlockStack>
+
+                                                                </Box>
+                                                            }
+
+                                                        </Box>
+                                                        {disabledContentByPlan &&
+                                                            <UpgradeTooltip />
+                                                        }
+                                                    </InlineStack>
 
 
                                                 </BlockStack>

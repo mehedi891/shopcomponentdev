@@ -7,8 +7,9 @@ import cartLinesUpdateFnc from "../utilities/cartLinesUpdateFnc";
 import cartApplyDiscountCodeFnc from "../utilities/cartApplyDiscountCodeFnc";
 import cartNoteUpdateFnc from "../utilities/cartNoteUpdateFnc";
 import { showLoading } from "../utilities/utilisFnc";
+import { BoleanOptions } from "../../../constants/constants";
 
-const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings }) => {
+const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) => {
   const { cartData } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -39,13 +40,13 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
     };
   }, [cartModal]);
 
-  useEffect(()=>{
-    if(cartData?.note){
+  useEffect(() => {
+    if (cartData?.note) {
       setAddNotes(cartData?.note);
     }
-  },[cartData?.note]);
+  }, [cartData?.note]);
 
- 
+
 
   const handleRemoveFromCart = async (lineId) => {
     const isExistCart = localStorage.getItem('shopcomponent_cartId') ? localStorage.getItem('shopcomponent_cartId') : null;
@@ -172,7 +173,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
     }
   }
 
-  const handleCheckout = async (e,notes) => {
+  const handleCheckout = async (e, notes) => {
     const target = e.target;
     showLoading(target, true);
     if (cartData?.lines?.nodes?.length > 0) {
@@ -188,7 +189,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
             }
           } catch (error) {
             console.log(error);
-          }finally {
+          } finally {
             showLoading(target, false);
           }
         }
@@ -197,12 +198,12 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
       window.open(checkoutUrl, '_blank');
       setTimeout(() => {
         showLoading(target, false);
-      },400);
+      }, 400);
 
     }
   }
 
-    const shoppingCartStyle = `
+  const shoppingCartStyle = `
 
   .spc_embedup_button {
     font-weight: 700;
@@ -705,112 +706,114 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
 
   `
 
-    return (
-      <dialog className="spc_embedup_shadow spc_embedup_cart_dialog" ref={cartModal}>
-        <div className="spc_embedup_cart_head_line">
-          <span className="spc_embedup_cart_title">{shoppingCartSettings.heading}</span>
-          <div className="spc_embedup_closeButton">
-            <button onClick={() => cartModal.current.close()} aria-label="Close cart dialog" className="spc_embedup_button spc_embedup_tertiary_button">
-              <svg viewBox="0 0 20 20" width="20" height="20">
-                <path d="M9 5a1 1 0 1 1 2 0v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H5a1 1 0 1 1 0-2h4V5z" style={{ transform: "rotate(45deg)", transformOrigin: "10px 10px" }}
-                >
-                </path>
-              </svg>
-            </button>
-          </div>
+  return (
+    <dialog className="spc_embedup_shadow spc_embedup_cart_dialog" ref={cartModal}>
+      <div className="spc_embedup_cart_head_line">
+        <span className="spc_embedup_cart_title">{shoppingCartSettings.heading}</span>
+        <div className="spc_embedup_closeButton">
+          <button onClick={() => cartModal.current.close()} aria-label="Close cart dialog" className="spc_embedup_button spc_embedup_tertiary_button">
+            <svg viewBox="0 0 20 20" width="20" height="20">
+              <path d="M9 5a1 1 0 1 1 2 0v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H5a1 1 0 1 1 0-2h4V5z" style={{ transform: "rotate(45deg)", transformOrigin: "10px 10px" }}
+              >
+              </path>
+            </svg>
+          </button>
         </div>
+      </div>
 
-        {cartData?.lines?.nodes?.length > 0 ?
-          <div className="spc_embedup_cart-contents">
+      {cartData?.lines?.nodes?.length > 0 ?
+        <div className="spc_embedup_cart-contents">
 
-            <div className="spc_embedup_line_items">
+          <div className="spc_embedup_line_items">
 
-              {cartData?.lines?.nodes && cartData.lines.nodes.map((item, index) => {
-                return <div key={item?.id || index} className="spc_embedup_line_item_container">
-                  <div className="spc_embedup_line_item">
-                    <div className="spc_embedup_line_image spc_embedup_img_placeholder">
-                      <img
-                        src={`${item?.merchandise?.image?.url}&width=216&height=240`}
-                        alt="Top and bottom view of a snowboard. The top view shows a stylized scene of water, trees, mountains, sky and a moon in blue colours. The bottom view has a blue liquid, drippy background with the text 'liquid' in a stylized script typeface."
-                        width="108"
-                      />
+            {cartData?.lines?.nodes && cartData.lines.nodes.map((item, index) => {
+              return <div key={item?.id || index} className="spc_embedup_line_item_container">
+                <div className="spc_embedup_line_item">
+                  <div className="spc_embedup_line_image spc_embedup_img_placeholder">
+                    <img
+                      src={`${item?.merchandise?.image?.url}&width=216&height=240`}
+                      alt="Top and bottom view of a snowboard. The top view shows a stylized scene of water, trees, mountains, sky and a moon in blue colours. The bottom view has a blue liquid, drippy background with the text 'liquid' in a stylized script typeface."
+                      width="108"
+                    />
+                  </div>
+
+                  <div className="spc_embedup_line_details">
+                    <div className="spc_embedup_line_header">
+                      <div className="spc_embedup_line_heading spc_embedup_placeholder">
+                        {item?.merchandise?.product?.title}
+                      </div>
+                      <span className="spc_embedup_line_price_column">
+                        <span className="spc_embedup_line_price">{getSymbolFromCurrency(item?.cost?.totalAmount?.currencyCode)}{item?.cost?.totalAmount?.amount}</span>
+                        {item?.cost?.compareAtAmountPerQuantity &&
+                          <span className="spc_embedup_line_original_price">
+                            {getSymbolFromCurrency(item?.cost?.compareAtAmountPerQuantity?.currencyCode)}{((item?.cost?.compareAtAmountPerQuantity?.amount * 1) * item?.quantity).toFixed(2)}
+                          </span>
+                        }
+                      </span>
                     </div>
 
-                    <div className="spc_embedup_line_details">
-                      <div className="spc_embedup_line_header">
-                        <div className="spc_embedup_line_heading spc_embedup_placeholder">
-                          {item?.merchandise?.product?.title}
-                        </div>
-                        <span className="spc_embedup_line_price_column">
-                          <span className="spc_embedup_line_price">{getSymbolFromCurrency(item?.cost?.totalAmount?.currencyCode)}{item?.cost?.totalAmount?.amount}</span>
-                          {item?.cost?.compareAtAmountPerQuantity &&
-                            <span className="spc_embedup_line_original_price">
-                              {getSymbolFromCurrency(item?.cost?.compareAtAmountPerQuantity?.currencyCode)}{((item?.cost?.compareAtAmountPerQuantity?.amount * 1) * item?.quantity).toFixed(2)}
-                            </span>
-                          }
-                        </span>
+                    <div
+                      className="spc_embedup_line_options spc_embedup_truncate spc_embedup_placeholder"
+                    >
+                      <span>{item?.merchandise?.title === "Default Title" ? '' : item?.merchandise?.title}</span>
+                    </div>
+
+                    <div className="spc_embedup_line_edits">
+                      <div className="spc_embedup_button spc_embedup_tertiary_button">
+                        <button
+                          className="spc_embedup_decrement"
+                          onClick={() => handleUpdateLineQuantity('decrement', item?.id, item?.quantity)}
+                        >
+                          <svg viewBox="0 0 20 20" className="w-4 h-4">
+                            <path d="M5 9h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2"></path>
+                          </svg>
+                        </button>
+                        <span data-testid="spc_embedup_quantity_label">{item?.quantity}</span>
+                        <button
+                          className="spc_embedup_increment"
+                          onClick={() => handleUpdateLineQuantity('increment', item?.id, item?.quantity)}
+                        >
+                          <svg viewBox="0 0 20 20" className="w-4 h-4">
+                            <path d="M9 5a1 1 0 1 1 2 0v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H5a1 1 0 1 1 0-2h4V5z"></path>
+                          </svg>
+                        </button>
                       </div>
 
-                      <div
-                        className="spc_embedup_line_options spc_embedup_truncate spc_embedup_placeholder"
-                      >
-                        <span>{item?.merchandise?.title === "Default Title" ? '' : item?.merchandise?.title}</span>
-                      </div>
-
-                      <div className="spc_embedup_line_edits">
-                        <div className="spc_embedup_button spc_embedup_tertiary_button">
-                          <button
-                            className="spc_embedup_decrement"
-                            onClick={() => handleUpdateLineQuantity('decrement', item?.id, item?.quantity)}
-                          >
-                            <svg viewBox="0 0 20 20" className="w-4 h-4">
-                              <path d="M5 9h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2"></path>
-                            </svg>
-                          </button>
-                          <span data-testid="spc_embedup_quantity_label">{item?.quantity}</span>
-                          <button
-                            className="spc_embedup_increment"
-                            onClick={() => handleUpdateLineQuantity('increment', item?.id, item?.quantity)}
-                          >
-                            <svg viewBox="0 0 20 20" className="w-4 h-4">
-                              <path d="M9 5a1 1 0 1 1 2 0v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H5a1 1 0 1 1 0-2h4V5z"></path>
-                            </svg>
-                          </button>
-                        </div>
-
-                        <span onClick={() => handleRemoveFromCart(item?.id)} className="spc_embedup_line_remove">
-                          <button
-                            className="spc_embedup_button spc_embedup_tertiary_button"
-                            aria-label="Remove item from cart"
-                          >
-                            <svg style={{ width: "14px", height: "16px" }}>
-                              <path
-                                d="M6.31 7.18c0-.51-.4-.92-.9-.92s-.9.41-.9.92v4.63c0 .51.4.93.9.93s.9-.42.9-.93V7.18z"
-                                style={{ transform: "translateX(3px)" }}
-                              ></path>
-                              <path d="M6.31 7.18c0-.51-.4-.92-.9-.92s-.9.41-.9.92v4.63c0 .51.4.93.9.93s.9-.42.9-.93V7.18z"></path>
-                              <path d="m7 0c-1.634 0-2.965 1.33-3.021 2.993H.902C.404 2.993 0 3.407 0 3.918c0 .511.404.926.902.926h.689v5.828c0 .91 0 1.599.044 2.148.043.551.132.971.314 1.338.315.635.818 1.151 1.437 1.474.358.187.766.278 1.303.323.535.045 1.207.045 2.094.045h.434c.887 0 1.558 0 2.093-.045.537-.045.946-.136 1.304-.323a3.3 3.3 0 0 0 1.437-1.474c.182-.367.27-.787.314-1.338.044-.55.044-1.239.044-2.148V4.844h.69c.497 0 .901-.415.901-.926 0-.511-.404-.925-.901-.925h-3.078C9.965 1.33 8.634 0 7 0zm-1.326 3.102h2.652a1.54 1.54 0 0 0-.387-.961c.215.222.357.521.383.852.002.036.004.073.004.109H5.674zM7 1.85c.638 0 1.161.503 1.215 1.143H5.785C5.839 2.353 6.362 1.85 7 1.85zM3.394 4.844h7.212v5.823c0 .943-.001 1.545-.038 2.003-.035.436-.093.585-.124.648a2.42 2.42 0 0 1-.649.666c-.061.032-.206.091-.632.127-.445.037-1.032.039-1.951.039h-.424c-.919 0-1.506-.002-1.952-.039-.426-.036-.57-.095-.631-.127a2.42 2.42 0 0 1-.649-.666c-.031-.063-.09-.212-.124-.648-.037-.458-.038-1.06-.038-2.003V4.844z"></path>
-                            </svg>
-                          </button>
-                        </span>
-                      </div>
+                      <span onClick={() => handleRemoveFromCart(item?.id)} className="spc_embedup_line_remove">
+                        <button
+                          className="spc_embedup_button spc_embedup_tertiary_button"
+                          aria-label="Remove item from cart"
+                        >
+                          <svg style={{ width: "14px", height: "16px" }}>
+                            <path
+                              d="M6.31 7.18c0-.51-.4-.92-.9-.92s-.9.41-.9.92v4.63c0 .51.4.93.9.93s.9-.42.9-.93V7.18z"
+                              style={{ transform: "translateX(3px)" }}
+                            ></path>
+                            <path d="M6.31 7.18c0-.51-.4-.92-.9-.92s-.9.41-.9.92v4.63c0 .51.4.93.9.93s.9-.42.9-.93V7.18z"></path>
+                            <path d="m7 0c-1.634 0-2.965 1.33-3.021 2.993H.902C.404 2.993 0 3.407 0 3.918c0 .511.404.926.902.926h.689v5.828c0 .91 0 1.599.044 2.148.043.551.132.971.314 1.338.315.635.818 1.151 1.437 1.474.358.187.766.278 1.303.323.535.045 1.207.045 2.094.045h.434c.887 0 1.558 0 2.093-.045.537-.045.946-.136 1.304-.323a3.3 3.3 0 0 0 1.437-1.474c.182-.367.27-.787.314-1.338.044-.55.044-1.239.044-2.148V4.844h.69c.497 0 .901-.415.901-.926 0-.511-.404-.925-.901-.925h-3.078C9.965 1.33 8.634 0 7 0zm-1.326 3.102h2.652a1.54 1.54 0 0 0-.387-.961c.215.222.357.521.383.852.002.036.004.073.004.109H5.674zM7 1.85c.638 0 1.161.503 1.215 1.143H5.785C5.839 2.353 6.362 1.85 7 1.85zM3.394 4.844h7.212v5.823c0 .943-.001 1.545-.038 2.003-.035.436-.093.585-.124.648a2.42 2.42 0 0 1-.649.666c-.061.032-.206.091-.632.127-.445.037-1.032.039-1.951.039h-.424c-.919 0-1.506-.002-1.952-.039-.426-.036-.57-.095-.631-.127a2.42 2.42 0 0 1-.649-.666c-.031-.063-.09-.212-.124-.648-.037-.458-.038-1.06-.038-2.003V4.844z"></path>
+                          </svg>
+                        </button>
+                      </span>
                     </div>
                   </div>
                 </div>
-              })
+              </div>
+            })
 
-              }
+            }
 
 
 
-            </div>
+          </div>
 
-            <div className="spc_embedup_cart_actions">
+          <div className="spc_embedup_cart_actions">
+
+            {shoppingCartSettings?.showDiscountCodeField === BoleanOptions.yes &&
 
               <div className="spc_embedup_discount_section">
                 <div className="spc_embedup_discount_header_row" onClick={() => setShowDiscountInput(!showDiscountInput)}>
                   <span className="spc_embedup_discount_header">
-                    <span>Discounts</span>
+                    <span>{shoppingCartSettings?.discountCodeTitle ?? 'Discounts'}</span>
                   </span>
                   <button className="spc_embedup_discount_toggle_button" type="button">{showDiscountInput ? "-" : "+"}</button>
                 </div>
@@ -818,10 +821,10 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
                 {showDiscountInput &&
                   <div className="spc_embedup_discount_expanded_ui">
                     <div className="spc_embedup_discount_code_input">
-                      <input type="text" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} className="spc_embedup_discount_input_field" id="spc_embedup_discount_code_input" placeholder="Enter discount code" />
+                      <input type="text" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} className="spc_embedup_discount_input_field" id="spc_embedup_discount_code_input" placeholder={shoppingCartSettings?.discountCodePlaceholder ?? 'Enter discount code'} />
 
                       <button onClick={() => { handleApplyDiscount('add') }} className={`spc_embedup_discount_apply_button spc_embedup_tertiary_button ${cartUpdateLoading ? 'loading' : ''}`} type="button">
-                        <span>Apply</span>
+                        <span>{shoppingCartSettings?.discountApplyBtnTxt ?? 'Apply'}</span>
                       </button>
                     </div>
 
@@ -856,61 +859,61 @@ const ShoppingCart = ({ cartModal, cartRef, token, store,shoppingCartSettings })
 
 
               </div>
+            }
 
+            {shoppingCartSettings?.showOrderNote === BoleanOptions.yes &&
               <div className="spc_embedup_discount_section spc_embedup_notes_section">
                 <div className="spc_embedup_discount_header_row" onClick={() => setShowAddNotes(!showAddNotes)}>
                   <span className="spc_embedup_discount_header">
-                    <span>Add Notes</span>
+                    <span>{shoppingCartSettings?.orderNoteTitle ?? 'Add Notes'}</span>
                   </span>
                   <button data-testid="discount-toggle-button" className="spc_embedup_discount_toggle_button" type="button">{showAddNotes ? "-" : "+"}</button>
                 </div>
                 {showAddNotes &&
                   <div className="spc_embedup_discount_expanded_ui">
                     <div className="spc_embedup_discount_code_input">
-                      <textarea value={addNotes} onChange={(e) => setAddNotes(e.target.value)} className="spc_embedup_discount_input_field" id="spc_embedup_discount_code_input" placeholder="Enter Addtional Notes" />
-                      {/* <button className="spc_embedup_discount_apply_button spc_embedup_tertiary_button" type="button">
-                      <span>Apply</span>
-                    </button> */}
+                      <textarea value={addNotes} onChange={(e) => setAddNotes(e.target.value)} className="spc_embedup_discount_input_field" id="spc_embedup_discount_code_input" placeholder={shoppingCartSettings?.orderNotePlaceholder ?? 'Enter notes'} />
                     </div>
                   </div>
                 }
               </div>
+            }
 
-              <div className="spc_embedup_cart_total">
-                <span className="spc_embedup_cart_total_label">Estimate total </span>
-                <span className={`spc_embedup_cart_total_amount_container ${cartUpdateLoading ? "loading" : ""}`}>
-                  {cartData?.discountAllocations?.length > 0 &&
-                    <span className="spc_embedup_cart_sub_total_amount">{getSymbolFromCurrency(cartData?.cost?.subtotalAmount?.currencyCode)}{cartData?.cost?.subtotalAmount?.amount}</span>
-                  }
-                  <span className="spc_embedup_cart_total_amount">{getSymbolFromCurrency(cartData?.cost?.totalAmount?.currencyCode)}{cartData?.cost?.totalAmount?.amount}</span>
-                </span>
-              </div>
+            <div className="spc_embedup_cart_total">
+              <span className="spc_embedup_cart_total_label">Estimate total </span>
+              <span className={`spc_embedup_cart_total_amount_container ${cartUpdateLoading ? "loading" : ""}`}>
+                {cartData?.discountAllocations?.length > 0 &&
+                  <span className="spc_embedup_cart_sub_total_amount">{getSymbolFromCurrency(cartData?.cost?.subtotalAmount?.currencyCode)}{cartData?.cost?.subtotalAmount?.amount}</span>
+                }
+                <span className="spc_embedup_cart_total_amount">{getSymbolFromCurrency(cartData?.cost?.totalAmount?.currencyCode)}{cartData?.cost?.totalAmount?.amount}</span>
+              </span>
+            </div>
 
-              <div className="spc_embedup_additional_text">
-                <span>{shoppingCartSettings?.additionalInfo}</span>
-              </div>
+            <div className="spc_embedup_additional_text">
+              <span>{shoppingCartSettings?.additionalInfo}</span>
+            </div>
 
-              <div className="spc_embedup_primary_button_container">
-                <button onClick={(e) => { handleCheckout(e,addNotes); }} className="spc_embedup_button spc_embedup_primary_button product-card__add-button" >
-                  <span>CHECKOUT</span>
-                </button>
-              </div>
-
+            <div className="spc_embedup_primary_button_container">
+              <button onClick={(e) => { handleCheckout(e, addNotes); }} className="spc_embedup_button spc_embedup_primary_button product-card__add-button" >
+                <span>{shoppingCartSettings?.shoppingCartBtnTxt ?? 'Checkout'}</span>
+              </button>
             </div>
 
           </div>
-          :
-          <div className="spc_embedup_cart-contents">
-            <div className="spc_embedup_cart_empty">{shoppingCartSettings?.emptyCartText}</div>
-          </div>
-        }
 
-        <style>
-          {shoppingCartStyle}
-        </style>
+        </div>
+        :
+        <div className="spc_embedup_cart-contents">
+          <div className="spc_embedup_cart_empty">{shoppingCartSettings?.emptyCartText}</div>
+        </div>
+      }
 
-      </dialog>
-    )
-  }
+      <style>
+        {shoppingCartStyle}
+      </style>
 
-  export default ShoppingCart
+    </dialog>
+  )
+}
+
+export default ShoppingCart

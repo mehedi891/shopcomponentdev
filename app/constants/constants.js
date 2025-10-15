@@ -71,6 +71,11 @@ const DISCOUNT_TYPE = {
   fixed: 'fixed'
 }
 
+const BoleanOptions = {
+  yes: 'yes',
+  no: 'no'
+}
+
 export {
   APPLIES_TO,
   ADD_TO_CART_TYPE,
@@ -83,5 +88,6 @@ export {
   PLAN_STATUS,
   PLAN_PRICE,
   MAX_ALLOWED_COMPONENTS,
-  DISCOUNT_TYPE
+  DISCOUNT_TYPE,
+  BoleanOptions
 }
