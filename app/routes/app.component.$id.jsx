@@ -3083,7 +3083,7 @@ const UpdateComponent = () => {
 
 
                           <InlineStack gap={'300'} blockAlign="center" align="start">
-                            <Box>
+                            <Box width={disabledContentByPlan ? 'max-content' : '100%'}>
                               <Controller
                                 name="shoppingCartSettings.showOrderNote"
                                 control={control}
@@ -3166,7 +3166,7 @@ const UpdateComponent = () => {
                           </InlineStack>
 
                           <InlineStack gap={'300'} blockAlign="center" align="start">
-                            <Box>
+                            <Box width={disabledContentByPlan ? 'max-content' : '100%'}>
                               <Controller
                                 name="shoppingCartSettings.showDiscountCodeField"
                                 control={control}
