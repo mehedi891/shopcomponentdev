@@ -156,7 +156,7 @@ const UpdateComponent = () => {
 
         shoppingCartBtnTxt: component?.shoppingCartSettings?.shoppingCartBtnTxt || 'CHECKOUT',
         showOrderNote: component?.shoppingCartSettings?.showOrderNote || BoleanOptions.no,
-        orderNoteTitle: component?.shoppingCartSettings?.orderNoteTitle || 'Add a note to your order',
+        orderNoteTitle: component?.shoppingCartSettings?.orderNoteTitle || 'Add a note to your order ',
         orderNotePlaceholder: component?.shoppingCartSettings?.orderNotePlaceholder || 'Write a note...',
         showDiscountCodeField: component?.shoppingCartSettings?.showDiscountCodeField || BoleanOptions.no,
         discountCodeTitle: component?.shoppingCartSettings?.discountCodeTitle || 'Apply discount code',
