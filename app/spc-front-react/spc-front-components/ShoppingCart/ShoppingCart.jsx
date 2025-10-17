@@ -291,7 +291,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0px 16px 0px 16px;
+    padding: 14px 16px 0px 16px;
     box-sizing: border-box;
 }
     .spc_embedup_cart_title {
@@ -376,7 +376,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    min-width: 95%;
     min-height: 200px;
     text-align: center;
     margin: 8px;
