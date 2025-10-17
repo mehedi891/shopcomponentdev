@@ -1,5 +1,5 @@
 import { Modal, TitleBar, useAppBridge } from "@shopify/app-bridge-react"
-import { BlockStack, Box, Card, InlineStack, Link, List, Text, Image } from "@shopify/polaris"
+import { BlockStack, Box, Card, InlineStack, Link, List, Text } from "@shopify/polaris"
 
 const Instruction = () => {
   const shopify = useAppBridge();
@@ -73,7 +73,7 @@ const Instruction = () => {
               thumbnailUrl={"/images/demo_video.webp"}
             /> */}
             <Link onClick={handleInstructionModal}>
-              <img src={"/images/demo_video.webp"} alt="Demo" height="275px" width="auto" loading="lazy" />
+              <img style={{borderRadius: "var(--p-border-radius-300)"}} src={"/images/demo_video_f.webp"} alt="Demo" height="275px" width="auto" loading="lazy" />
 
             </Link>
           </Box>
