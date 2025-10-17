@@ -66,12 +66,12 @@ export const loader = async ({ request }) => {
 
     const totalPublishSpc = await admin.graphql(
         `#graphql
-  query PublishedProductCount($publicationId: ID!) {
-    publishedProductsCount(publicationId: $publicationId) {
-      count
-      precision
-    }
-  }`,
+            query PublishedProductCount($publicationId: ID!) {
+                publishedProductsCount(publicationId: $publicationId) {
+                count
+                precision
+                }
+            }`,
 
         {
             variables: {
@@ -79,6 +79,7 @@ export const loader = async ({ request }) => {
             },
         },
     );
+    
     const totalPublishSpcJson = await totalPublishSpc.json();
 
     if (totalPublishSpcJson?.data?.publishedProductsCount?.count === 0) {
@@ -132,84 +133,76 @@ export const loader = async ({ request }) => {
 
     }
 
-//     const pulblicationCollection = await admin.graphql(
-//         `#graphql
-//   query publication($id: ID!) {
-//     publication(id: $id) {
-//       id
-//       collections(first: 40) {
-//         edges {
-//           node {
-//             id
-//           }
-//         }
-//       }
-//     }
-//   }`,
-//         {
-//             variables: {
-//                 "id": shop?.publicationId
-//             },
-//         },
-//     );
-//     const pulblicationCollectionJson = await pulblicationCollection.json();
+    const pulblicationCollection = await admin.graphql(
+        `#graphql
+            query publication($id: ID!) {
+                publication(id: $id) {
+                id
+                collections(first: 40) {
+                    edges {
+                    node {
+                        id
+                    }
+                    }
+                }
+                }
+            }`,
+        {
+            variables: {
+                "id": shop?.publicationId
+            },
+        },
+    );
 
-//     console.log('pulblicationCollectionJson:', pulblicationCollectionJson.data.publication.collections.edges.length);
+    const pulblicationCollectionJson = await pulblicationCollection.json();
 
-//     if (pulblicationCollectionJson?.data?.publication?.collections?.edges?.length === 0) {
-//         const collectionsRes = await admin.graphql(
-//             `#graphql
-//               query {
-//                 collections(first: 10) {
-//                   edges {
-//                     node {
-//                       id
-//                     }
-//                   }
-//                 }
-//               }`,
-//         );
-//         const collections = await collectionsRes.json();
+    if (pulblicationCollectionJson?.data?.publication?.collections?.edges?.length === 0) {
+        const collectionsRes = await admin.graphql(
+            `#graphql
+              query {
+                collections(first: 10) {
+                  edges {
+                    node {
+                      id
+                    }
+                  }
+                }
+              }`,
+        );
+        const collections = await collectionsRes.json();
 
-//         let collectionArr = [];
+        let collectionArr = [];
 
-//         if (collections?.data?.collections?.edges?.length > 0) {
-//             collectionArr = collections?.data?.collections?.edges.map(collection => `${collection.node.id}`);
+        if (collections?.data?.collections?.edges?.length > 0) {
+            collectionArr = collections?.data?.collections?.edges.map(collection => `${collection.node.id}`);
 
-//         }
+        }
 
-//         console.log('colloecrtionArr:', collectionArr);
-
-
-//      const res =await admin.graphql(
-//     `#graphql
-//   mutation PublishablePublish($collectionId: ID!, $publicationId: ID!) {
-//     publishablePublish(id: $collectionId, input: {publicationId: $publicationId}) {
-//       publishable {
-//         publishedOnPublication(publicationId: $publicationId)
-//       }
-//       userErrors {
-//         field
-//         message
-//       }
-//     }
-//   }`,
-//   {
-//     variables: {
-//         "collectionId": collectionArr,
-//         "publicationId": shop?.publicationId || ""
-//     },
-//   },
-//   );
-
-// const json = await res.json();
-// console.log(JSON.stringify(json, null, 2));
+        console.log('colloecrtionArr:', collectionArr);
 
 
+        await admin.graphql(
+            `#graphql
+  mutation PublishablePublish($collectionId: ID!, $publicationId: ID!) {
+    publishablePublish(id: $collectionId, input: {publicationId: $publicationId}) {
+      publishable {
+        publishedOnPublication(publicationId: $publicationId)
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }`,
+            {
+                variables: {
+                    "collectionId": collectionArr[0] || "",
+                    "publicationId": shop?.publicationId || ""
+                },
+            },
+        );
 
-
-
-//     }
+    }
 
 
     const trackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();

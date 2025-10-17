@@ -28,7 +28,7 @@ mutation cartNoteUpdate(
 
 
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

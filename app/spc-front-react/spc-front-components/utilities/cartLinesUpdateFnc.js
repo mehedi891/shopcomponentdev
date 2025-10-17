@@ -27,7 +27,7 @@ mutation cartLinesRemove(
 
 
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ mutation cartLinesRemove(
     });
 
     const data = await res.json();
-    console.log(data);
+    //console.log(data);
     if (data.data.cartLinesUpdate.userErrors.length) {
       console.log("error:", data.data.cartLinesUpdate.userErrors);
 

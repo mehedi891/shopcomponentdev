@@ -25607,7 +25607,7 @@ query cart(
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25731,7 +25731,7 @@ mutation cartLinesRemove(
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25793,7 +25793,7 @@ mutation cartLinesRemove(
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25802,7 +25802,6 @@ mutation cartLinesRemove(
       body: JSON.stringify({ query: mutation, variables })
     });
     const data = await res.json();
-    console.log(data);
     if (data.data.cartLinesUpdate.userErrors.length) {
       console.log("error:", data.data.cartLinesUpdate.userErrors);
       return {
@@ -25856,7 +25855,7 @@ mutation cartDiscountCodesUpdate(
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25920,7 +25919,7 @@ mutation cartNoteUpdate(
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26107,7 +26106,6 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
             "quantity": updatedQty
           }
         ];
-        console.log("linesArr", linesArr);
         const cartQtyUpdate = await cartLinesUpdateFnc_default(isExistCart, linesArr, token, store);
         if (cartQtyUpdate?.success) {
           setCartData({ ...cartQtyUpdate.cartData });
@@ -26180,7 +26178,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
         }
       }
       const checkoutUrl = cartData?.checkoutUrl;
-      window.open(checkoutUrl, "_blank");
+      window.open(checkoutUrl, "_top");
       setTimeout(() => {
         showLoading(target, false);
       }, 400);
@@ -26588,7 +26586,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
     padding: 8px 12px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
     background-color: #ffffff;
     color: #374151;
 }
@@ -26846,7 +26844,6 @@ var ShoppingCart_default = ShoppingCart;
 // app/spc-front-react/spc-front-components/utilities/cartLineAddFnc.js
 init_define_import_meta_env();
 var cartLineAddFnc = async (isExistCart, selectedVariant, store, token) => {
-  console.log({ isExistCart, selectedVariant, store, token });
   const mutation = `#graphql
    mutation cartLinesAdd(
   $cartId: ID!
@@ -26868,7 +26865,7 @@ ${CART_FIELDS}
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26947,7 +26944,7 @@ var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTrac
     language: "EN"
   };
   try {
-    const res = await fetch(`https://${store}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

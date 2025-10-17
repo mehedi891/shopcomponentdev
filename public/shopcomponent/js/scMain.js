@@ -346,7 +346,7 @@ async function cartLineAddFnc(existCartId, shop, accessToken, variants) {
   };
 
   try {
-    const res = await fetch(`https://${shop}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${shop}/api/2025-10/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -445,7 +445,7 @@ async function cartCreateFnc(shop, accessToken, variants, tracingCode, customert
     }
   };
   try {
-    const res = await fetch(`https://${shop}/api/2025-07/graphql.json`, {
+    const res = await fetch(`https://${shop}/api/2025-10/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

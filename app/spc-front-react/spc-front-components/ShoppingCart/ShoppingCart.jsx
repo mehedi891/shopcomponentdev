@@ -119,7 +119,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
           "quantity": updatedQty
         }
         ];
-        console.log('linesArr', linesArr);
+        //console.log('linesArr', linesArr);
         const cartQtyUpdate = await cartLinesUpdateFnc(isExistCart, linesArr, token, store);
         if (cartQtyUpdate?.success) {
           setCartData({ ...cartQtyUpdate.cartData });
@@ -195,7 +195,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
         }
       }
       const checkoutUrl = cartData?.checkoutUrl;
-      window.open(checkoutUrl, '_blank');
+      window.open(checkoutUrl, '_top');
       setTimeout(() => {
         showLoading(target, false);
       }, 400);
@@ -605,7 +605,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
     padding: 8px 12px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
     background-color: #ffffff;
     color: #374151;
 }
