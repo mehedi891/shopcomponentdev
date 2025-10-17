@@ -521,7 +521,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
     height: 20px;
 }
 .spc_embedup_cart_actions {
-    padding: 0px 16px 0px 16px;
+    padding: 0px 16px 16px 16px;
     display: flex;
     flex-direction: column;
     align-items: end;
