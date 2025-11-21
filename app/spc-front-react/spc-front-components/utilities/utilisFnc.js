@@ -1,7 +1,7 @@
 
 const getSelectedVariantId = (targetElement,appliesTo,fullView)=>{
    let variantId = '';
-  if (appliesTo == 'collection' && fullView === 'true') {
+  if ( fullView === 'true') {
     const variantNodeParent = targetElement.closest('.product-modal__container');
     const variantNode = variantNodeParent.querySelector('.product-card__variant-selector');
     variantId = variantNode.getAttribute('data-variant-id');

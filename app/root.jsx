@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigate,
   useNavigation,
 } from "@remix-run/react";
 // i18next imports
@@ -72,7 +73,7 @@ export let handle = {
   lng: "en",
 };
 export default function App() {
- // Get the locale from the loader
+  // Get the locale from the loader
   let { locale, ns } = useLoaderData();
   let { i18n } = useTranslation(ns);
   let langShow = locale + (ns == "common" ? "" : ("-" + ns).toUpperCase());
@@ -88,6 +89,24 @@ export default function App() {
       shopify.loading(isNavigating);
     }
   }, [isNavigating]);
+
+  //New polaris web component navigation handling start
+
+    const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleNavigate = (event) => {
+      const href = event.target.getAttribute('href');
+      if (href) navigate(href);
+    };
+
+    document.addEventListener('shopify:navigate', handleNavigate);
+    return () => {
+      document.removeEventListener('shopify:navigate', handleNavigate);
+    };
+  }, [navigate]);
+
+   //New polaris web component navigation handling end
   return (
     <html lang={langShow} ns={ns} dir={i18n.dir()}>
       <head>
@@ -100,6 +119,9 @@ export default function App() {
         />
         <Meta />
         <Links />
+         {/* New polaris web component navigation handling start */}
+        <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+          {/* New polaris web component navigation handling end */}
       </head>
       <body>
         <Outlet />

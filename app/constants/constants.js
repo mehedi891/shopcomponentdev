@@ -76,6 +76,26 @@ const BoleanOptions = {
   no: 'no'
 }
 
+const COMISSION_CRITERIA = {
+  tiered: 'tiered',
+  fixed: 'fixed'
+}
+
+const TIERED_TYPE = {
+  quantity: 'quantity',
+  amount: 'amount'
+} 
+
+const FIXED_COMISSION = {
+  amount: 'amount',
+  percentage: 'percentage'
+}
+
+const AFFILIATE_STATUS = {
+  active: 'active',
+  inactive: 'inactive'
+}
+
 export {
   APPLIES_TO,
   ADD_TO_CART_TYPE,
@@ -89,5 +109,9 @@ export {
   PLAN_PRICE,
   MAX_ALLOWED_COMPONENTS,
   DISCOUNT_TYPE,
-  BoleanOptions
+  BoleanOptions,
+  COMISSION_CRITERIA,
+  TIERED_TYPE,
+  FIXED_COMISSION,
+  AFFILIATE_STATUS
 }

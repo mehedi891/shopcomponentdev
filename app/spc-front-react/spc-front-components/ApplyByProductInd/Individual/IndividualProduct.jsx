@@ -11,7 +11,7 @@ import cartCreateFnc from "../../utilities/cartCreateFnc";
 
 
 const IndividualProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, customCss, tracking, layout, shop, appliesTo, addToCartType } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType } = componentData;
   const [selectecTedProducts, setSelectecTedProducts] = useState([]);
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -114,6 +114,42 @@ const IndividualProduct = ({ componentData, token, store }) => {
   }
 
 
+  const handleOpenQuickView = async (event, appliesTo) => {
+    event.preventDefault();
+
+    const target = event.target;
+    showLoading(target, true);
+
+    if (appliesTo === 'product') {
+      const container = target.closest('.product-card__buttons');
+      const dialog = container.querySelector('#shopcomponent-product-modal');
+      if (dialog) {
+        dialog.showModal();
+        dialog.querySelector('#shopcomponent-product-modal-context').update(event);
+        setTimeout(() => {
+          showLoading(target, false);
+        }, 1000);
+      }
+    } else if (appliesTo === 'collection') {
+      const container = target.closest('.shopcomponent_pd_container');
+      const dialog = container.querySelector('#shopcomponent-product-modal');
+      if (dialog) {
+        dialog.showModal();
+        dialog.querySelector('#shopcomponent-product-modal-context').update(event);
+        setTimeout(() => {
+          showLoading(target, false);
+        }, 1000);
+      }
+    } else {
+      console.log('Method not allowed');
+      setTimeout(() => {
+        showLoading(target, false);
+      }, 1000);
+    }
+
+  }
+
+
 
   useEffect(() => {
     window.spcAddToCartIndFnc = (event, ...args) => {
@@ -121,6 +157,9 @@ const IndividualProduct = ({ componentData, token, store }) => {
     };
     window.spcAddToCheckoutFnc = (event, ...args) => {
       handleAddToCheckout(event, ...args);
+    }
+    window.spcShowQuickView = (event, ...args) => {
+      handleOpenQuickView(event, ...args);
     }
   }, []);
 
@@ -131,7 +170,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
       <div className="shopcomponent_pd_container">
 
-       
+
 
         <div className="shopcomponent_title_N_description">
           <div className="shopcomponent_title">{title}</div>
@@ -186,7 +225,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
         componentSettings={componentSettings}
         productLayoutSettings={productLayoutSettings}
         shoppingCartSettings={shoppingCartSettings}
-        customCss={customCss}
+        customCss={componentSettings?.customCss || ''}
         tracking={tracking}
       />
 

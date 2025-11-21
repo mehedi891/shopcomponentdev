@@ -48,13 +48,13 @@ export default function App() {
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
         <Link to="/app" rel="home">
-          Home
         </Link>
-        <Link to="/app">
+        <Link to="/app" rel="home">
           {t("components")}
         </Link>
         <Link to="/app/createcomponent">{t("create_componet")}</Link>
         <Link to="/app/settings">{t("settings")}</Link>
+        <Link rel="affiliate" to="/app/affiliate">Affiliate</Link>
         <Link to="/app/plans">{t("subscription_plan")}</Link>
         <Link to="/app/getsupport">{t("get_support")}</Link>
       </NavMenu>

@@ -10,7 +10,7 @@ import cartLineAddFnc from "../utilities/cartLineAddFnc";
 import cartCreateFnc from "../utilities/cartCreateFnc";
 
 const BulkProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, customCss, tracking, layout, shop, enableQtyField, customerTracking, addToCartType } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType } = componentData;
 
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -158,7 +158,7 @@ const BulkProduct = ({ componentData, token, store }) => {
         componentSettings={componentSettings}
         productLayoutSettings={productLayoutSettings}
         shoppingCartSettings={shoppingCartSettings}
-        customCss={customCss}
+        customCss={componentSettings?.customCss}
         tracking={tracking}
       />
 

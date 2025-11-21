@@ -6,11 +6,10 @@ import { getSelectedVariantId, showLoading } from "../../utilities/utilisFnc";
 import cartLineAddFnc from "../../utilities/cartLineAddFnc";
 import cartCreateFnc from "../../utilities/cartCreateFnc";
 import { ContextComponent } from "../../../entryPoints/ContextWrapper/ContextWrapper";
-import CartCountBuble from "../../ShoppingCart/CartCountBuble/CartCountBuble";
 import ShoppingCart from "../../ShoppingCart/ShoppingCart";
 
 const IndividualCollection = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, customCss, tracking, layout, shop, appliesTo } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo } = componentData;
 
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -125,7 +124,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
         componentSettings={componentSettings}
         productLayoutSettings={productLayoutSettings}
         shoppingCartSettings={shoppingCartSettings}
-        customCss={customCss}
+        customCss={componentSettings?.customCss}
         tracking={tracking}
 
       />

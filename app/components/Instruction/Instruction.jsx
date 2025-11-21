@@ -6,6 +6,13 @@ const Instruction = () => {
   const handleInstructionModal = () => {
     shopify.modal.show("video-tutorial-modal-instruction");
   }
+
+   
+    // useEffect(() => {
+    //   shopify.webVitals.onReport()
+    // },[])
+    
+  
   return (
     <Box>
       <Modal id="video-tutorial-modal-instruction">
@@ -66,15 +73,8 @@ const Instruction = () => {
 
 
           <Box className="Polaris-Box spc_videoThumbnail" minWidth="49%" maxWidth="500px">
-
-            {/* <VideoThumbnail
-              // videoLength={222}
-              onClick={handleInstructionModal}
-              thumbnailUrl={"/images/demo_video.webp"}
-            /> */}
             <Link onClick={handleInstructionModal}>
               <img style={{borderRadius: "var(--p-border-radius-300)"}} src={"/images/demo_video_f.webp"} alt="Demo" height="275px" width="auto" loading="lazy" />
-
             </Link>
           </Box>
 

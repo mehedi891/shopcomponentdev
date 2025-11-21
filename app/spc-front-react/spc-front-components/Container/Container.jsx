@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import IndividualProduct from "../ApplyByProductInd/Individual/IndividualProduct";
 import IndividualCollection from "../AppplyByCollectionInd/Individual/IndividualCollection";
 import BulkProduct from "../ApplyByProductBulk/BulkProduct";
-import CartCountBuble from "../ShoppingCart/CartCountBuble/CartCountBuble";
 import CartBubleWrapper from "../ShoppingCart/CartCountBuble/CartBubleWrapper";
 
 const Container = ({ id, token, store }) => {

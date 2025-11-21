@@ -28,22 +28,14 @@ const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token
               </button>
   `;
 
- const pdQuickViewBtnCollectionHtml = `
-        <button
-                class="product-card__add-button product-card__view-button spcProductCardBtn_${tracking}"
-                onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
-              >
-                View product
-              </button>
-
-    `;
+ 
 const modalQuickViewHtml = `
 <dialog id="shopcomponent-product-modal" class="product-modal" >
   <shopify-context id="shopcomponent-product-modal-context" type="product" wait-for-update>
     <template>
       <div class="product-modal__container">
         <div class="product-modal__close-container">
-          <button class="product-modal__close" onclick="getElementById('shopcomponent-product-modal').close();">&#10005;</button>
+          <button class="product-modal__close" onclick="this.closest('dialog').close()">&#10005;</button>
         </div>
         <div class="product-modal__content">
           <div class="product-modal__layout">
@@ -88,15 +80,27 @@ const modalQuickViewHtml = `
 </dialog>
 
 `;
+
+const pdQuickViewBtnCollectionHtml = `
+        <button
+                class="collection product-card__add-button product-card__view-button spcProductCardBtn_${tracking}"
+                onclick="spcShowQuickView(event,'${appliesTo}')"
+              >
+                View product
+              </button>
+              
+
+    `;
   const productFullViewModalHtml = `
 
-             <button class="product-card__add-button product-card__view-button spcProductCardBtn_${tracking}"
-                onclick="getElementById('shopcomponent-product-modal').showModal(); getElementById('shopcomponent-product-modal-context').update(event);"
+             <button class="product product-card__add-button product-card__view-button spcProductCardBtn_${tracking}"
+                
+                onclick="spcShowQuickView(event,'${appliesTo}')"
               >
                ${viewBtnTxt}
               </button>
 
-              ${modalQuickViewHtml}
+               ${modalQuickViewHtml}
 
 `
 
@@ -131,6 +135,8 @@ const modalQuickViewHtml = `
                  ${componentSettings.fullView ? productFullViewModalHtml : ''}
                  ${!componentSettings.fullView && componentSettings.cartBehavior == 'cart' ? pdAddToCartBtnHtml : ''}
                   ${!componentSettings.fullView && componentSettings.cartBehavior == 'checkout' ? pdCheckoutBtnHtml : ''}
+
+                 
                 </div>
           </div>
         </div>
@@ -158,7 +164,7 @@ const modalQuickViewHtml = `
               <h2 class="product-card__title spcProductCardTitle_${tracking}">
                 <shopify-data query="product.title"></shopify-data>
               </h2>
-              <div class="product-card__price spcProductCardPrice_$tracking}">
+              <div class="product-card__price spcProductCardPrice_${tracking}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
