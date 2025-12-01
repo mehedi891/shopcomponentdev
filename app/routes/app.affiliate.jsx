@@ -1,10 +1,10 @@
 import { Outlet } from "@remix-run/react";
-import { PolarisVizProvider } from '@shopify/polaris-viz';
+//import { PolarisVizProvider } from '@shopify/polaris-viz';
 const Affiliate = () => {
    return (
-      <PolarisVizProvider>
+      // <PolarisVizProvider>
          <Outlet />
-      </PolarisVizProvider>
+      // </PolarisVizProvider>
    );
 
 }
