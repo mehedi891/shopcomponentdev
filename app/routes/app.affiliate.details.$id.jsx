@@ -3,8 +3,9 @@ import db from "../db.server";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { AFFILIATE_STATUS } from "../constants/constants";
+import ClientOnlyCmp from "../components/ClientOnly/ClientOnly";
 import { BarChart, LineChart, PolarisVizProvider } from "@shopify/polaris-viz";
-import ClientOnly from "../components/ClientOnly/ClientOnly";
+
 export const loader = async ({ request, params }) => {
   const { admin } = await authenticate.admin(request);
 
@@ -454,7 +455,7 @@ const Affiliatedetails = () => {
                 </s-stack>
 
                 <PolarisVizProvider>
-                  <ClientOnly>
+                  <ClientOnlyCmp>
                     <LineChart
                       xAxisOptions={{
                         labelFormatter: (key) => new Date(key).toLocaleDateString(),
@@ -464,7 +465,7 @@ const Affiliatedetails = () => {
                       }}
                       data={data}
                     />
-                  </ClientOnly>
+                  </ClientOnlyCmp>
                 </PolarisVizProvider>
 
               </s-box>
@@ -485,7 +486,7 @@ const Affiliatedetails = () => {
                 </s-stack>
 
                 <PolarisVizProvider>
-                  <ClientOnly>
+                  <ClientOnlyCmp>
                     <BarChart
                       xAxisOptions={{
                         labelFormatter: (x) => {
@@ -507,7 +508,7 @@ const Affiliatedetails = () => {
                       ]}
 
                     />
-                  </ClientOnly>
+                  </ClientOnlyCmp>
                 </PolarisVizProvider>
 
               </s-box>

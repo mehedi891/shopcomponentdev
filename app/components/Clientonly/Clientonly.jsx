@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const ClientOnly = ({children}) => {
+const ClientOnlyCmp = ({children}) => {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     if(typeof window !== 'undefined') {
@@ -14,4 +14,4 @@ const ClientOnly = ({children}) => {
   )
 }
 
-export default ClientOnly
+export default ClientOnlyCmp
