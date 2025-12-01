@@ -432,7 +432,7 @@ const Affiliatedetails = () => {
 
 
 
-          <s-grid
+          {/* <s-grid
             gridTemplateColumns="@container (inline-size < 500px) 1fr, 1fr 1fr"
             gap="small"
             justifyContent="space-between"
@@ -515,7 +515,7 @@ const Affiliatedetails = () => {
             </s-grid-item>
 
 
-          </s-grid>
+          </s-grid> */}
 
 
 
