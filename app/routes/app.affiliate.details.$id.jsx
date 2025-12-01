@@ -4,7 +4,7 @@ import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { AFFILIATE_STATUS } from "../constants/constants";
 import { BarChart, LineChart, PolarisVizProvider } from "@shopify/polaris-viz";
-import { ClientOnly } from "remix-utils/client-only";
+import ClientOnly from "../components/ClientOnly/ClientOnly";
 export const loader = async ({ request, params }) => {
   const { admin } = await authenticate.admin(request);
 
@@ -18,11 +18,11 @@ export const loader = async ({ request, params }) => {
   });
 
 
- const from = new Date();
-from.setDate(from.getDate() - 1200); // fetch from 1200 days ago
-const fromStr = from.toISOString().split('T')[0];
+  const from = new Date();
+  from.setDate(from.getDate() - 1200); // fetch from 1200 days ago
+  const fromStr = from.toISOString().split('T')[0];
 
-const query = `#graphql
+  const query = `#graphql
   query OrdersForChart($cursor: String) {
     orders(
       first: 250
@@ -52,9 +52,9 @@ const query = `#graphql
 
 
 
-    const jsonRes = await admin.graphql(query);
-   const jsonData = await jsonRes.json();
-   
+  const jsonRes = await admin.graphql(query);
+  const jsonData = await jsonRes.json();
+
 
   if (affData?.id) {
     return {
@@ -338,7 +338,7 @@ const Affiliatedetails = () => {
 
 
 
-          <ClientOnly>
+          {/* <ClientOnly>
 
             {() => (
 
@@ -426,7 +426,97 @@ const Affiliatedetails = () => {
 
             )}
 
-          </ClientOnly>
+          </ClientOnly> */}
+
+
+
+
+          <s-grid
+            gridTemplateColumns="@container (inline-size < 500px) 1fr, 1fr 1fr"
+            gap="small"
+            justifyContent="space-between"
+            paddingBlockStart="large-200"
+            paddingBlockEnd="small-100"
+
+          >
+            <s-grid-item>
+              <s-box
+                background="base"
+                borderRadius="small-100"
+                padding="small-200"
+              >
+                <s-stack
+                  gap="small-300"
+                  padding="small-300 none large-200 small"
+                >
+                  <s-text size="small">Total sales</s-text>
+                  <s-text type="strong">$12000</s-text>
+                </s-stack>
+
+                <PolarisVizProvider>
+                  <ClientOnly>
+                    <LineChart
+                      xAxisOptions={{
+                        labelFormatter: (key) => new Date(key).toLocaleDateString(),
+                      }}
+                      yAxisOptions={{
+                        labelFormatter: (value) => `$${value.toFixed(2)}`,
+                      }}
+                      data={data}
+                    />
+                  </ClientOnly>
+                </PolarisVizProvider>
+
+              </s-box>
+            </s-grid-item>
+
+            <s-grid-item>
+              <s-box
+                background="base"
+                borderRadius="small-100"
+                padding="small-200"
+              >
+                <s-stack
+                  gap="small-300"
+                  padding="small-300 none large-200 small"
+                >
+                  <s-text size="small">Total sales</s-text>
+                  <s-text type="strong">$12000</s-text>
+                </s-stack>
+
+                <PolarisVizProvider>
+                  <ClientOnly>
+                    <BarChart
+                      xAxisOptions={{
+                        labelFormatter: (x) => {
+                          return `${x}`
+                        }
+                      }}
+                      yAxisOptions={{
+                        labelFormatter: (y) => {
+                          return `${y}`
+                        }
+                      }}
+                      data={[
+                        {
+                          ...data[0],
+                          color: 'red',
+                          isComparison: false
+                        },
+
+                      ]}
+
+                    />
+                  </ClientOnly>
+                </PolarisVizProvider>
+
+              </s-box>
+            </s-grid-item>
+
+
+          </s-grid>
+
+
 
 
 
