@@ -3,8 +3,8 @@ import db from "../db.server";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { AFFILIATE_STATUS } from "../constants/constants";
-import ClientOnlyCmp from "../components/ClientOnly/ClientOnly";
 import { BarChart, LineChart, PolarisVizProvider } from "@shopify/polaris-viz";
+import ClientOnlyCmp from "../components/ClientOnlyCmp/ClientOnlyCmp";
 
 export const loader = async ({ request, params }) => {
   const { admin } = await authenticate.admin(request);
