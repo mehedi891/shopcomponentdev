@@ -15,11 +15,16 @@ import i18next from "./i18next.server";
 import { existsSync } from "node:fs";
 import styles from "./styles/global.css?url";
 import { useEffect } from "react";
+import polarisVizStyles from "./styles/polaris-viz.css?url";
 
 
 export const links = () => {
-  return [{ rel: "stylesheet", href: styles }];
+  return [
+    { rel: "stylesheet", href: styles },
+    { rel: "stylesheet", href: polarisVizStyles },
+  ];
 };
+
 
 export async function loader({ request }) {
   // First get the language from the request using i18next
@@ -92,7 +97,7 @@ export default function App() {
 
   //New polaris web component navigation handling start
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleNavigate = (event) => {
@@ -106,7 +111,7 @@ export default function App() {
     };
   }, [navigate]);
 
-   //New polaris web component navigation handling end
+  //New polaris web component navigation handling end
   return (
     <html lang={langShow} ns={ns} dir={i18n.dir()}>
       <head>
@@ -119,12 +124,15 @@ export default function App() {
         />
         <Meta />
         <Links />
-         {/* New polaris web component navigation handling start */}
+        {/* New polaris web component navigation handling start */}
         <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
-          {/* New polaris web component navigation handling end */}
+        {/* New polaris web component navigation handling end */}
       </head>
       <body>
-        <Outlet />
+       
+          <Outlet />
+   
+
         <ScrollRestoration />
         <Scripts />
       </body>

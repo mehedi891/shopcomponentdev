@@ -66,7 +66,6 @@ model Session {
   emailVerified Boolean?  @default(false)
 }
 
-
 model Component {
   id                    Int        @id @default(autoincrement())
   title                 String
@@ -87,11 +86,12 @@ model Component {
   softDelete            Boolean    @default(false)
   shop                  Shop       @relation(fields: [shopId], references: [id])
   orders                Order[]
-  affiliate             Affiliate?
   totalOrderCount       Int?       @default(0)
   totalOrderValue       Float?     @default(0.00)
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
+  affiliateId           Int?
+  affiliate             Affiliate? @relation(fields: [affiliateId], references: [id])
 }
 
 model Shop {
@@ -162,21 +162,27 @@ model Order {
 }
 
 model Affiliate {
-  id                  Int        @id @default(autoincrement())
-  name                String?    @default("SPC_affiliate")
-  affTrackingCode     String?    @unique @default("SPC_affiliate_tracking")
-  url                 String?
-  email               String?
-  description         String?
-  paypalId            String?
-  comissionPercentage Float?     @default(0.00)
-  comissionAmount     Float?     @default(0.00)
-  componentId         Int?       @unique
-  shopId              Int        @unique
-  components          Component? @relation(fields: [componentId], references: [id])
-  shop                Shop       @relation(fields: [shopId], references: [id])
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  id                Int         @id @default(autoincrement())
+  affTrackingCode   String?     @unique @default("SPC_affiliate_tracking")
+  name              String?     @default("SPC_affiliate")
+  email             String?
+  website           String?
+  phone             String?
+  address           String?
+  notes             String?
+  commissionCiteria String?
+  payoutMethods     Json?
+  fixedCommission   Json?
+  tieredCommission  Json?
+  status            String?
+  shopId            Int         
+  components        Component[]
+  shop              Shop        @relation(fields: [shopId], references: [id])
+  totalOrderCount   Int?        @default(0)
+  totalOrderValue   Float?      @default(0.00)
+  totalCommission   Float?      @default(0.00)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 }
 
 model App {

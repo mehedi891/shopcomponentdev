@@ -81,10 +81,6 @@ const COMISSION_CRITERIA = {
   fixed: 'fixed'
 }
 
-const TIERED_TYPE = {
-  quantity: 'quantity',
-  amount: 'amount'
-} 
 
 const FIXED_COMISSION = {
   amount: 'amount',
@@ -111,7 +107,6 @@ export {
   DISCOUNT_TYPE,
   BoleanOptions,
   COMISSION_CRITERIA,
-  TIERED_TYPE,
   FIXED_COMISSION,
   AFFILIATE_STATUS
 }

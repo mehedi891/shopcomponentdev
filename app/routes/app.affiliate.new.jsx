@@ -1,14 +1,46 @@
-
-import { useActionData, useNavigation } from "@remix-run/react"
+import crypto from "crypto";
+import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
-import { BlockStack, Box, Button, Card, Divider, Grid, InlineStack, Layout, Page, RadioButton, Select, Text, TextField } from "@shopify/polaris";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, TIERED_TYPE } from "../constants/constants";
+import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION } from "../constants/constants";
 import TieredCommission from "../components/TieredCommission/TieredCommission";
+import { authenticate } from "../shopify.server";
+import db from "../db.server";
+import { SaveBar } from "@shopify/app-bridge-react";
+import {  useEffect } from "react";
+
+export const loader = async ({ request }) => {
+  const { session, redirect } = await authenticate.admin(request);
+  const shop = await db.shop.findUnique({
+    where: {
+      shopifyDomain: session.shop
+    },
+    select: {
+      plan: true,
+      id: true,
+
+    }
+  });
+
+  if (!shop?.plan) {
+    throw redirect('/app/plans')
+  }
+  const affTrackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
+
+  return {
+    affTrackingCode,
+    shop
+  }
+}
 
 const CreateAffiliate = () => {
+  const { affTrackingCode, shop } = useLoaderData();
+  //console.log('Shop:', shop);
   const navigation = useNavigation();
   const actionData = useActionData();
+  const navigate = useNavigate();
+  const submit = useSubmit();
+  const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
   const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
     defaultValues: {
       name: 'Mehedi Hasan',
@@ -18,9 +50,8 @@ const CreateAffiliate = () => {
       address: '',
       notes: '',
       commissionCiteria: COMISSION_CRITERIA.fixed,
-      tieredType: TIERED_TYPE.quantity,
       payoutMethods: {
-        method: 'Paypal',
+        method: payoutMethods[0],
         value: '',
       },
       fixedCommission: {
@@ -32,11 +63,13 @@ const CreateAffiliate = () => {
         // { from: 5, to: 10, rate: 10, type: 'percentage' },
       ],
       status: AFFILIATE_STATUS.active,
+      affTrackingCode,
+      shopId: shop.id
 
     }
   });
 
-  const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
+
 
   const { fields, append, remove, insert, replace } = useFieldArray({
     control,
@@ -44,9 +77,34 @@ const CreateAffiliate = () => {
   });
   const watchedValues = watch();
 
+  useEffect(()=>{
+    if(actionData?.success){
+       shopify.toast.show(actionData.message, {
+            duration: 1000,
+        });
+        navigate(`/app/affiliate/${actionData?.data?.id}`);
+    }else if(actionData?.success === false){
+      shopify.toast.show(actionData.message, {
+        duration: 1000,
+      });
+
+    }
+
+
+  },[actionData]);
   const affFormHandleSubmit = (data) => {
-    console.log('Affiliate form data submitted:', data);
-    // Handle form submission logic here
+    const updatedData = {
+      ...data,
+      tieredCommission: JSON.stringify(data.tieredCommission),
+      payoutMethods: JSON.stringify(data.payoutMethods),
+      fixedCommission: JSON.stringify(data.fixedCommission)
+    };
+    //console.log('Affiliate form data submitted:', updatedData);
+    submit(updatedData, { method: 'post', });
+  }
+
+  const handleDiscard = () => {
+    reset();
   }
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
@@ -383,11 +441,23 @@ const CreateAffiliate = () => {
         <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
       </s-stack>
 
+      <SaveBar id="spc-save-bar">
+        <button type="submit" variant="primary"
+          {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
+        ></button>
+        <button
+          type="button"
+          onClick={() => {
+            handleDiscard();
+          }}
+        >
+        </button>
+      </SaveBar>
 
       <s-box padding="large none none none">
         <s-section >
           <s-query-container>
-            <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar>
+            <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar onReset={() => reset()}>
               <s-box background="base" border="base" borderRadius="large">
                 <s-stack gap="medium-400" padding="small-200 small-200 small-200 large-100">
                   <s-heading size="small">Affiliate information</s-heading>
@@ -769,23 +839,29 @@ const CreateAffiliate = () => {
                   <s-box padding="small-200 small-200 small-200 large-100">
 
 
-                    {payoutMethods.length > 0 &&
+                    {/* {payoutMethods.length > 0 &&
                       payoutMethods.map((method, index) => (
                         <s-stack key={index}>
-                          <s-checkbox
-                            label={method}
-                            checked={watchedValues.payoutMethods.method === method}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
-
-                              if (checked) {
-                                // select this method
-                                setValue('payoutMethods.method', method, { shouldDirty: true });
-                              } else {
-                                // unselect
-                                setValue('payoutMethods.method', '', { shouldDirty: true });
-                              }
+                          <Controller
+                            name="payoutMethods.method"
+                            rules={{
+                              required:"Please select Method"
                             }}
+                            control={control}
+                            render={({ field }) => (
+                              <s-checkbox
+                                label={method}
+                                value={method}
+                                key={`${method}-${watchedValues.payoutMethods.method}`}
+                                name="payoutMethods.method"
+                                checked={field.value === method}
+                                required
+                                onChange={(e) => {
+                                  //console.log('values:',e.target.value);
+                                  field.onChange(e.target.value);
+                                }}
+                              />
+                            )}
                           />
 
                           {watchedValues.payoutMethods.method === method && (
@@ -819,8 +895,61 @@ const CreateAffiliate = () => {
                           )}
                         </s-stack>
                       ))
-                    }
+                    } */}
 
+
+                    <Controller
+                      name="payoutMethods.method"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <s-choice-list
+                          label="Status"
+                          labelAccessibilityVisibility="exclusive"
+                          name="payoutMethods.method"
+                          error={fieldState.error?.message || actionData?.errors?.payoutMethods.method}
+                          onChange={(event) => field.onChange(event.currentTarget.values[0])}
+                        >
+
+
+                          {payoutMethods.length > 0 && payoutMethods.map((method, index) => (
+
+                            <s-choice key={index} defaultSelected={index === 0} value={method}>
+                              {method}
+                            </s-choice>
+                          ))
+
+                          }
+                        </s-choice-list>
+                      )}
+                    />
+
+                    <Controller
+                      name="payoutMethods.value"
+                      control={control}
+                      rules={{
+                        required: "Payout method details are required",
+                        maxLength: {
+                          value: 100,
+                          message: "Payout details cannot exceed 100 characters",
+                        },
+                      }}
+                      render={({ field, fieldState }) => (
+                        <s-box inlineSize="500px" padding="large-100 none small-100 none">
+                          <s-text-field
+                            label="Payment details"
+                            labelAccessibilityVisibility="exclusive"
+                            name="payoutMethods.value"
+                            placeholder={`Enter ${watchedValues.payoutMethods.method} details`}
+                            value={field.value ?? ''}
+                            error={fieldState.error?.message || actionData?.errors?.payoutMethods?.value}
+                            maxLength={100}
+                            minLength={3}
+                            required
+                            onChange={(value) => field.onChange(value)}
+                          />
+                        </s-box>
+                      )}
+                    />
 
                   </s-box>
 
@@ -859,8 +988,8 @@ const CreateAffiliate = () => {
               </s-box>
 
               <s-box padding="large-100 none">
-                <s-button type="submit" variant="primary">Add Affiliate</s-button>
-                <s-button onClick={() => reset()}  variant="secondary">Discard</s-button>
+                <s-button type="submit" variant="primary" loading={navigation.state == 'submitting'}>Add Affiliate</s-button>
+               
               </s-box>
             </form>
           </s-query-container>
@@ -874,3 +1003,38 @@ const CreateAffiliate = () => {
 }
 
 export default CreateAffiliate
+
+
+export const action = async ({ request }) => {
+  const {session} = await authenticate.admin(request);
+
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+  //console.log('Affiliate form data submitted:', data);
+  // Handle form submission logic here
+  try {
+    const shopId = Number(formData.get('shopId'));
+    const affData = await db.affiliate.create({
+      data: { ...data, shopId: shopId, tieredCommission: JSON.parse(data.tieredCommission), payoutMethods: JSON.parse(data.payoutMethods), fixedCommission: JSON.parse(data.fixedCommission) }
+    });
+    if(affData?.id){
+      return {
+        success: true,
+        message: "Affiliate created successfully.",
+        data: affData
+      }
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: "Something went wrong. Please try again."
+    }
+  }
+
+
+
+
+  return {
+    success: true
+  }
+}
