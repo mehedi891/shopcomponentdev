@@ -92,6 +92,11 @@ const AFFILIATE_STATUS = {
   inactive: 'inactive'
 }
 
+const TIERED_COMISSION_TYPE = {
+  quantity: 'quantity',
+  orderAmount: 'orderAmount'
+}
+
 export {
   APPLIES_TO,
   ADD_TO_CART_TYPE,
@@ -108,5 +113,6 @@ export {
   BoleanOptions,
   COMISSION_CRITERIA,
   FIXED_COMISSION,
-  AFFILIATE_STATUS
+  AFFILIATE_STATUS,
+  TIERED_COMISSION_TYPE
 }

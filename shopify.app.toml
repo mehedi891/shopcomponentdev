@@ -3,7 +3,7 @@
 client_id = "f96d7136a6d4dd93b083a85e08ec9221"
 name = "embedupdev - sell anywhere"
 handle = "embedupdev"
-application_url = "https://settled-climbing-condor.ngrok-free.app"
+application_url = "https://uninscribed-unindustrialized-stefania.ngrok-free.app"
 embedded = true
 
 [build]

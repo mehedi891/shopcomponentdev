@@ -64,8 +64,8 @@ const TieredCommission = ({ field, index, register, watch, remove, length }) => 
             name={typeFieldName}
             value={typeValue ?? field.type}
           >
-            <s-option value={FIXED_COMISSION.percentage}>Percent of sale</s-option>
-            <s-option value={FIXED_COMISSION.amount}>Order amount</s-option>
+            <s-option value={FIXED_COMISSION.percentage}>Percentage</s-option>
+            <s-option value={FIXED_COMISSION.amount}>Fixed amount</s-option>
           </s-select>
         </s-grid-item>
 

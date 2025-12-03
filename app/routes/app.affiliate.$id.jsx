@@ -1,7 +1,7 @@
 import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION } from "../constants/constants";
+import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, TIERED_COMISSION_TYPE } from "../constants/constants";
 import TieredCommission from "../components/TieredCommission/TieredCommission";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
@@ -45,6 +45,7 @@ const Updateaffiliate = () => {
         value: 0,
         type: FIXED_COMISSION.percentage
       },
+      tieredCommissionType: affData?.tieredCommissionType || TIERED_COMISSION_TYPE.quantity,
       tieredCommission: affData?.tieredCommission || [{ from: 0, to: 1, rate: 0, type: 'percentage' }],
       status: affData?.status || AFFILIATE_STATUS.active,
       affTrackingCode: affData?.affTrackingCode || "",
@@ -344,6 +345,20 @@ const Updateaffiliate = () => {
                     {watchedValues.commissionCiteria === COMISSION_CRITERIA.tiered &&
                       <s-box padding="small-100 none">
                         {/* Heading start */}
+
+                        <s-box padding="none none large-100 none" maxInlineSize="400px">
+                          <Controller
+                            name="tieredCommissionType"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                              <s-select label="Tiered type" onChange={(event) => field.onChange(event.currentTarget.value)}>
+                                <s-option selected={TIERED_COMISSION_TYPE.quantity === watchedValues.tieredCommissionType} value={TIERED_COMISSION_TYPE.quantity}>Orders quantity</s-option>
+                                <s-option selected={TIERED_COMISSION_TYPE.orderAmount === watchedValues.tieredCommissionType} value={TIERED_COMISSION_TYPE.orderAmount}>Orders amount</s-option>
+                              </s-select>
+                            )}
+                          />
+                        </s-box>
+
                         <s-grid
                           gridTemplateColumns="repeat(7, 1fr)"
                           gap="large-200"
@@ -354,7 +369,7 @@ const Updateaffiliate = () => {
                           borderRadius="large large none none"
                         >
                           <s-grid-item gridColumn="span 2">
-                            <s-text>Quantity</s-text>
+                           <s-text>{watchedValues.tieredCommissionType === TIERED_COMISSION_TYPE.quantity ? "Orders quantity range" : "Orders amount range"}</s-text>
                           </s-grid-item>
                           <s-grid-item gridColumn="span 2">
                             <s-text>Commission type</s-text>
@@ -393,12 +408,10 @@ const Updateaffiliate = () => {
                               onClick={() => {
                                 const tiers = getValues('tieredCommission') || [];
                                 const lastTier = tiers[tiers.length - 1];
-
-                                const lastFrom = Number(lastTier?.from) || 0;
-                                const nextFrom = lastFrom + 1;
-
                                 const lastTo = Number(lastTier?.to) || 0;
-                                const nextTo = lastTo + 1;
+                                //const lastFrom = Number(lastTier?.from) || 0;
+                                const nextFrom = lastTo + 1;
+                                const nextTo = nextFrom + 1;
 
                                 append({
                                   from: nextFrom,
@@ -570,8 +583,8 @@ export const action = async ({ request, params }) => {
         message: "Affiliate updated successfully."
       }
     }
-  }else if (request.method === 'PUT'){
-    console.log('status:',data,data.status);
+  } else if (request.method === 'PUT') {
+    console.log('status:', data, data.status);
     const affData = await db.affiliate.update({
       where: {
         id: Number(id)
@@ -586,7 +599,7 @@ export const action = async ({ request, params }) => {
         message: "Affiliate status updated successfully."
       }
     }
-  }else if (request.method === 'DELETE'){
+  } else if (request.method === 'DELETE') {
     const affData = await db.affiliate.delete({
       where: {
         id: Number(id)
@@ -598,7 +611,7 @@ export const action = async ({ request, params }) => {
         message: "Affiliate deleted successfully."
       }
     }
-  }else{
+  } else {
     return {
       success: false,
       message: "Method not allowed."

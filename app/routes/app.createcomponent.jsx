@@ -54,7 +54,8 @@ export const loader = async ({ request }) => {
         },
         include: {
             plan: true,
-            components: true
+            components: true,
+            affiliates: true
         }
     });
 
@@ -79,7 +80,7 @@ export const loader = async ({ request }) => {
             },
         },
     );
-    
+
     const totalPublishSpcJson = await totalPublishSpc.json();
 
     if (totalPublishSpcJson?.data?.publishedProductsCount?.count === 0) {
@@ -205,6 +206,9 @@ export const loader = async ({ request }) => {
     }
 
 
+
+
+
     const trackingCode = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
 
     return {
@@ -215,7 +219,7 @@ export const loader = async ({ request }) => {
 
 const CreateComponent = () => {
     const { trackingCode, shopData } = useLoaderData();
-    //console.log('shopData:', shopData);
+    console.log('shopData:', shopData);
     const navigate = useNavigate();
     const actionData = useActionData();
     const [toogleOpen, setToogleOpen] = useState({
@@ -229,6 +233,7 @@ const CreateComponent = () => {
         settingsOpen: false,
         customCssOpen: false,
         tranckingOpen: false,
+        affiliateAssignOpen: false
     });
     const [selectedCollection, setSelectedCollection] = useState([]);
     const [selectedProductsInd, setSelectedProductsInd] = useState([]);
@@ -333,6 +338,7 @@ const CreateComponent = () => {
             tracking: trackingCode || '',
             customerTracking: '',
             shopId: shopData?.id,
+            affiliateId: null,
             compHtml: 'EmptyHtml'
         }
     });
@@ -3727,6 +3733,92 @@ const CreateComponent = () => {
                                         </Collapsible>
                                     </Box>
                                 </Box>
+
+                                <Box paddingBlockEnd={'400'}>
+                                    <Box background="bg-fill" borderRadius="200">
+                                        <Box minHeight="50px">
+                                            <div className="collapsibleButtonDiv">
+                                                <Button onClick={() => {
+                                                    setToogleOpen({
+                                                        ...toogleOpen,
+                                                        affiliateAssignOpen: !toogleOpen.affiliateAssignOpen,
+                                                    });
+                                                }}
+                                                    textAlign="left"
+                                                    variant="monochromePlain"
+                                                    size="large"
+                                                    fullWidth
+                                                    disclosure={toogleOpen.affiliateAssignOpen ? 'up' : 'down'}
+                                                >
+
+
+                                                    {disabledContentByPlan ?
+                                                        <InlineStack blockAlign="center" gap={"150"}>
+                                                            <Text variant="bodyMd" fontWeight="medium">{"Assign Affiliate"}</Text>
+                                                            <UpgradeTooltip />
+                                                        </InlineStack>
+                                                        :
+                                                        <Text variant="bodyMd" fontWeight="medium">{"Assign a Affiliate"}</Text>
+                                                    }
+
+                                                </Button>
+                                            </div>
+                                        </Box>
+
+                                        <Collapsible
+                                            open={toogleOpen.affiliateAssignOpen}
+                                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                            expandOnPrint
+                                        >
+                                            <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
+                                                <BlockStack gap={'100'}>
+                                                    {/* <Controller
+                                                        name="affiliateId"
+                                                        control={control}
+                                                        
+                                                        render={({ field }) => (
+                                                            <Select
+                                                            label="Select Affiliate"
+                                                            name="affiliateId"
+                                                            options={shopData?.affiliates?.length > 0 ? shopData?.affiliates?.map((item) => {
+                                                                return {
+                                                                    value: item.id,
+                                                                    label: item.name
+                                                                }
+                                                            }) : []}
+                                                            value={field.value || ""}
+                                                            onChange={field.onChange}
+                                                            />
+                                                        )}
+                                                    /> */}
+                                                </BlockStack>
+                                            </Box>
+                                        </Collapsible>
+                                    </Box>
+                                </Box>
+
+                                <s-clickable
+                                    padding="base small base small"
+                                    background="base"
+                                    borderRadius="base"
+                                    onClick={() => {
+                                        setToogleOpen({
+                                            ...toogleOpen,
+                                            affiliateAssignOpen: !toogleOpen.affiliateAssignOpen,
+                                        });
+                                    }}
+                                >
+                                    <s-stack direction="inline" justifyContent="space-between" alignItems="center">
+                                        <s-text>Show Affiliate</s-text>
+                                        <s-icon type={toogleOpen.affiliateAssignOpen ? 'caret-up' : 'caret-down'} />
+                                    </s-stack>
+
+                                    {toogleOpen.affiliateAssignOpen &&
+                                        <s-box>
+                                            <s-text variant="bodyMd" fontWeight="medium">{"Assign a Affiliate"}</s-text>
+                                        </s-box>
+                                    }
+                                </s-clickable>
 
 
                             </BlockStack>

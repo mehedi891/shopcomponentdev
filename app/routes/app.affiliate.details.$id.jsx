@@ -6,6 +6,7 @@ import { AFFILIATE_STATUS } from "../constants/constants";
 // import ClientOnlyCmp from "../components/ClientOnlyCmp/ClientOnlyCmp";
 // import { BarChart, LineChart } from "@shopify/polaris-viz";
 
+
 export const loader = async ({ request, params }) => {
   const { admin } = await authenticate.admin(request);
 
@@ -28,7 +29,7 @@ export const loader = async ({ request, params }) => {
     orders(
       first: 250
       after: $cursor
-      query: "created_at:>='${fromStr}' fulfillment_status:fulfilled"
+      query: "created_at:>='${fromStr}'"
       sortKey: CREATED_AT
     ) {
       edges {
@@ -431,8 +432,8 @@ const Affiliatedetails = () => {
 
 
 
-{/* 
-          <s-grid
+
+          {/* <s-grid
             gridTemplateColumns="@container (inline-size < 500px) 1fr, 1fr 1fr"
             gap="small"
             justifyContent="space-between"

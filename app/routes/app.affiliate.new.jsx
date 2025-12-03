@@ -2,12 +2,12 @@ import crypto from "crypto";
 import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION } from "../constants/constants";
+import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, TIERED_COMISSION_TYPE } from "../constants/constants";
 import TieredCommission from "../components/TieredCommission/TieredCommission";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { SaveBar } from "@shopify/app-bridge-react";
-import {  useEffect } from "react";
+import { useEffect } from "react";
 
 export const loader = async ({ request }) => {
   const { session, redirect } = await authenticate.admin(request);
@@ -58,6 +58,7 @@ const CreateAffiliate = () => {
         value: 0,
         type: FIXED_COMISSION.percentage
       },
+      tieredCommissionType:TIERED_COMISSION_TYPE.quantity,
       tieredCommission: [
         { from: 0, to: 1, rate: 0, type: 'percentage' },
         // { from: 5, to: 10, rate: 10, type: 'percentage' },
@@ -77,13 +78,13 @@ const CreateAffiliate = () => {
   });
   const watchedValues = watch();
 
-  useEffect(()=>{
-    if(actionData?.success){
-       shopify.toast.show(actionData.message, {
-            duration: 1000,
-        });
-        navigate(`/app/affiliate/${actionData?.data?.id}`);
-    }else if(actionData?.success === false){
+  useEffect(() => {
+    if (actionData?.success) {
+      shopify.toast.show(actionData.message, {
+        duration: 1000,
+      });
+      navigate(`/app/affiliate/${actionData?.data?.id}`);
+    } else if (actionData?.success === false) {
       shopify.toast.show(actionData.message, {
         duration: 1000,
       });
@@ -91,7 +92,7 @@ const CreateAffiliate = () => {
     }
 
 
-  },[actionData]);
+  }, [actionData]);
   const affFormHandleSubmit = (data) => {
     const updatedData = {
       ...data,
@@ -657,8 +658,8 @@ const CreateAffiliate = () => {
                           control={control}
                           render={({ field, fieldState }) => (
                             <s-select label="Commission type" onChange={(event) => field.onChange(event.currentTarget.value)}>
-                              <s-option value={FIXED_COMISSION.percentage}>Percent of sale</s-option>
-                              <s-option value={FIXED_COMISSION.amount}>Order amount</s-option>
+                              <s-option value={FIXED_COMISSION.percentage}>Percentage</s-option>
+                              <s-option value={FIXED_COMISSION.amount}>Fixed Amount</s-option>
                             </s-select>
                           )}
                         />
@@ -685,6 +686,20 @@ const CreateAffiliate = () => {
                     {watchedValues.commissionCiteria === COMISSION_CRITERIA.tiered &&
                       <s-box padding="small-100 none">
                         {/* Heading start */}
+
+                        <s-box padding="none none large-100 none" maxInlineSize="400px">
+                          <Controller
+                            name="tieredCommissionType"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                              <s-select label="Tiered type" onChange={(event) => field.onChange(event.currentTarget.value)}>
+                                <s-option value={TIERED_COMISSION_TYPE.quantity}>Orders quantity</s-option>
+                                <s-option value={TIERED_COMISSION_TYPE.orderAmount}>Orders amount</s-option>
+                              </s-select>
+                            )}
+                          />
+                        </s-box>
+
                         <s-grid
                           gridTemplateColumns="repeat(7, 1fr)"
                           gap="large-200"
@@ -695,7 +710,7 @@ const CreateAffiliate = () => {
                           borderRadius="large large none none"
                         >
                           <s-grid-item gridColumn="span 2">
-                            <s-text>Quantity</s-text>
+                            <s-text>{watchedValues.tieredCommissionType === TIERED_COMISSION_TYPE.quantity ? "Orders quantity range" : "Orders amount range"}</s-text>
                           </s-grid-item>
                           <s-grid-item gridColumn="span 2">
                             <s-text>Commission type</s-text>
@@ -795,12 +810,10 @@ const CreateAffiliate = () => {
                               onClick={() => {
                                 const tiers = getValues('tieredCommission') || [];
                                 const lastTier = tiers[tiers.length - 1];
-
-                                const lastFrom = Number(lastTier?.from) || 0;
-                                const nextFrom = lastFrom + 1;
-
                                 const lastTo = Number(lastTier?.to) || 0;
-                                const nextTo = lastTo + 1;
+                                //const lastFrom = Number(lastTier?.from) || 0;
+                                const nextFrom = lastTo + 1;
+                                const nextTo = nextFrom + 1;
 
                                 append({
                                   from: nextFrom,
@@ -989,7 +1002,7 @@ const CreateAffiliate = () => {
 
               <s-box padding="large-100 none">
                 <s-button type="submit" variant="primary" loading={navigation.state == 'submitting'}>Add Affiliate</s-button>
-               
+
               </s-box>
             </form>
           </s-query-container>
@@ -1006,7 +1019,7 @@ export default CreateAffiliate
 
 
 export const action = async ({ request }) => {
-  const {session} = await authenticate.admin(request);
+  const { session } = await authenticate.admin(request);
 
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
@@ -1017,7 +1030,7 @@ export const action = async ({ request }) => {
     const affData = await db.affiliate.create({
       data: { ...data, shopId: shopId, tieredCommission: JSON.parse(data.tieredCommission), payoutMethods: JSON.parse(data.payoutMethods), fixedCommission: JSON.parse(data.fixedCommission) }
     });
-    if(affData?.id){
+    if (affData?.id) {
       return {
         success: true,
         message: "Affiliate created successfully.",
