@@ -77,7 +77,14 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     target: "esnext",
+    ssr: true,
+    rollupOptions: {
+      output: {
+        format: "esm",
+      },
+    },
   },
+
   optimizeDeps: {
     include: ["@shopify/app-bridge-react", "@shopify/polaris"],
     esbuildOptions: {
