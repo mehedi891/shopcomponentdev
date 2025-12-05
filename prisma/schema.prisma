@@ -80,6 +80,9 @@ model Component {
   productLayoutSettings Json?
   buttonStyleSettings   Json?
   tracking              String?         @unique
+  utmSource             String?
+  utmMedium             String?
+  utmCampaign           String?
   customerTracking      String?
   compHtml              String?         @default("empty")
   shopId                Int
@@ -195,6 +198,7 @@ model Affiliate {
   tieredCommission     Json?
   tieredCommissionType String?
   status               String?
+  isDefault            Boolean?        @default(false)
   shopId               Int
   components           Component[]
   ordersByMonth        OrdersByMonth[]

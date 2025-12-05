@@ -233,7 +233,7 @@ const CreateComponent = () => {
         settingsOpen: false,
         customCssOpen: false,
         tranckingOpen: false,
-        affiliateAssignOpen: false
+        affiliateAssignOpen: true
     });
     const [selectedCollection, setSelectedCollection] = useState([]);
     const [selectedProductsInd, setSelectedProductsInd] = useState([]);
@@ -337,8 +337,11 @@ const CreateComponent = () => {
             },
             tracking: trackingCode || '',
             customerTracking: '',
+            utmSource: '',
+            utmMedium: '',
+            utmCampaign: '',
             shopId: shopData?.id,
-            affiliateId: null,
+            affiliateId: shopData?.affiliates[0].id || null,
             compHtml: 'EmptyHtml'
         }
     });
@@ -604,6 +607,8 @@ const CreateComponent = () => {
 
     }
 
+
+
     //Start webcomponents 
 
 
@@ -855,8 +860,6 @@ const CreateComponent = () => {
             
         </style>
     `
-
-
 
     useEffect(() => {
         if (selectedViewMDF.id === 3 && selectedViewMDF.view === 'full') {
@@ -2128,6 +2131,20 @@ const CreateComponent = () => {
                         btnDisabled={isDirty}
                         title={t("create_componet")}
                     />
+                    {/* {shopData?.affiliates?.length === 0 &&
+                        // <s-box paddingBlockEnd="large">
+                        //     <s-banner heading="Affiliate not found" tone="warning" dismissible>
+                        //         Please create a affiliate first.
+                        //         <s-button
+                        //             slot="secondary-actions"
+                        //             variant="secondary"
+                        //             href="/app/affiliate/new"
+                        //         >
+                        //             Create affiliate
+                        //         </s-button>
+                        //     </s-banner>
+                        // </s-box>
+                    } */}
                     <Layout>
                         {disabledContentByPlan && shopData?.components?.length > 0 &&
                             <Layout.Section variant="fullWidth">
@@ -2156,6 +2173,8 @@ const CreateComponent = () => {
                                 </Banner>
                             </Layout.Section>
                         }
+
+
 
                         <Layout.Section variant="oneThird">
 
@@ -3669,156 +3688,214 @@ const CreateComponent = () => {
                                     </Box>
                                 </Box>
 
-                                <Box paddingBlockEnd={'400'}>
-                                    <Box background="bg-fill" borderRadius="200">
-                                        <Box minHeight="50px">
-                                            <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => {
-                                                    setToogleOpen({
-                                                        ...toogleOpen,
-                                                        tranckingOpen: !toogleOpen.tranckingOpen,
-                                                    });
-                                                }}
-                                                    textAlign="left"
-                                                    variant="monochromePlain"
-                                                    size="large"
-                                                    fullWidth
-                                                    disclosure={toogleOpen.tranckingOpen ? 'up' : 'down'}
+
+
+                                <s-box paddingBlockEnd={'large'}>
+                                    <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+
+                                        <s-clickable
+                                            padding="small"
+                                            background="base"
+                                            borderRadius="base"
+                                            minBlockSize="50px"
+                                            onClick={() => {
+                                                setToogleOpen({
+                                                    ...toogleOpen,
+                                                    tranckingOpen: !toogleOpen.tranckingOpen,
+                                                });
+                                            }}
+                                        >
+                                            <s-stack
+                                                direction="inline"
+                                                justifyContent="space-between"
+                                                alignItems="center"
+                                            >
+                                                <s-stack
+                                                    direction="inline"
+                                                    gap="small-300"
                                                 >
+                                                    <s-text type="strong">Tracking</s-text>
+                                                    {disabledContentByPlan &&
+                                                        <UpgradeTooltip />
+                                                    }
+                                                </s-stack>
+                                                <s-icon type={toogleOpen.tranckingOpen ? "caret-up" : "caret-down"}></s-icon>
+                                            </s-stack>
+                                        </s-clickable>
+
+                                        {toogleOpen.tranckingOpen &&
+
+                                            <s-box padding="none small small small">
+                                                <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
+                                                    <s-stack
+                                                        gap="small"
+                                                    >
+                                                        <Controller
+                                                            name="customerTracking"
+                                                            control={control}
+                                                            // rules={{
+                                                            //     required: true,
+
+                                                            // }}
+                                                            render={({ field }) => (
+                                                                <s-text-field
+                                                                    name="customerTracking"
+                                                                    label={"Custom tracking code"}
+                                                                    value={field.value}
+                                                                    onChange={field.onChange}
+                                                                    minLength={2}
+                                                                    maxLength={20}
+                                                                    showCharacterCount
+                                                                    placeholder={t("enter_tracking_code")}
+                                                                />
+                                                            )}
+                                                        />
+
+                                                        <Controller
+                                                            name="utmSource"
+                                                            control={control}
+                                                            // rules={{
+                                                            //     required: true,
+
+                                                            // }}
+                                                            render={({ field }) => (
+                                                                <s-text-field
+                                                                    name="utmSource"
+                                                                    label={"UTM Source"}
+                                                                    value={field.value}
+                                                                    onChange={field.onChange}
+                                                                    minLength={2}
+                                                                    maxLength={20}
+                                                                    showCharacterCount
+                                                                    placeholder={"Enter utm source"}
+                                                                />
+                                                            )}
+                                                        />
+
+                                                        <Controller
+                                                            name="utmMedium"
+                                                            control={control}
+                                                            // rules={{
+                                                            //     required: true,
+
+                                                            // }}
+                                                            render={({ field }) => (
+                                                                <s-text-field
+                                                                    name="utmMedium"
+                                                                    label={"UTM Medium"}
+                                                                    value={field.value}
+                                                                    onChange={field.onChange}
+                                                                    minLength={2}
+                                                                    maxLength={20}
+                                                                    showCharacterCount
+                                                                    placeholder={"Enter utm medium"}
+                                                                />
+                                                            )}
+                                                        />
+
+                                                        <Controller
+                                                            name="utmCampaign"
+                                                            control={control}
+                                                            // rules={{
+                                                            //     required: true,
+
+                                                            // }}
+                                                            render={({ field }) => (
+                                                                <s-text-field
+                                                                    name="utmCampaign"
+                                                                    label={"UTM Campaign"}
+                                                                    value={field.value}
+                                                                    onChange={field.onChange}
+                                                                    minLength={2}
+                                                                    maxLength={20}
+                                                                    showCharacterCount
+                                                                    placeholder={"Enter utm campaign"}
+                                                                />
+                                                            )}
+                                                        />
+
+                                                    </s-stack>
+                                                </div>
+                                            </s-box>
+
+                                        }
+
+                                    </s-box>
+                                </s-box>
 
 
-                                                    {disabledContentByPlan ?
-                                                        <InlineStack blockAlign="center" gap={"150"}>
-                                                            <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
-                                                            <UpgradeTooltip />
-                                                        </InlineStack>
-                                                        :
-                                                        <Text variant="bodyMd" fontWeight="medium">{t("trancking")}</Text>
+                                <s-box paddingBlockEnd={'large'}>
+                                    <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+
+                                        <s-clickable
+                                            padding="small"
+                                            background="base"
+                                            borderRadius="base"
+                                            minBlockSize="50px"
+                                            onClick={() => {
+                                                setToogleOpen({
+                                                    ...toogleOpen,
+                                                    affiliateAssignOpen: !toogleOpen.affiliateAssignOpen,
+                                                });
+                                            }}
+                                        >
+                                            <s-stack
+                                                direction="inline"
+                                                justifyContent="space-between"
+                                                alignItems="center"
+                                            >
+                                                <s-stack
+                                                    direction="inline"
+                                                    gap="small-300"
+                                                >
+                                                    <s-text type="strong">Affiliates</s-text>
+                                                    {disabledContentByPlan &&
+                                                        <UpgradeTooltip />
                                                     }
 
-                                                </Button>
-                                            </div>
-                                        </Box>
+                                                </s-stack>
+                                                <s-icon type={toogleOpen.affiliateAssignOpen ? "caret-up" : "caret-down"}></s-icon>
+                                            </s-stack>
+                                        </s-clickable>
 
-                                        <Collapsible
-                                            open={toogleOpen.tranckingOpen}
-                                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                            expandOnPrint
-                                        >
-                                            <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
-                                                <BlockStack gap={'100'}>
-                                                    <Controller
-                                                        name="customerTracking"
-                                                        control={control}
-                                                        // rules={{
-                                                        //     required: true,
+                                        {toogleOpen.affiliateAssignOpen &&
 
-                                                        // }}
-                                                        render={({ field }) => (
-                                                            <TextField
-                                                                name="customerTracking"
-                                                                label={t("tracking_code")}
-                                                                value={field.value}
-                                                                onChange={field.onChange}
-                                                                type="text"
-                                                                minLength={2}
-                                                                maxLength={20}
-                                                                showCharacterCount
-                                                                placeholder={t("enter_tracking_code")}
-                                                            />
-                                                        )}
-                                                    />
-                                                </BlockStack>
-                                            </Box>
-                                        </Collapsible>
-                                    </Box>
-                                </Box>
-
-                                <Box paddingBlockEnd={'400'}>
-                                    <Box background="bg-fill" borderRadius="200">
-                                        <Box minHeight="50px">
-                                            <div className="collapsibleButtonDiv">
-                                                <Button onClick={() => {
-                                                    setToogleOpen({
-                                                        ...toogleOpen,
-                                                        affiliateAssignOpen: !toogleOpen.affiliateAssignOpen,
-                                                    });
-                                                }}
-                                                    textAlign="left"
-                                                    variant="monochromePlain"
-                                                    size="large"
-                                                    fullWidth
-                                                    disclosure={toogleOpen.affiliateAssignOpen ? 'up' : 'down'}
-                                                >
-
-
-                                                    {disabledContentByPlan ?
-                                                        <InlineStack blockAlign="center" gap={"150"}>
-                                                            <Text variant="bodyMd" fontWeight="medium">{"Assign Affiliate"}</Text>
-                                                            <UpgradeTooltip />
-                                                        </InlineStack>
+                                            <s-box padding="none small small small">
+                                                <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
+                                                    {shopData?.affiliates?.length === 0 ?
+                                                        <s-text type="auto" tone="critical">Please create a affiliate first to assign. <s-link href="/app/affiliate/new">Create Affiliate</s-link></s-text>
                                                         :
-                                                        <Text variant="bodyMd" fontWeight="medium">{"Assign a Affiliate"}</Text>
-                                                    }
-
-                                                </Button>
-                                            </div>
-                                        </Box>
-
-                                        <Collapsible
-                                            open={toogleOpen.affiliateAssignOpen}
-                                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                            expandOnPrint
-                                        >
-                                            <Box paddingBlockEnd={'300'} paddingInline={'300'} className={disabledContentByPlan ? 'Polaris-Box btncollapsibleHidden' : 'Polaris-Box'} aria-disabled={disabledContentByPlan}>
-                                                <BlockStack gap={'100'}>
-                                                    {/* <Controller
-                                                        name="affiliateId"
-                                                        control={control}
-                                                        
-                                                        render={({ field }) => (
-                                                            <Select
-                                                            label="Select Affiliate"
+                                                        <Controller
                                                             name="affiliateId"
-                                                            options={shopData?.affiliates?.length > 0 ? shopData?.affiliates?.map((item) => {
-                                                                return {
-                                                                    value: item.id,
-                                                                    label: item.name
-                                                                }
-                                                            }) : []}
-                                                            value={field.value || ""}
-                                                            onChange={field.onChange}
-                                                            />
-                                                        )}
-                                                    /> */}
-                                                </BlockStack>
-                                            </Box>
-                                        </Collapsible>
-                                    </Box>
-                                </Box>
+                                                            control={control}
+                                                            defaultValue={null}
+                                                            // rules={{
+                                                            //     required: "Please select a affiliate"
+                                                            // }}
+                                                            render={({ field, fieldState }) => (
+                                                                <s-select label="Select a affiliate" placeholder="Choose a affiliate"
+                                                                    onChange={(event) => field.onChange(event.currentTarget.value)}
+                                                                    value={field.value}
+                                                                    error={fieldState?.error?.message}
+                                                                    //required
+                                                                >
+                                                                    {shopData?.affiliates?.map((item) => {
+                                                                        return (
+                                                                            <s-option key={item.id} disabled={item.isDefault === true} defaultSelected={item.isDefault === true} value={item.id}>{item.name}</s-option>
+                                                                        )
+                                                                    })
+                                                                    }
+                                                                </s-select>
+                                                            )}
+                                                        />
+                                                    }
+                                                </div>
+                                            </s-box>
 
-                                <s-clickable
-                                    padding="base small base small"
-                                    background="base"
-                                    borderRadius="base"
-                                    onClick={() => {
-                                        setToogleOpen({
-                                            ...toogleOpen,
-                                            affiliateAssignOpen: !toogleOpen.affiliateAssignOpen,
-                                        });
-                                    }}
-                                >
-                                    <s-stack direction="inline" justifyContent="space-between" alignItems="center">
-                                        <s-text>Show Affiliate</s-text>
-                                        <s-icon type={toogleOpen.affiliateAssignOpen ? 'caret-up' : 'caret-down'} />
-                                    </s-stack>
+                                        }
 
-                                    {toogleOpen.affiliateAssignOpen &&
-                                        <s-box>
-                                            <s-text variant="bodyMd" fontWeight="medium">{"Assign a Affiliate"}</s-text>
-                                        </s-box>
-                                    }
-                                </s-clickable>
+                                    </s-box>
+                                </s-box>
 
 
                             </BlockStack>
@@ -3974,7 +4051,7 @@ export const action = async ({ request }) => {
     if (customerTracking === '') {
         customerTracking = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
     }
-    const updatedData = { ...data, customerTracking: customerTracking, enableQtyField: enableQtyField, shopId: shopId };
+    const updatedData = { ...data, customerTracking: customerTracking, enableQtyField: enableQtyField, shopId: shopId, affiliateId: Number(data.affiliateId) };
 
 
     const createComp = await db.component.create({

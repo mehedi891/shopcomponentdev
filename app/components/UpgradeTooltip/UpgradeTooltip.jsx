@@ -1,14 +1,15 @@
-import { Box, Icon, Tooltip } from "@shopify/polaris"
-import { LockFilledIcon } from "@shopify/polaris-icons"
 
 
 const UpgradeTooltip = () => {
   return (
-    <Box maxWidth="30px">
-      <Tooltip padding="300" preferredPosition="above" content={'Upgrade your plan to use this feature'}>
-        <Icon source={LockFilledIcon} />
-      </Tooltip>
-    </Box>
+    <s-box maxInlineSize="30px">
+      <s-tooltip id="spc-tooltip">Upgrade your plan to use this feature</s-tooltip>
+      <s-icon
+        interestFor="spc-tooltip"
+        accessibilityLabel="tooltip"
+        type="lock"
+      />
+    </s-box>
   )
 }
 

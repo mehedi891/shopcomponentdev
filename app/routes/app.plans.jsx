@@ -9,7 +9,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
-import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
+import { ADD_TO_CART_TYPE, AFFILIATE_STATUS, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {
@@ -67,8 +67,17 @@ export const loader = async ({ request }) => {
       coupon: true,
       trialDays: true,
       isAppliedCoupon: true,
+      affiliates: {
+        where: {
+          shop: {
+            shopifyDomain: session.shop
+          },
+          isDefault: true,
+        }
+      }
     }
   });
+
 
   if (!shopData?.scAccessToken) {
     //console.log('creating sc token');
@@ -123,6 +132,46 @@ export const loader = async ({ request }) => {
         trialDays: true,
         isAppliedCoupon: true,
       }
+    });
+  }
+
+  if (shopData?.affiliates.length === 0) {
+    //console.log('if hitted......');
+    await db.affiliate.upsert({
+      where: {
+        shop: {
+          shopifyDomain: session.shop,
+        },
+        shopId: shopData?.id,
+        isDefault: true,
+        affTrackingCode: `spc_aff_${shopData?.id}`,
+      },
+      update: {},
+      create: {
+        name: 'EmbedUp Affiliate',
+        email: 'app@efoli.com',
+        phone: '',
+        website: 'https://www.efoli.com',
+        address: '',
+        notes: '',
+        commissionCiteria: "fixed",
+        payoutMethods: {
+          method: "others",
+          value: 'app.efoli.com',
+        },
+        fixedCommission: {
+          value: 0,
+          type: "percentage",
+        },
+        tieredCommissionType: "",
+        tieredCommission: [
+          { from: 0, to: 1, rate: 0, type: 'percentage' }
+        ],
+        status: AFFILIATE_STATUS.active,
+        affTrackingCode: `spc_aff_${shopData?.id}`,
+        shopId: shopData?.id,
+        isDefault: true,
+      },
     });
   }
 
@@ -215,7 +264,7 @@ export const loader = async ({ request }) => {
 const Plans = () => {
   const { shopData, shopInfo, appSubscriptions, trialDaysOffer, couponData, node_env } = useLoaderData();
   const fetcher = useFetcher();
-  //console.log('appSubscriptions:', appSubscriptions);
+  //console.log('shopData:', shopData);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const [planPriceAndDiscount, setPlanPriceAndDiscount] = useState({
