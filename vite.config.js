@@ -38,6 +38,16 @@ if (host === "localhost") {
 }
 
 export default defineConfig({
+  ssr: {
+    noExternal: [
+      "@shopify/polaris-viz",
+      "@shopify/polaris-viz-core",
+      "d3-scale",
+      "d3-array",
+      "d3-interpolate",
+      "d3-color"
+    ],
+  },
   server: {
     allowedHosts: [host],
     cors: {
