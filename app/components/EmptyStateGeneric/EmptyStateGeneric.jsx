@@ -1,5 +1,10 @@
 
-const EmptyStateGeneric = () => {
+const EmptyStateGeneric = ({
+  title="Opps!!! No affiliate found",
+  text=" Create a new affiliate to get started",
+  btnText="Create a affiliate",
+  btnHref="/app/affiliate/new"
+}) => {
   return (
     <s-section accessibilityLabel="Empty state section">
       <s-grid gap="base" justifyItems="center" paddingBlock="large-400">
@@ -13,15 +18,13 @@ const EmptyStateGeneric = () => {
         </s-box>
         <s-grid justifyItems="center" maxInlineSize="450px" gap="base">
           <s-stack alignItems="center">
-            <s-heading>Opps!!! No affiliate found</s-heading>
-            <s-paragraph>
-              Create a new affiliate to get started
-            </s-paragraph>
+            <s-heading>{title}</s-heading>
+            <s-paragraph>{text}</s-paragraph>
           </s-stack>
           <s-button-group>
-            <s-button slot="primary-action" icon="plus" href="/app/affiliate/new" aria-label="Create a new affiliate">
+            <s-button slot="primary-action" icon="plus" href={btnHref} aria-label="Create a new">
               {" "}
-              Create a affiliate{" "}
+              {btnText}{" "}
             </s-button>
           </s-button-group>
         </s-grid>

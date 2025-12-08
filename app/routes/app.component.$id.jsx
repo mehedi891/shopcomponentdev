@@ -71,7 +71,7 @@ export const loader = async ({ request, params }) => {
 }
 const UpdateComponent = () => {
   const { component, shopData, appUrl } = useLoaderData();
-  //console.log(component);
+  //console.log('component:',component);
   const actionData = useActionData();
   const navigate = useNavigate();
   const location = useLocation();
@@ -3766,7 +3766,7 @@ const UpdateComponent = () => {
                               //   required: "Please select a affiliate"
                               // }}
                               render={({ field, fieldState }) => (
-                                <s-select label="Select a affiliate" placeholder="Choose a affiliate"
+                                <s-select label="Assign affiliate" placeholder="Choose a affiliate"
                                   onChange={(event) => field.onChange(event.currentTarget.value)}
                                   value={field.value}
                                   error={fieldState?.error?.message}

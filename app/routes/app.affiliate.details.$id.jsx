@@ -2,9 +2,14 @@ import { useLoaderData, useNavigation } from "@remix-run/react";
 import db from "../db.server";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
-import { AFFILIATE_STATUS } from "../constants/constants";
+import { AFFILIATE_STATUS, COMISSION_CRITERIA } from "../constants/constants";
 import ClientOnlyCmp from "../components/ClientOnlyCmp/ClientOnlyCmp";
 import { BarChart, LineChart } from "@shopify/polaris-viz";
+import buildOrderQuery from "../utilis/buildOrderQuery";
+import { useState } from "react";
+import calculateComponentTotalOrders from "../utilis/calculateComponentTotalOrders";
+import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
+import calcCurrMonthPendingCommision from "../utilis/calcCurrMonthPendingCommision";
 
 
 export const loader = async ({ request, params }) => {
@@ -12,56 +17,66 @@ export const loader = async ({ request, params }) => {
 
   const { id } = params;
 
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
   const affData = await db.affiliate.findUnique({
     where: {
       id: Number(id)
+    },
+    include: {
+      components: {
+        select: {
+          id: true,
+          title: true,
+          orders: {
+            where: {
+              createdAt: {
+                gte: startOfMonth,
+                lt: endOfMonth
+              }
+            }
+          }
+        }
+      },
+      orders: true
     }
   });
 
+  
 
-  const from = new Date();
-  from.setDate(from.getDate() - 1200); // fetch from 1200 days ago
-  const fromStr = from.toISOString().split('T')[0];
+  let spOrders = [];
 
-  const query = `#graphql
-  query OrdersForChart($cursor: String) {
-    orders(
-      first: 250
-      after: $cursor
-      query: "created_at:>='${fromStr}'"
-      sortKey: CREATED_AT
-    ) {
-      edges {
-        node {
-          id
-          name
-          createdAt
-          sourceName
-          currencyCode
-          fulfillable
-          currentSubtotalPriceSet{presentmentMoney {amount currencyCode}}
-        }
-      }
-      pageInfo {
-        hasNextPage
-        startCursor
-        endCursor
-      }
-    }
+  let jsonData = {};
+  if (affData?.orders?.length > 0) {
+    const query = buildOrderQuery(affData?.orders);
+    const jsonRes = await admin.graphql(query);
+    jsonData = await jsonRes.json();
+
   }
-`;
 
 
 
-  const jsonRes = await admin.graphql(query);
-  const jsonData = await jsonRes.json();
+  let components = [];
 
+  if (jsonData?.data) {
+    spOrders = Object.values(jsonData.data);
+    components = calculateComponentTotalOrders(affData?.components || [], spOrders || [], affData?.commissionCiteria, affData?.commissionCiteria === COMISSION_CRITERIA.fixed ? affData?.fixedCommission : affData?.tieredCommission, affData?.tieredCommissionType);
+  }
+
+  let currMonthTotalPendingCommission = 0;
+
+  if (affData?.orders?.length > 0) {
+    currMonthTotalPendingCommission = calcCurrMonthPendingCommision(spOrders, affData?.commissionCiteria, affData?.commissionCiteria === COMISSION_CRITERIA.fixed ? affData?.fixedCommission : affData?.tieredCommission, affData?.tieredCommissionType);
+  }
 
   if (affData?.id) {
     return {
       affData,
-      series: jsonData.data.orders.edges
+      spOrders: spOrders || [],
+      components,
+      currMonthTotalPendingCommission:currMonthTotalPendingCommission ?? 0
     }
   }
 
@@ -72,97 +87,28 @@ export const loader = async ({ request, params }) => {
   }
 }
 const Affiliatedetails = () => {
-  const { affData, series } = useLoaderData();
+  const { affData, spOrders, components,currMonthTotalPendingCommission } = useLoaderData();
   const navigation = useNavigation();
-  console.log("Series:", series);
+  const [showOrderDataRange, setShowOrderDataRange] = useState({
+    title: "Today",
+    value: 0
+  });
+
+
+  const data2 = spOrders.map((order) => ({
+    key: order?.createdAt,
+    value: Number(order.currentTotalPriceSet?.shopMoney?.amount),
+  })).sort((a, b) => a.key - b.key);
+
+
+  //console.log(data2);
+  console.log("orderData:", spOrders);
+  console.log("components:", components);
+  console.log("affData:", affData);
   const data = [
     {
       name: "Total sales",
-      data: [
-        // October 2025
-        { key: "2025-10-01", value: 1450.75 },
-        { key: "2025-10-05", value: 1600.50 },
-        { key: "2025-10-10", value: 1985.75 },
-        { key: "2025-10-15", value: 1750.30 },
-        { key: "2025-10-20", value: 1905.85 },
-
-        // November 2025
-        { key: "2025-11-01", value: 2100.50 },
-        { key: "2025-11-05", value: 2230.75 },
-        { key: "2025-11-10", value: 2450.90 },
-        { key: "2025-11-15", value: 2335.40 },
-        { key: "2025-11-20", value: 2200.60 },
-
-        // December 2025
-        { key: "2025-12-01", value: 2500.25 },
-        { key: "2025-12-05", value: 2650.10 },
-        { key: "2025-12-10", value: 2800.75 },
-        { key: "2025-12-15", value: 2685.90 },
-        { key: "2025-12-20", value: 2905.30 },
-
-        // January 2026
-        { key: "2026-01-01", value: 3100.15 },
-        { key: "2026-01-05", value: 3230.50 },
-        { key: "2026-01-10", value: 3400.75 },
-        { key: "2026-01-15", value: 3325.60 },
-        { key: "2026-01-20", value: 3455.85 },
-
-        // February 2026
-        { key: "2026-02-01", value: 3550.40 },
-        { key: "2026-02-05", value: 3750.25 },
-        { key: "2026-02-10", value: 3800.90 },
-        { key: "2026-02-15", value: 3690.10 },
-        { key: "2026-02-20", value: 3955.60 },
-
-        // March 2026
-        { key: "2026-03-01", value: 4100.30 },
-        { key: "2026-03-05", value: 4250.45 },
-        { key: "2026-03-10", value: 4450.60 },
-        { key: "2026-03-15", value: 4325.80 },
-        { key: "2026-03-20", value: 4550.95 },
-
-        // April 2026
-        { key: "2026-04-01", value: 4750.80 },
-        { key: "2026-04-05", value: 4800.90 },
-        { key: "2026-04-10", value: 4999.25 },
-        { key: "2026-04-15", value: 4900.35 },
-        { key: "2026-04-20", value: 5100.45 },
-
-        // May 2026
-        { key: "2026-05-01", value: 5300.60 },
-        { key: "2026-05-05", value: 5400.70 },
-        { key: "2026-05-10", value: 5500.90 },
-        { key: "2026-05-15", value: 5600.25 },
-        { key: "2026-05-20", value: 5700.40 },
-
-        // June 2026
-        { key: "2026-06-01", value: 5850.55 },
-        { key: "2026-06-05", value: 6000.60 },
-        { key: "2026-06-10", value: 6150.30 },
-        { key: "2026-06-15", value: 6200.80 },
-        { key: "2026-06-20", value: 6300.95 },
-
-        // July 2026
-        { key: "2026-07-01", value: 6400.10 },
-        { key: "2026-07-05", value: 6550.25 },
-        { key: "2026-07-10", value: 6700.80 },
-        { key: "2026-07-15", value: 6750.95 },
-        { key: "2026-07-20", value: 6900.60 },
-
-        // August 2026
-        { key: "2026-08-01", value: 7050.75 },
-        { key: "2026-08-05", value: 7200.85 },
-        { key: "2026-08-10", value: 7350.95 },
-        { key: "2026-08-15", value: 7400.25 },
-        { key: "2026-08-20", value: 7500.40 },
-
-        // September 2026
-        { key: "2026-09-01", value: 7600.55 },
-        { key: "2026-09-05", value: 7750.60 },
-        { key: "2026-09-10", value: 7900.75 },
-        { key: "2026-09-15", value: 8000.95 },
-        { key: "2026-09-20", value: 8100.10 },
-      ],
+      data: data2,
       color: "green",
     },
   ];
@@ -182,8 +128,18 @@ const Affiliatedetails = () => {
           >
             <s-button href="/app/affiliate" accessibilityLabel="Back to affiliate" icon="arrow-left" variant="tertiary"></s-button>
             <s-text type="strong">Back to Affiliate</s-text>
-            <s-button icon="calendar" variant="secondary">Today</s-button>
-            <s-button icon="calendar" variant="secondary">Oct 16,2025</s-button>
+            <s-button commandFor="order_date_picker" icon="calendar" variant="secondary">{showOrderDataRange.title}</s-button>
+            <s-popover id="order_date_picker">
+              <s-stack direction="block" padding="small-300">
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Today", value: 0 })} variant="tertiary">Today</s-button>
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Last 7 days", value: 7 })} variant="tertiary">Last 7 days</s-button>
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Last 15 days", value: 15 })} variant="tertiary">Last 15 days</s-button>
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Last 30 days", value: 30 })} variant="tertiary">Last 30 days</s-button>
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Last 3 months", value: 90 })} variant="tertiary">Last 3 months</s-button>
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Last 6 months", value: 180 })} variant="tertiary">Last 6 months</s-button>
+                <s-button commandFor="order_date_picker" onClick={() => setShowOrderDataRange({ title: "Last 1 year", value: 365 })} variant="tertiary">Last 1 year</s-button>
+              </s-stack>
+            </s-popover>¸
 
           </s-stack>
           <s-section>
@@ -246,21 +202,21 @@ const Affiliatedetails = () => {
             <s-section>
               <s-stack gap="small-100">
                 <s-text>Total Sales</s-text>
-                <s-text type="strong">$12000</s-text>
+                <s-text type="strong">${affData?.totalOrderValue ?? 0}</s-text>
               </s-stack>
             </s-section>
 
             <s-section>
               <s-stack gap="small-100">
                 <s-text>Total Commission</s-text>
-                <s-text type="strong">$1000</s-text>
+                <s-text type="strong">{Number(affData?.totalCommission.toFixed(2)) + Number(currMonthTotalPendingCommission.toFixed(2)) ?? 0}</s-text>
               </s-stack>
             </s-section>
 
             <s-section>
               <s-stack gap="small-100">
                 <s-text>Pending Commission</s-text>
-                <s-text type="strong">$2000</s-text>
+                <s-text type="strong">{currMonthTotalPendingCommission.toFixed(2) ?? 0}</s-text>
               </s-stack>
             </s-section>
 
@@ -271,6 +227,60 @@ const Affiliatedetails = () => {
               </s-stack>
             </s-section>
           </s-grid>
+
+
+          <s-box paddingBlockEnd="large-100">
+            {components?.length > 0 ?
+              <s-section padding="none">
+                <s-stack
+                  padding="small-100 small"
+                >
+                  <s-heading>Assigned Components</s-heading>
+                </s-stack>
+
+                <s-table>
+                  <s-table-header-row>
+                    <s-table-header>Component ID</s-table-header>
+                    <s-table-header>Component Name</s-table-header>
+                    <s-table-header>Total Sales</s-table-header>
+                    <s-table-header>Sale amount</s-table-header>
+                    <s-table-header>Commission</s-table-header>
+                    <s-table-header>Status</s-table-header>
+                  </s-table-header-row>
+                  <s-table-body>
+
+                    {components?.map((cmp, index) => (
+                      <s-table-row key={index}>
+                        <s-table-cell>{cmp.id}</s-table-cell>
+                        <s-table-cell>{cmp.title}</s-table-cell>
+                        <s-table-cell>{cmp?.currMonthTotalOrders ?? 0}</s-table-cell>
+                        <s-table-cell>{cmp?.currMonthTotalValue.toFixed(2) ?? 0}</s-table-cell>
+                        <s-table-cell>{cmp?.currMonthPendingCommission.toFixed(2) ?? 0}</s-table-cell>
+                        <s-table-cell>
+                          <s-badge tone="warning">Unpaid</s-badge>
+                        </s-table-cell>
+
+                      </s-table-row>
+                    ))
+
+
+
+                    }
+
+
+
+                  </s-table-body>
+                </s-table>
+
+              </s-section> :
+              <EmptyStateGeneric 
+              title="No Assigned Component found"
+              text="Assign a component to get started"
+              btnText="Assign a component"
+              btnHref="/app/"
+              />
+            }
+          </s-box>
 
           <s-section padding="none">
             <s-stack
@@ -439,7 +449,7 @@ const Affiliatedetails = () => {
             justifyContent="space-between"
             paddingBlockStart="large-200"
             paddingBlockEnd="small-100"
-
+            maxBlockSize="300px"
           >
             <s-grid-item>
               <s-box
@@ -455,19 +465,22 @@ const Affiliatedetails = () => {
                   <s-text type="strong">$12000</s-text>
                 </s-stack>
 
-            
-                  <ClientOnlyCmp>
-                    <LineChart
-                      xAxisOptions={{
-                        labelFormatter: (key) => new Date(key).toLocaleDateString(),
-                      }}
-                      yAxisOptions={{
-                        labelFormatter: (value) => `$${value.toFixed(2)}`,
-                      }}
-                      data={data}
-                    />
-                  </ClientOnlyCmp>
-               
+
+                <ClientOnlyCmp>
+                  <LineChart
+
+                    xAxisOptions={{
+                      labelFormatter: (key) => new Date(key).toLocaleDateString(),
+                    }}
+                    yAxisOptions={{
+                      labelFormatter: (value) => `$${value.toFixed(2)}`,
+                    }}
+                    data={data}
+                    emptyStateText="No Sales found"
+                    errorText="Something went wrong"
+                  />
+                </ClientOnlyCmp>
+
 
               </s-box>
             </s-grid-item>
@@ -486,31 +499,32 @@ const Affiliatedetails = () => {
                   <s-text type="strong">$12000</s-text>
                 </s-stack>
 
-              
-                  <ClientOnlyCmp>
-                    <BarChart
-                      xAxisOptions={{
-                        labelFormatter: (x) => {
-                          return `${x}`
-                        }
-                      }}
-                      yAxisOptions={{
-                        labelFormatter: (y) => {
-                          return `${y}`
-                        }
-                      }}
-                      data={[
-                        {
-                          ...data[0],
-                          color: 'red',
-                          isComparison: false
-                        },
 
-                      ]}
+                <ClientOnlyCmp>
+                  <BarChart
+                    xAxisOptions={{
+                      labelFormatter: (x) => {
+                        return `${x}`
+                      }
+                    }}
+                    emptyStateText="Commision not Found"
+                    yAxisOptions={{
+                      labelFormatter: (y) => {
+                        return `${y}`
+                      }
+                    }}
+                    data={[
+                      {
+                        ...data[0],
+                        color: 'red',
+                        isComparison: false
+                      },
 
-                    />
-                  </ClientOnlyCmp>
-             
+                    ]}
+
+                  />
+                </ClientOnlyCmp>
+
 
               </s-box>
             </s-grid-item>

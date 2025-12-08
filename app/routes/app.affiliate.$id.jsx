@@ -600,14 +600,14 @@ export const action = async ({ request, params }) => {
       }
     }
   } else if (request.method === 'DELETE') {
-    const component = await db.component.updateMany({
-      where:{
-        affiliateId: Number(id)
-      },
-      data: {
-        affiliateId: null
-      }
-    })
+    // const component = await db.component.updateMany({
+    //   where:{
+    //     affiliateId: Number(id)
+    //   },
+    //   data: {
+    //     affiliateId: null
+    //   }
+    // })
    
     const affData = await db.affiliate.delete({
       where: {

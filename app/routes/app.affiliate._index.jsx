@@ -9,12 +9,29 @@ import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
+
+  const shopData = await db.shop.findUnique({
+    where: { shopifyDomain: session.shop },
+    select: {
+      id: true,
+      totalOrderCount: true,
+      totalOrderValue: true
+    },
+  });
+
   const affData = await db.affiliate.findMany({
     where: {
       shop: {
         shopifyDomain: session.shop,
       },
-      isDefault:false
+      isDefault: false
+    },
+    include: {
+      shop: {
+        select: {
+          id: true
+        }
+      }
     },
     orderBy: {
       id: 'desc',
@@ -25,12 +42,15 @@ export const loader = async ({ request }) => {
 
   return {
     affData: affData || [],
+    shopData:shopData || {}
   }
 }
 
 const Affiliate = () => {
-  const { affData } = useLoaderData();
-  //console.log('affData:', affData);
+  const { affData,shopData } = useLoaderData();
+
+  //console.log('affData',affData);
+
   const navigation = useNavigation();
   const navigate = useNavigate();
   const fetcher = useFetcher();
@@ -68,6 +88,8 @@ const Affiliate = () => {
     }
   }, [fetcher.data]);
 
+  // console.log('fetcherData:',fetcher.data);
+
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
     <s-page inlineSize="large">
       <s-query-container>
@@ -78,22 +100,22 @@ const Affiliate = () => {
         >
           <s-section>
             <s-stack gap="small-100">
-              <s-text>Total Sales</s-text>
-              <s-text type="strong">$12000</s-text>
+              <s-text>Total Orders</s-text>
+              <s-text type="strong">${shopData?.totalOrderValue ?? 0}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Commission Paid</s-text>
-              <s-text type="strong">$1000</s-text>
+              <s-text type="strong">$0</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Pending Commission</s-text>
-              <s-text type="strong">$2000</s-text>
+              <s-text type="strong">$0</s-text>
             </s-stack>
           </s-section>
 
@@ -143,7 +165,7 @@ const Affiliate = () => {
 
                         </s-link>
 
-                        <s-text >{'100' + item.id}</s-text>
+                        <s-text >{`#${1000 + item.id}`}</s-text>
 
                       </s-table-cell>
                       <s-table-cell>{item.name}</s-table-cell>

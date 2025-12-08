@@ -67,76 +67,77 @@ model Session {
 }
 
 model Component {
-  id                    Int             @id @default(autoincrement())
+  id                    Int        @id @default(autoincrement())
   title                 String
   description           String?
-  appliesTo             String          @default("product")
+  appliesTo             String     @default("product")
   addToCartType         Json
-  enableQtyField        Boolean         @default(false)
-  layout                String          @default("grid")
-  status                String          @default("deactived")
+  enableQtyField        Boolean    @default(false)
+  layout                String     @default("grid")
+  status                String     @default("deactived")
   componentSettings     Json?
   shoppingCartSettings  Json?
   productLayoutSettings Json?
   buttonStyleSettings   Json?
-  tracking              String?         @unique
+  tracking              String?    @unique
   utmSource             String?
   utmMedium             String?
   utmCampaign           String?
   customerTracking      String?
-  compHtml              String?         @default("empty")
+  compHtml              String?    @default("empty")
   shopId                Int
-  softDelete            Boolean         @default(false)
-  shop                  Shop            @relation(fields: [shopId], references: [id])
+  softDelete            Boolean    @default(false)
+  shop                  Shop       @relation(fields: [shopId], references: [id])
   orders                Order[]
-  ordersByMonth         OrdersByMonth[]
-  totalOrderCount       Int?            @default(0)
-  totalOrderValue       Float?          @default(0.00)
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
+  // ordersByMonth         OrdersByMonth[]
+  totalOrderCount       Int?       @default(0)
+  totalOrderValue       Float?     @default(0.00)
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
   affiliateId           Int?
-  affiliate             Affiliate?      @relation(fields: [affiliateId], references: [id])
+  affiliate             Affiliate? @relation(fields: [affiliateId], references: [id])
 }
 
 model Shop {
-  id                   Int             @id @default(autoincrement())
-  shopifyShopGid       String?         @unique
-  shopifyDomain        String?         @unique
-  scAccessToken        String?
-  headlessAccessToken  String?
-  installationCount    Int?
-  maxAllowedComponents Int?            @default(1)
-  name                 String?
-  url                  String?
-  isFirstInstall       Boolean?        @default(true)
-  partnerDevelopment   Boolean?        @default(true)
-  shopOwnerName        String?
-  email                String?
-  shopOwnerPhone       String?
-  currencyCode         String?
-  weightUnit           String?
-  billingAddress       String?
-  shopifyPlan          String?
-  appPlan              String?         @default("Free")
-  trialDays            Int?            @default(5)
-  planActivatedAt      DateTime?       @default(now())
-  shopifyPlus          Boolean?        @default(false)
-  myshopifyDomain      String?
-  appDisabled          Boolean?        @default(false)
-  appCatalogId         String?
-  publicationId        String?
-  isInstalled          Boolean?        @default(false)
-  coupon               String?
-  isAppliedCoupon      Boolean?        @default(true)
-  plan                 Plan?
-  components           Component[]
-  affiliates           Affiliate[]
-  ordersByMonth        OrdersByMonth[]
-  orders               Order[]
-  totalOrderCount      Int?            @default(0)
-  totalOrderValue      Float?          @default(0.00)
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  id                      Int                      @id @default(autoincrement())
+  shopifyShopGid          String?                  @unique
+  shopifyDomain           String?                  @unique
+  scAccessToken           String?
+  headlessAccessToken     String?
+  installationCount       Int?
+  maxAllowedComponents    Int?                     @default(1)
+  name                    String?
+  url                     String?
+  isFirstInstall          Boolean?                 @default(true)
+  partnerDevelopment      Boolean?                 @default(true)
+  shopOwnerName           String?
+  email                   String?
+  shopOwnerPhone          String?
+  currencyCode            String?
+  weightUnit              String?
+  billingAddress          String?
+  shopifyPlan             String?
+  appPlan                 String?                  @default("Free")
+  trialDays               Int?                     @default(5)
+  planActivatedAt         DateTime?                @default(now())
+  shopifyPlus             Boolean?                 @default(false)
+  myshopifyDomain         String?
+  appDisabled             Boolean?                 @default(false)
+  appCatalogId            String?
+  publicationId           String?
+  isInstalled             Boolean?                 @default(false)
+  coupon                  String?
+  isAppliedCoupon         Boolean?                 @default(true)
+  plan                    Plan?
+  components              Component[]
+  affiliates              Affiliate[]
+  shopOrdersByMonth       ShopOrdersByMonth[]
+  orders                  Order[]
+  totalOrderCount         Int?                     @default(0)
+  totalOrderValue         Float?                   @default(0.00)
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  affiliateOrdersByMonths AffiliateOrdersByMonth[]
 }
 
 model Plan {
@@ -168,47 +169,61 @@ model Order {
   updatedAt   DateTime   @updatedAt
 }
 
-model OrdersByMonth {
-  id          Int        @id @default(autoincrement())
-  monthYear   String?    @unique
-  totalOrders Int?       @default(0)
-  totalValue  Float?     @default(0.00)
+model ShopOrdersByMonth {
+  id          Int      @id @default(autoincrement())
+  monthYear   String   
+  totalOrders Int      @default(0)
+  totalValue  Float    @default(0.00)
   shopId      Int
-  shop        Shop       @relation(fields: [shopId], references: [id])
-  componentId Int
-  component   Component  @relation(fields: [componentId], references: [id])
-  affiliateId Int?
-  affiliate   Affiliate? @relation(fields: [affiliateId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  shop        Shop     @relation(fields: [shopId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([monthYear, shopId])
+}
+
+
+model AffiliateOrdersByMonth {
+  id          Int       @id @default(autoincrement())
+  monthYear   String
+  totalOrders Int?      @default(0)
+  totalValue  Float?    @default(0.00)
+  shopId      Int
+  shop        Shop      @relation(fields: [shopId], references: [id])
+  affiliateId Int
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([monthYear, shopId, affiliateId])
 }
 
 model Affiliate {
-  id                   Int             @id @default(autoincrement())
-  affTrackingCode      String?         @unique @default("SPC_affiliate_tracking")
-  name                 String?         @default("SPC_affiliate")
-  email                String?
-  website              String?
-  phone                String?
-  address              String?
-  notes                String?
-  commissionCiteria    String?
-  payoutMethods        Json?
-  fixedCommission      Json?
-  tieredCommission     Json?
-  tieredCommissionType String?
-  status               String?
-  isDefault            Boolean?        @default(false)
-  shopId               Int
-  components           Component[]
-  ordersByMonth        OrdersByMonth[]
-  orders               Order[]
-  shop                 Shop            @relation(fields: [shopId], references: [id])
-  totalOrderCount      Int?            @default(0)
-  totalOrderValue      Float?          @default(0.00)
-  totalCommission      Float?          @default(0.00)
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  id                     Int                      @id @default(autoincrement())
+  affTrackingCode        String?                  @unique @default("SPC_affiliate_tracking")
+  name                   String?                  @default("SPC_affiliate")
+  email                  String?
+  website                String?
+  phone                  String?
+  address                String?
+  notes                  String?
+  commissionCiteria      String?
+  payoutMethods          Json?
+  fixedCommission        Json?
+  tieredCommission       Json?
+  tieredCommissionType   String?
+  status                 String?
+  isDefault              Boolean?                 @default(false)
+  shopId                 Int
+  components             Component[]
+  affiliateOrdersByMonth AffiliateOrdersByMonth[]
+  orders                 Order[]
+  shop                   Shop                     @relation(fields: [shopId], references: [id])
+  totalOrderCount        Int?                     @default(0)
+  totalOrderValue        Float?                   @default(0.00)
+  totalCommission        Float?                   @default(0.00)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
 }
 
 model App {
