@@ -5,10 +5,24 @@ import { authenticate } from "../shopify.server";
 import { AFFILIATE_STATUS } from "../constants/constants";
 import { useEffect } from "react";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
+  const { session,admin } = await authenticate.admin(request);
+
+    const response = await admin.graphql(
+    `#graphql
+      query{
+        shop{
+          currencyCode
+        }
+      }
+    `
+  );
+
+  const data = await response.json();
+  const shopCurrency = data.data.shop.currencyCode;
 
   const shopData = await db.shop.findUnique({
     where: { shopifyDomain: session.shop },
@@ -19,7 +33,9 @@ export const loader = async ({ request }) => {
     },
   });
 
-  const affData = await db.affiliate.findMany({
+  let affData = [];
+
+  affData = await db.affiliate.findMany({
     where: {
       shop: {
         shopifyDomain: session.shop,
@@ -31,6 +47,11 @@ export const loader = async ({ request }) => {
         select: {
           id: true
         }
+      },
+      components: {
+        select: {
+          id: true
+        }
       }
     },
     orderBy: {
@@ -38,18 +59,54 @@ export const loader = async ({ request }) => {
     }
   });
 
+  let affSalesData = [];
+
+  if (affData?.length > 0) {
+
+    affSalesData = await db.order.groupBy({
+      by: ['affiliateId'],
+      where: {
+        affiliateId: {
+          in: affData.map(aff => aff.id)
+        }
+      },
+      _sum: {
+        commission: true,
+        totalValue: true,
+
+      }
+    });
+
+    if (affSalesData?.length > 0) {
+      affData = affData.map(aff => {
+        const salesData = affSalesData.find(sale => sale.affiliateId === aff.id);
+        return {
+          ...aff,
+          lifetTimetotalCommission: salesData?._sum.commission || 0,
+          lifeTimeTotalSales: salesData?._sum.totalValue || 0
+        }
+      })
+
+    }
+
+  }
+
+
+
+  console.log('affSalesData:', affSalesData);
 
 
   return {
     affData: affData || [],
-    shopData:shopData || {}
+    shopData: shopData || {},
+    shopCurrency: shopCurrency || 'USD',
   }
 }
 
 const Affiliate = () => {
-  const { affData,shopData } = useLoaderData();
+  const { affData, shopCurrency } = useLoaderData();
 
-  //console.log('affData',affData);
+  console.log('affData',affData);
 
   const navigation = useNavigation();
   const navigate = useNavigate();
@@ -90,6 +147,26 @@ const Affiliate = () => {
 
   // console.log('fetcherData:',fetcher.data);
 
+const {
+  totalCommissionPaid,
+  totalCommission,
+  totalSales,
+} = (affData ?? []).reduce(
+  (acc, aff) => {
+    acc.totalCommissionPaid += Number(aff?.totalCommissionPaid || 0);
+    acc.totalCommission += Number(aff?.lifetTimetotalCommission || 0);
+    acc.totalSales += Number(aff?.lifeTimeTotalSales || 0);
+    return acc;
+  },
+  {
+    totalCommissionPaid: 0,
+    totalCommission: 0,
+    totalSales: 0,
+  }
+);
+
+const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
+
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
     <s-page inlineSize="large">
       <s-query-container>
@@ -101,21 +178,21 @@ const Affiliate = () => {
           <s-section>
             <s-stack gap="small-100">
               <s-text>Total Orders</s-text>
-              <s-text type="strong">${shopData?.totalOrderValue ?? 0}</s-text>
+              <s-text type="strong">{currencySymbol+totalSales.toFixed(2) ?? 0}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Commission Paid</s-text>
-              <s-text type="strong">$0</s-text>
+              <s-text type="strong">{currencySymbol+totalCommissionPaid.toFixed(2)}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Pending Commission</s-text>
-              <s-text type="strong">$0</s-text>
+              <s-text type="strong">{currencySymbol}{(totalCommission - totalCommissionPaid).toFixed(2)}</s-text>
             </s-stack>
           </s-section>
 
@@ -171,8 +248,8 @@ const Affiliate = () => {
                       <s-table-cell>{item.name}</s-table-cell>
                       <s-table-cell>{item.email}</s-table-cell>
                       <s-table-cell>{item.totalOrderCount}</s-table-cell>
-                      <s-table-cell>{item.totalOrderValue}</s-table-cell>
-                      <s-table-cell>{item.totalCommission}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{item.totalOrderValue.toFixed(2)}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{item?.lifetTimetotalCommission.toFixed(2) ?? 0}</s-table-cell>
                       <s-table-cell>{item?.components?.length > 0 ? item?.components?.length : 0}</s-table-cell>
                       <s-table-cell>
 

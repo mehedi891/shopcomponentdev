@@ -1,92 +1,112 @@
 import { authenticate } from "../shopify.server";
-import {inspect} from 'node:util';
+import { inspect } from 'node:util';
 
-//import db from "../db.server";
+import db from "../db.server";
+import calculateTotalRefund from "../utilis/calculateTotalRefund";
+import { COMISSION_CRITERIA } from "../constants/constants";
+import { calculateFixedCommission, calculateTierCommission } from "../utilis/calculateCommission";
 
 export const action = async ({ request }) => {
-  const { payload,topic,subTopic } = await authenticate.webhook(request);
+  const { payload, topic, subTopic } = await authenticate.webhook(request);
 
 
   console.log('from orders update');
-  console.log('from orders update payload',payload);
-  console.log('topic:',topic,'Subtopic:',subTopic);
-
-  console.log(
-  inspect(payload, {
-    depth: null,            // no depth limit
-    maxArrayLength: null,   // print all elements
-    colors: true,
-    compact: false,
-    breakLength: 120
-  })
-);
-
-  //console.dir(payload,'infinite');
-
-  // const isSpcOrder = payload?.note_attributes?.find(
-  //   (item) => item.name === "shopcomponent_tracking"
+  // console.log('from orders update payload', payload);
+  console.log('topic:', topic, 'Subtopic:', subTopic);
+  // console.log(
+  //   inspect(payload, {
+  //     depth: null,            // no depth limit
+  //     maxArrayLength: null,   // print all elements
+  //     colors: true,
+  //     compact: false,
+  //     breakLength: 120
+  //   })
   // );
 
-  // if (!isSpcOrder) return new Response();
+  const isExistOrder = await db.order.findUnique({
+    where: {
+      orderId: payload?.admin_graphql_api_id,
+    },
+    include: {
+      affiliate: {
+        select: {
+          id: true,
+          commissionCiteria: true,
+          fixedCommission: true,
+          tieredCommission: true,
+          totalSubTotalValue: true,
+        }
+      }
+    }
+  });
+  if (!isExistOrder) {
+    console.log('Not find any order in DBBBBBBBBB');
+    return new Response();
+  }
 
-  // const component = await db.component.findUnique({
-  //   where: {
-  //     tracking: isSpcOrder.value,
-  //   },
-  // });
+  if (payload?.cancel_reason || payload?.cancelled_at) {
+    await db.order.update({
+      where: {
+        orderId: payload?.admin_graphql_api_id,
+      },
+      data: {
+        isCancelled: true,
+      },
+    });
 
-  // if (!component?.id) return new Response();
+    return new Response();
+  }
 
-  // const totalPrice = parseFloat(payload.total_price);
-  // const shopId = Number(component.shopId);
-  // const componentId = Number(component.id);
+  let refundValue = 0;
 
-  // try {
-  //   await db.$transaction([
-  //     db.order.create({
-  //       data: {
-  //         orderId: payload?.admin_graphql_api_id,
-  //         orderObj: JSON.stringify(payload),
-  //         shopId,
-  //         componentId,
-  //       },
-  //     }),
+  if (Array.isArray(payload?.refunds) && payload?.refunds?.length > 0) {
+    console.log('Start Calculate refun>>>>>>>>>>>>>>>>>>>:');
+    refundValue = calculateTotalRefund(payload?.refunds || []);
+    console.log("Refunds:>>>>>>>>>>>>>>>>>", refundValue);
+  }
 
-  //     db.component.update({
-  //       where: { id: componentId },
-  //       data: {
-  //         totalOrderCount: { increment: 1 },
-  //         totalOrderValue: { increment: totalPrice },
-  //       },
-  //     }),
+  let fulFilledValue = 0;
 
-  //     db.shop.update({
-  //       where: { id: shopId },
-  //       data: {
-  //         totalOrderCount: { increment: 1 },
-  //         totalOrderValue: { increment: totalPrice },
-  //       },
-  //     }),
+  if (Array.isArray(payload?.fulfillments) && payload?.fulfillments?.length > 0) {
+    fulFilledValue = payload?.fulfillments.reduce((sum, f) => {
+      const lineTotal = f.line_items.reduce((s, item) => {
+        return s + Number(item.price_set.shop_money.amount);
+      }, 0);
+      return sum + lineTotal;
+    }, 0);
+  }
 
-  //     db.app.upsert({
-  //       where: { id: 1 },
-  //       update: {
-  //         totalOrderCount: { increment: 1 },
-  //         totalOrderValue: { increment: totalPrice },
-  //       },
-  //       create: {
-  //         id: 1,
-  //         totalOrderCount: 1,
-  //         totalOrderValue: totalPrice,
-  //       },
-  //     }),
+  const commissionalValue = Number(payload?.subtotal_price_set?.shop_money?.amount) - refundValue;
+  let commission = 0;
+  if(isExistOrder?.affiliateId){
+    const aff = isExistOrder?.affiliate;
+    
+    if(aff?.commissionCiteria === COMISSION_CRITERIA.fixed){
+      
+      commission = calculateFixedCommission(aff.fixedCommission,commissionalValue);
+    }else if(aff?.commissionCiteria === COMISSION_CRITERIA.tiered){
+       
+      commission = calculateTierCommission(aff.tieredCommission,aff?.totalSubTotalValue || 0,commissionalValue);
+    }
+  }
 
-  //   ]);
-  // } catch (error) {
-  //   console.error("Transaction failed:", error);
-  // }
+  //console.log("Commission:",commission);
+  //console.log("affiliate:",isExistOrder?.affiliate);
 
- 
+  await db.order.update({
+    where: {
+      orderId: payload?.admin_graphql_api_id,
+    },
+    data: {
+      refundValue: refundValue,
+      fulFilledValue: fulFilledValue,
+      commissionalValue: commissionalValue,
+      commission: commission,
+    },
+  });
+
+  console.log("Orders update completed!!!!!!!");
+
 
   return new Response();
 };

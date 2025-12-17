@@ -126,6 +126,7 @@ export default function App() {
         <Links />
         {/* New polaris web component navigation handling start */}
         <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+        {/* <script src="https://cdn.shopify.com/s/javascripts/currencies.js"></script> */}
         {/* New polaris web component navigation handling end */}
       </head>
       <body>

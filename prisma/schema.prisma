@@ -156,22 +156,32 @@ model Plan {
 }
 
 model Order {
-  id          Int        @id @default(autoincrement())
-  orderId     String     @unique
-  orderObj    String?    @db.Text
-  shopId      Int
-  componentId Int
-  component   Component  @relation(fields: [componentId], references: [id])
-  shop        Shop       @relation(fields: [shopId], references: [id])
-  affiliateId Int?
-  affiliate   Affiliate? @relation(fields: [affiliateId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id                 Int        @id @default(autoincrement())
+  orderId            String     @unique
+  orderObj           String?    @db.Text
+  totalValue         Float?     @default(0)
+  subTotalValue      Float?     @default(0)
+  refundValue        Float?     @default(0)
+  fulFilledValue     Float?     @default(0)
+  commissionalValue  Float?     @default(0)
+  commission         Float?     @default(0)
+  isCancelled        Boolean?   @default(false)
+  isDeleted          Boolean?   @default(false)
+  currency           String?
+  shopifyOrderNumber Int?
+  shopId             Int
+  componentId        Int
+  component          Component  @relation(fields: [componentId], references: [id])
+  shop               Shop       @relation(fields: [shopId], references: [id])
+  affiliateId        Int?
+  affiliate          Affiliate? @relation(fields: [affiliateId], references: [id])
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 }
 
 model ShopOrdersByMonth {
   id          Int      @id @default(autoincrement())
-  monthYear   String   
+  monthYear   String
   totalOrders Int      @default(0)
   totalValue  Float    @default(0.00)
   shopId      Int
@@ -181,7 +191,6 @@ model ShopOrdersByMonth {
 
   @@unique([monthYear, shopId])
 }
-
 
 model AffiliateOrdersByMonth {
   id          Int       @id @default(autoincrement())
@@ -221,9 +230,22 @@ model Affiliate {
   shop                   Shop                     @relation(fields: [shopId], references: [id])
   totalOrderCount        Int?                     @default(0)
   totalOrderValue        Float?                   @default(0.00)
+  totalSubTotalValue     Float?                   @default(0.00)
   totalCommission        Float?                   @default(0.00)
+  totalCommissionPaid    Float?                   @default(0.00)
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
+  affiliateTransactions  AffiliateTransaction[]
+}
+
+model AffiliateTransaction {
+  id                 Int       @id @default(autoincrement())
+  affiliateId        Int
+  affiliate          Affiliate @relation(fields: [affiliateId], references: [id])
+  commissionPaid     Float     @default(0.00)
+  transactionDetails String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
 
 model App {

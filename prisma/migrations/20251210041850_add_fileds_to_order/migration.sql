@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "public"."Order" ADD COLUMN     "fulFilledValue" DOUBLE PRECISION DEFAULT 0,
+ADD COLUMN     "isCancelled" BOOLEAN DEFAULT false,
+ADD COLUMN     "isDeleted" BOOLEAN DEFAULT false,
+ADD COLUMN     "refundValue" DOUBLE PRECISION DEFAULT 0,
+ADD COLUMN     "subTotalValue" DOUBLE PRECISION DEFAULT 0,
+ALTER COLUMN "totalValue" DROP NOT NULL;

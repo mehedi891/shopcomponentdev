@@ -58,7 +58,7 @@ const CreateAffiliate = () => {
         value: 0,
         type: FIXED_COMISSION.percentage
       },
-      tieredCommissionType:TIERED_COMISSION_TYPE.quantity,
+      tieredCommissionType:TIERED_COMISSION_TYPE.orderAmount,
       tieredCommission: [
         { from: 0, to: 1, rate: 0, type: 'percentage' },
         // { from: 5, to: 10, rate: 10, type: 'percentage' },
@@ -687,18 +687,19 @@ const CreateAffiliate = () => {
                       <s-box padding="small-100 none">
                         {/* Heading start */}
 
-                        <s-box padding="none none large-100 none" maxInlineSize="400px">
+                        {/* <s-box padding="none none large-100 none" maxInlineSize="400px">
                           <Controller
                             name="tieredCommissionType"
                             control={control}
                             render={({ field, fieldState }) => (
                               <s-select label="Tiered type" onChange={(event) => field.onChange(event.currentTarget.value)}>
-                                <s-option value={TIERED_COMISSION_TYPE.quantity}>Orders quantity</s-option>
                                 <s-option value={TIERED_COMISSION_TYPE.orderAmount}>Orders amount</s-option>
+                                <s-option value={TIERED_COMISSION_TYPE.quantity}>Orders quantity</s-option>
+                                
                               </s-select>
                             )}
                           />
-                        </s-box>
+                        </s-box> */}
 
                         <s-grid
                           gridTemplateColumns="repeat(7, 1fr)"
