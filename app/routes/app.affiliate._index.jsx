@@ -178,21 +178,21 @@ const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
           <s-section>
             <s-stack gap="small-100">
               <s-text>Total Orders</s-text>
-              <s-text type="strong">{currencySymbol+totalSales.toFixed(2) ?? 0}</s-text>
+              <s-text type="strong">{currencySymbol+totalSales ?? 0}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Commission Paid</s-text>
-              <s-text type="strong">{currencySymbol+totalCommissionPaid.toFixed(2)}</s-text>
+              <s-text type="strong">{currencySymbol+totalCommissionPaid}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Pending Commission</s-text>
-              <s-text type="strong">{currencySymbol}{(totalCommission - totalCommissionPaid).toFixed(2)}</s-text>
+              <s-text type="strong">{currencySymbol}{totalCommission - totalCommissionPaid}</s-text>
             </s-stack>
           </s-section>
 
@@ -248,8 +248,8 @@ const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
                       <s-table-cell>{item.name}</s-table-cell>
                       <s-table-cell>{item.email}</s-table-cell>
                       <s-table-cell>{item.totalOrderCount}</s-table-cell>
-                      <s-table-cell>{currencySymbol}{item.totalOrderValue.toFixed(2)}</s-table-cell>
-                      <s-table-cell>{currencySymbol}{item?.lifetTimetotalCommission.toFixed(2) ?? 0}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{item.totalOrderValue}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{item?.lifetTimetotalCommission ?? 0}</s-table-cell>
                       <s-table-cell>{item?.components?.length > 0 ? item?.components?.length : 0}</s-table-cell>
                       <s-table-cell>
 
