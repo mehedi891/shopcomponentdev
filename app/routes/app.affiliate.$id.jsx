@@ -111,7 +111,7 @@ const Updateaffiliate = () => {
       <s-query-container>
         <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar onReset={() => reset()}>
           <s-stack
-            padding="large-100 none large none"
+            padding="large-100 none none none"
             direction="inline"
             gap="small"
             justifyContent="start"
@@ -121,10 +121,7 @@ const Updateaffiliate = () => {
             <s-text type="strong">Update: {affData?.name}</s-text>
           </s-stack>
 
-          <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
-            <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
-            <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
-          </s-stack>
+        
 
           <SaveBar id="spc-save-bar">
             <button type="submit" variant="primary"

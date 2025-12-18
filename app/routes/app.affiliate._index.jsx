@@ -113,7 +113,6 @@ export const loader = async ({ request }) => {
 const Affiliate = () => {
   const { affData, shopCurrency, shopData } = useLoaderData();
 
-  console.log('affData', affData);
 
   const navigation = useNavigation();
   const navigate = useNavigate();
