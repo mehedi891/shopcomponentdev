@@ -2,12 +2,12 @@ import crypto from "crypto";
 import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, TIERED_COMISSION_TYPE } from "../constants/constants";
+import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, PLAN_NAME, TIERED_COMISSION_TYPE } from "../constants/constants";
 import TieredCommission from "../components/TieredCommission/TieredCommission";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { SaveBar } from "@shopify/app-bridge-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const loader = async ({ request }) => {
   const { session, redirect } = await authenticate.admin(request);
@@ -40,6 +40,7 @@ const CreateAffiliate = () => {
   const actionData = useActionData();
   const navigate = useNavigate();
   const submit = useSubmit();
+   const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
   const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
   const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
     defaultValues: {
@@ -83,7 +84,7 @@ const CreateAffiliate = () => {
       shopify.toast.show(actionData.message, {
         duration: 1000,
       });
-      navigate(`/app/affiliate/${actionData?.data?.id}`);
+      navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
     } else if (actionData?.success === false) {
       shopify.toast.show(actionData.message, {
         duration: 1000,
@@ -94,6 +95,7 @@ const CreateAffiliate = () => {
 
   }, [actionData]);
   const affFormHandleSubmit = (data) => {
+    
     const updatedData = {
       ...data,
       tieredCommission: JSON.stringify(data.tieredCommission),
@@ -107,6 +109,11 @@ const CreateAffiliate = () => {
   const handleDiscard = () => {
     reset();
   }
+
+    useEffect(() => {
+    setDisabledContentProPlan(shop?.plan?.planName === PLAN_NAME.pro ? false : true)
+  }, [shop?.plan?.planName]);
+
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
     // <Box>
@@ -436,6 +443,15 @@ const CreateAffiliate = () => {
     // </Page>
 
     <s-page heading="EmbedUp - Sell Anywhere" inlineSize="base">
+
+      {disabledContentProPlan &&
+          <s-stack paddingBlockStart="large">
+            <s-banner heading="Attention!!" tone="warning">
+              Upgrade the plan to use the Affiliate feature
+              <s-button href="/app/plans" slot="secondary-actions">Upgrade to pro</s-button>
+            </s-banner>
+          </s-stack>
+        }
 
       <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
         <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
@@ -943,22 +959,23 @@ const CreateAffiliate = () => {
                       rules={{
                         required: "Payout method details are required",
                         maxLength: {
-                          value: 100,
-                          message: "Payout details cannot exceed 100 characters",
+                          value: 300,
+                          message: "Payout details cannot exceed 300 characters",
                         },
                       }}
                       render={({ field, fieldState }) => (
                         <s-box inlineSize="500px" padding="large-100 none small-100 none">
-                          <s-text-field
+                          <s-text-area
                             label="Payment details"
                             labelAccessibilityVisibility="exclusive"
                             name="payoutMethods.value"
                             placeholder={`Enter ${watchedValues.payoutMethods.method} details`}
                             value={field.value ?? ''}
                             error={fieldState.error?.message || actionData?.errors?.payoutMethods?.value}
-                            maxLength={100}
+                            maxLength={300}
                             minLength={3}
                             required
+                            row={1}
                             onChange={(value) => field.onChange(value)}
                           />
                         </s-box>
@@ -991,8 +1008,9 @@ const CreateAffiliate = () => {
                           error={fieldState.error?.message || actionData?.errors?.status}
                           onChange={(event) => field.onChange(event.currentTarget.values[0])}
                         >
-                          <s-choice value={AFFILIATE_STATUS.active} defaultSelected>Active</s-choice>
-                          <s-choice value={AFFILIATE_STATUS.inactive}>Deactive</s-choice>
+                          <s-choice value={AFFILIATE_STATUS.active} defaultSelected>Approve</s-choice>
+                          <s-choice value={AFFILIATE_STATUS.pending}>Pending</s-choice>
+                          <s-choice value={AFFILIATE_STATUS.inactive}>Reject/Disabled</s-choice> 
                         </s-choice-list>
                       )}
                     />
@@ -1002,7 +1020,7 @@ const CreateAffiliate = () => {
               </s-box>
 
               <s-box padding="large-100 none">
-                <s-button type="submit" variant="primary" loading={navigation.state == 'submitting'}>Add Affiliate</s-button>
+                <s-button disabled={disabledContentProPlan} type="submit" variant="primary" loading={navigation.state == 'submitting'}>Add Affiliate</s-button>
 
               </s-box>
             </form>

@@ -1,4 +1,4 @@
-import { useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
+import { useActionData, useLoaderData, useLocation, useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react"
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, TIERED_COMISSION_TYPE } from "../constants/constants";
@@ -6,7 +6,7 @@ import TieredCommission from "../components/TieredCommission/TieredCommission";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { SaveBar } from "@shopify/app-bridge-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const loader = async ({ request, params }) => {
   const { session } = await authenticate.admin(request);
@@ -25,10 +25,15 @@ const Updateaffiliate = () => {
   const { affData } = useLoaderData();
   console.log("affData:", affData);
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const actionData = useActionData();
   const submit = useSubmit();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const params = new URLSearchParams(location.search);
+  const [showNewCreatedBanner, setShowNewCreatedBanner] = useState(params.get("new_created") === "true");
   const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
-  const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
+  const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue, } = useForm({
     defaultValues: {
       name: affData?.name || "",
       email: affData?.email || "",
@@ -85,38 +90,74 @@ const Updateaffiliate = () => {
     };
     //console.log('Affiliate form data submitted:', updatedData);
     submit(updatedData, { method: 'post', });
+    setShowNewCreatedBanner(false);
   }
 
   const handleDiscard = () => {
     reset();
+    shopify.saveBar.hide('spc-save-bar')
   }
+
+    useEffect(() => {
+    if (searchParams.toString()) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
+
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
     <s-page heading="EmbedUp - Sell Anywhere" inlineSize="base">
+      <s-query-container>
+        <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar onReset={() => reset()}>
+          <s-stack
+            padding="large-100 none large none"
+            direction="inline"
+            gap="small"
+            justifyContent="start"
+            alignItems="center"
+          >
+            <s-button disabled={isDirty} onClick={() => navigate('/app/affiliate')} accessibilityLabel="Back to affiliate" icon="arrow-left" variant="tertiary"></s-button>
+            <s-text type="strong">Update: {affData?.name}</s-text>
+          </s-stack>
 
-      <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
-        <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
-        <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
-      </s-stack>
+          <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
+            <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
+            <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
+          </s-stack>
 
-      <SaveBar id="spc-save-bar">
-        <button type="submit" variant="primary"
-          {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
-        ></button>
-        <button
-          type="button"
-          onClick={() => {
-            handleDiscard();
-          }}
-        >
-        </button>
-      </SaveBar>
+          <SaveBar id="spc-save-bar">
+            <button type="submit" variant="primary"
+              {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
+            ></button>
+            <button
+              type="button"
+              onClick={() => {
+                handleDiscard();
+              }}
+            >
+            </button>
+          </SaveBar>
+          {showNewCreatedBanner &&
+            <s-stack paddingBlockStart="large">
+              <s-banner heading="Affiliated created successfully" tone="success" dismissible>
+                <s-stack
+                  direction="inline"
+                  gap="small"
+                  justifyContent="start"
+                  alignItems="center"
+                >
+                  <s-link href="/app/affiliate">Back to Affiliates</s-link>
+                  <s-link href="/app">Back to dasboard</s-link>
 
-      <s-box padding="large none none none">
-        <s-section >
-          <s-query-container>
-            <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar onReset={() => reset()}>
+                </s-stack>
+              </s-banner>
+            </s-stack>
+          }
+
+          <s-box padding="large none none none">
+            <s-section >
+
               <s-box background="base" border="base" borderRadius="large">
                 <s-stack gap="medium-400" padding="small-200 small-200 small-200 large-100">
                   <s-heading size="small">Affiliate information</s-heading>
@@ -369,7 +410,7 @@ const Updateaffiliate = () => {
                           borderRadius="large large none none"
                         >
                           <s-grid-item gridColumn="span 2">
-                           <s-text>{watchedValues.tieredCommissionType === TIERED_COMISSION_TYPE.quantity ? "Orders quantity range" : "Orders amount range"}</s-text>
+                            <s-text>{watchedValues.tieredCommissionType === TIERED_COMISSION_TYPE.quantity ? "Orders quantity range" : "Orders amount range"}</s-text>
                           </s-grid-item>
                           <s-grid-item gridColumn="span 2">
                             <s-text>Commission type</s-text>
@@ -479,22 +520,23 @@ const Updateaffiliate = () => {
                       rules={{
                         required: "Payout method details are required",
                         maxLength: {
-                          value: 100,
-                          message: "Payout details cannot exceed 100 characters",
+                          value: 300,
+                          message: "Payout details cannot exceed 300 characters",
                         },
                       }}
                       render={({ field, fieldState }) => (
                         <s-box inlineSize="500px" padding="large-100 none small-100 none">
-                          <s-text-field
+                          <s-text-area
                             label="Payment details"
                             labelAccessibilityVisibility="exclusive"
                             name="payoutMethods.value"
                             placeholder={`Enter ${watchedValues.payoutMethods.method} details`}
                             value={field.value ?? ''}
                             error={fieldState.error?.message || actionData?.errors?.payoutMethods?.value}
-                            maxLength={100}
+                            maxLength={300}
                             minLength={3}
                             required
+                            row={1}
                             onChange={(value) => { field.onChange(value) }}
                           />
                         </s-box>
@@ -527,8 +569,9 @@ const Updateaffiliate = () => {
                           error={fieldState.error?.message || actionData?.errors?.status}
                           onChange={(event) => field.onChange(event.currentTarget.values[0])}
                         >
-                          <s-choice value={AFFILIATE_STATUS.active} defaultSelected={watchedValues.status === AFFILIATE_STATUS.active}>Active</s-choice>
-                          <s-choice value={AFFILIATE_STATUS.inactive} defaultSelected={watchedValues.status === AFFILIATE_STATUS.inactive}>Deactive</s-choice>
+                          <s-choice value={AFFILIATE_STATUS.active} defaultSelected={watchedValues.status === AFFILIATE_STATUS.active}>Approved</s-choice>
+                           <s-choice value={AFFILIATE_STATUS.pending} defaultSelected={watchedValues.status === AFFILIATE_STATUS.pending}>Pending</s-choice>
+                          <s-choice value={AFFILIATE_STATUS.inactive} defaultSelected={watchedValues.status === AFFILIATE_STATUS.inactive}>Reject/Deactive</s-choice>
                         </s-choice-list>
                       )}
                     />
@@ -540,13 +583,14 @@ const Updateaffiliate = () => {
               <s-box padding="large-100 none">
                 <s-stack direction="inline" gap="base">
                   <s-button type="submit" disabled={!isDirty} variant="primary" loading={navigation.state == 'submitting'}>Update Affiliate</s-button>
-                  <s-button onClick={() => reset()} disabled={!isDirty} variant="secondary">Discard</s-button>
+                  <s-button onClick={() => { reset(); }} disabled={!isDirty} variant="secondary">Discard</s-button>
                 </s-stack>
               </s-box>
-            </form>
-          </s-query-container>
-        </s-section>
-      </s-box>
+
+            </s-section>
+          </s-box>
+        </form>
+      </s-query-container>
 
     </s-page>
 
@@ -608,7 +652,7 @@ export const action = async ({ request, params }) => {
     //     affiliateId: null
     //   }
     // })
-   
+
     const affData = await db.affiliate.delete({
       where: {
         id: Number(id)

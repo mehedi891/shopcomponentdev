@@ -100,7 +100,8 @@ const FIXED_COMISSION = {
 
 const AFFILIATE_STATUS = {
   active: 'active',
-  inactive: 'inactive'
+  inactive: 'inactive',
+  pending: 'pending'
 }
 
 const TIERED_COMISSION_TYPE = {

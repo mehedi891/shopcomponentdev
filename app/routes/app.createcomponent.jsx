@@ -268,6 +268,7 @@ const CreateComponent = () => {
     });
     const [embedPHtmlCode, setEmbedPHtmlCode] = useState('');
     const [disabledContentByPlan, setDisabledContentByPlan] = useState(false);
+    const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
     const [delayedSrcDoc, setDelayedSrcDoc] = useState("");
     const [checkMaxSelectedVariants, setCheckMaxSelectedVariants] = useState(false);
     const navigation = useNavigation();
@@ -349,7 +350,8 @@ const CreateComponent = () => {
 
 
     useEffect(() => {
-        setDisabledContentByPlan(shopData?.plan?.planName === 'Free' ? true : false)
+        setDisabledContentByPlan(shopData?.plan?.planName === PLAN_NAME.free ? true : false)
+        setDisabledContentProPlan(shopData?.plan?.planName === PLAN_NAME.pro ? false : true)
     }, [shopData]);
 
 
@@ -3715,7 +3717,7 @@ const CreateComponent = () => {
                                                     gap="small-300"
                                                 >
                                                     <s-text type="strong">Tracking</s-text>
-                                                    {disabledContentByPlan &&
+                                                    {disabledContentProPlan &&
                                                         <UpgradeTooltip />
                                                     }
                                                 </s-stack>
@@ -3726,7 +3728,7 @@ const CreateComponent = () => {
                                         {toogleOpen.tranckingOpen &&
 
                                             <s-box padding="none small small small">
-                                                <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
+                                                <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
                                                     <s-stack
                                                         gap="small"
                                                     >
@@ -3849,7 +3851,7 @@ const CreateComponent = () => {
                                                     gap="small-300"
                                                 >
                                                     <s-text type="strong">Affiliates</s-text>
-                                                    {disabledContentByPlan &&
+                                                    {disabledContentProPlan &&
                                                         <UpgradeTooltip />
                                                     }
 
@@ -3861,7 +3863,7 @@ const CreateComponent = () => {
                                         {toogleOpen.affiliateAssignOpen &&
 
                                             <s-box padding="none small small small">
-                                                <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
+                                                <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
                                                     {shopData?.affiliates?.length === 0 ?
                                                         <s-text type="auto" tone="critical">Please create a affiliate first to assign. <s-link href="/app/affiliate/new">Create Affiliate</s-link></s-text>
                                                         :
@@ -3877,7 +3879,7 @@ const CreateComponent = () => {
                                                                     onChange={(event) => field.onChange(event.currentTarget.value)}
                                                                     value={field.value}
                                                                     error={fieldState?.error?.message}
-                                                                    //required
+                                                                //required
                                                                 >
                                                                     {shopData?.affiliates?.map((item) => {
                                                                         return (

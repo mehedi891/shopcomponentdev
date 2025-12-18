@@ -36,7 +36,17 @@ function calculateTierCommission(tiers, lifeTimesubTotalAmount, commissionalValu
   // console.log({ thisiuiu: "From calculateTierCommission", tiers, lifeTimesubTotalAmount, commissionalValue,tieredCommission,commission });
 }
 
+function getCurrentTier(tiers, lifeTimesubTotalAmount) {
+  const subTotalAmount = Number(lifeTimesubTotalAmount);
+  let tieredCommission = tiers.find(c => Number(c.from) <= subTotalAmount && Number(c.to) >= subTotalAmount) || [];
+  if (tieredCommission?.length === 0) {
+    tieredCommission = tiers[tiers.length - 1];
+  }
+  return tieredCommission;
+}
+
 export {
   calculateFixedCommission,
-  calculateTierCommission
+  calculateTierCommission,
+  getCurrentTier
 }

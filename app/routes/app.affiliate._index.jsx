@@ -2,16 +2,16 @@ import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-ru
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import db from "../db.server";
 import { authenticate } from "../shopify.server";
-import { AFFILIATE_STATUS } from "../constants/constants";
-import { useEffect } from "react";
+import { AFFILIATE_STATUS, PLAN_NAME } from "../constants/constants";
+import { useEffect, useState } from "react";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import getSymbolFromCurrency from "currency-symbol-map";
 
 
 export const loader = async ({ request }) => {
-  const { session,admin } = await authenticate.admin(request);
+  const { session, admin, redirect } = await authenticate.admin(request);
 
-    const response = await admin.graphql(
+  const response = await admin.graphql(
     `#graphql
       query{
         shop{
@@ -29,9 +29,18 @@ export const loader = async ({ request }) => {
     select: {
       id: true,
       totalOrderCount: true,
-      totalOrderValue: true
+      totalOrderValue: true,
+      plan: {
+        select: {
+          planName: true
+        }
+      }
     },
   });
+
+  if (!shopData?.plan) {
+    throw redirect('/app/plans')
+  }
 
   let affData = [];
 
@@ -93,8 +102,6 @@ export const loader = async ({ request }) => {
 
 
 
-  console.log('affSalesData:', affSalesData);
-
 
   return {
     affData: affData || [],
@@ -104,13 +111,14 @@ export const loader = async ({ request }) => {
 }
 
 const Affiliate = () => {
-  const { affData, shopCurrency } = useLoaderData();
+  const { affData, shopCurrency, shopData } = useLoaderData();
 
-  console.log('affData',affData);
+  console.log('affData', affData);
 
   const navigation = useNavigation();
   const navigate = useNavigate();
   const fetcher = useFetcher();
+  const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
   const tableHeaders = [
     "ID",
     "Name",
@@ -147,29 +155,42 @@ const Affiliate = () => {
 
   // console.log('fetcherData:',fetcher.data);
 
-const {
-  totalCommissionPaid,
-  totalCommission,
-  totalSales,
-} = (affData ?? []).reduce(
-  (acc, aff) => {
-    acc.totalCommissionPaid += Number(aff?.totalCommissionPaid || 0);
-    acc.totalCommission += Number(aff?.lifetTimetotalCommission || 0);
-    acc.totalSales += Number(aff?.lifeTimeTotalSales || 0);
-    return acc;
-  },
-  {
-    totalCommissionPaid: 0,
-    totalCommission: 0,
-    totalSales: 0,
-  }
-);
+  const {
+    totalCommissionPaid,
+    totalCommission,
+    totalSales,
+  } = (affData ?? []).reduce(
+    (acc, aff) => {
+      acc.totalCommissionPaid += Number(aff?.totalCommissionPaid || 0);
+      acc.totalCommission += Number(aff?.lifetTimetotalCommission || 0);
+      acc.totalSales += Number(aff?.lifeTimeTotalSales || 0);
+      return acc;
+    },
+    {
+      totalCommissionPaid: 0,
+      totalCommission: 0,
+      totalSales: 0,
+    }
+  );
 
-const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
+  useEffect(() => {
+    setDisabledContentProPlan(shopData?.plan?.planName === PLAN_NAME.pro ? false : true)
+  }, [shopData?.plan?.planName]);
+
+  const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
+
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
     <s-page inlineSize="large">
       <s-query-container>
+        {disabledContentProPlan &&
+          <s-stack>
+            <s-banner heading="Attention!!" tone="warning">
+              Upgrade the plan to use the Affiliate feature
+              <s-button href="/app/plans" slot="secondary-actions">Upgrade to pro</s-button>
+            </s-banner>
+          </s-stack>
+        }
         <s-grid
           gridTemplateColumns="@container (inline-size < 500px) 1fr 1fr, 1fr 1fr 1fr 1fr"
           gap="base"
@@ -178,14 +199,14 @@ const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
           <s-section>
             <s-stack gap="small-100">
               <s-text>Total Orders</s-text>
-              <s-text type="strong">{currencySymbol+totalSales ?? 0}</s-text>
+              <s-text type="strong">{currencySymbol + totalSales ?? 0}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Commission Paid</s-text>
-              <s-text type="strong">{currencySymbol+totalCommissionPaid}</s-text>
+              <s-text type="strong">{currencySymbol + totalCommissionPaid}</s-text>
             </s-stack>
           </s-section>
 
@@ -219,7 +240,7 @@ const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
                 </s-stack>
               </s-stack>
 
-              <s-table variant="auto" loading={fetcher.state !== 'idle'}>
+              <s-table variant="auto" loading={fetcher.state !== 'idle' || disabledContentProPlan}>
 
                 <s-table-header-row>
                   {tableHeaders.map((title, index) => (
@@ -255,25 +276,25 @@ const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
 
                         <s-badge
                           tone={item.status === AFFILIATE_STATUS.active ? 'success' : 'critical'}
-                        >{item.status === AFFILIATE_STATUS.active ? 'Active' : 'Inactive'}</s-badge>
+                        >{item.status === AFFILIATE_STATUS.active ? 'Approved' : 'Inactive/Reject'}</s-badge>
                       </s-table-cell>
                       <s-table-cell>
                         <s-button accessibilityLabel="More" commandFor={`affliate-popover_` + item.id} variant="secondary" icon="menu-horizontal" />
                         <s-popover id={`affliate-popover_` + item.id} inlineSize="8">
                           <s-stack slots="children" direction="block" padding="small small">
-                            <s-button href={`/app/affiliate/details/${item.id}`} accessibilityLabel="See details" icon="info" variant="tertiary"
+                            <s-button disabled={disabledContentProPlan} href={`/app/affiliate/details/${item.id}`} accessibilityLabel="See details" icon="info" variant="tertiary"
                             >
                               View details
                             </s-button>
-                            <s-button accessibilityLabel="Edit" icon="edit" variant="tertiary"
+                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Edit" icon="edit" variant="tertiary"
                               onClick={() => { navigate(`/app/affiliate/${item.id}`) }}
                             >Edit Affiliate</s-button>
 
-                            <s-button accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} icon={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} variant="tertiary"
+                            <s-button disabled={disabledContentProPlan} accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} icon={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} variant="tertiary"
                               onClick={() => handleStatusChange(item.id, item.status === AFFILIATE_STATUS.active ? AFFILIATE_STATUS.inactive : AFFILIATE_STATUS.active)}
                             >{item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'}</s-button>
 
-                            <s-button accessibilityLabel="Delete" tone="critical" icon="delete" variant="tertiary" commandFor={`delete_modal_` + item.id}>Delete</s-button>
+                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical" icon="delete" variant="tertiary" commandFor={`delete_modal_` + item.id}>Delete</s-button>
 
                             <s-modal id={`delete_modal_` + item.id} heading="Delete Affiliate — This action cannot be undone" accessibilityLabel="Delete Affiliate">
 

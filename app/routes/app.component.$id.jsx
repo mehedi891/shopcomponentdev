@@ -25,7 +25,8 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
-import { ADD_TO_CART_TYPE, AFFILIATE_STATUS, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
+import { ADD_TO_CART_TYPE, AFFILIATE_STATUS, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS, PLAN_NAME } from "../constants/constants";
+
 
 export const loader = async ({ request, params }) => {
   const { id } = params;
@@ -54,8 +55,8 @@ export const loader = async ({ request, params }) => {
         include: {
           plan: true,
           affiliates: {
-            where:{
-              status:AFFILIATE_STATUS.active
+            where: {
+              status: AFFILIATE_STATUS.active
             }
           }
         }
@@ -122,6 +123,7 @@ const UpdateComponent = () => {
   });
   const [embedPHtmlCode, setEmbedPHtmlCode] = useState('');
   const [disabledContentByPlan, setDisabledContentByPlan] = useState(false);
+  const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
   const [delayedSrcDoc, setDelayedSrcDoc] = useState("");
   const [checkMaxSelectedVariants, setCheckMaxSelectedVariants] = useState(false);
   const params = new URLSearchParams(location.search);
@@ -206,8 +208,9 @@ const UpdateComponent = () => {
   //console.log('component:', component);
 
   useEffect(() => {
-    setDisabledContentByPlan(component?.shop?.plan?.planName === 'Free' ? true : false)
-  }, [component]);
+    setDisabledContentByPlan(shopData?.plan?.planName === PLAN_NAME.free ? true : false)
+    setDisabledContentProPlan(shopData?.plan?.planName === PLAN_NAME.pro ? false : true)
+  }, [shopData?.plan?.planName]);
 
 
 
@@ -3608,7 +3611,7 @@ const UpdateComponent = () => {
                           gap="small-300"
                         >
                           <s-text type="strong">Tracking</s-text>
-                          {disabledContentByPlan &&
+                          {disabledContentProPlan &&
                             <UpgradeTooltip />
                           }
                         </s-stack>
@@ -3619,7 +3622,7 @@ const UpdateComponent = () => {
                     {toogleOpen.tranckingOpen &&
 
                       <s-box padding="none small small small">
-                        <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
+                        <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
                           <s-stack
                             gap="small"
                           >
@@ -3742,7 +3745,7 @@ const UpdateComponent = () => {
                           gap="small-300"
                         >
                           <s-text type="strong">Affiliates</s-text>
-                          {disabledContentByPlan &&
+                          {disabledContentProPlan &&
                             <UpgradeTooltip />
                           }
 
@@ -3754,7 +3757,7 @@ const UpdateComponent = () => {
                     {toogleOpen.affiliateAssignOpen &&
 
                       <s-box padding="none small small small">
-                        <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
+                        <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
                           {shopData?.affiliates?.length === 0 ?
                             <s-text type="auto" tone="critical">Please create a affiliate first to assign. <s-link href="/app/affiliate/new">Create Affiliate</s-link></s-text>
                             :
@@ -3770,7 +3773,7 @@ const UpdateComponent = () => {
                                   onChange={(event) => field.onChange(event.currentTarget.value)}
                                   value={field.value}
                                   error={fieldState?.error?.message}
-                                  // required
+                                // required
                                 >
                                   {component?.shop?.affiliates?.map((item) => {
                                     return (

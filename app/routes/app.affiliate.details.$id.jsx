@@ -2,13 +2,14 @@ import { useFetcher, useLoaderData, useNavigation } from "@remix-run/react";
 import db from "../db.server";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
-import { AFFILIATE_STATUS } from "../constants/constants";
+import { AFFILIATE_STATUS, COMISSION_CRITERIA } from "../constants/constants";
 
 import { useEffect, useState } from "react";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import { capitalizeFirstCaracter } from "../utilis/generalUtils";
 import TransactionModal from "../components/TransactionModal/TransactionModal";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { getCurrentTier } from "../utilis/calculateCommission";
 
 
 
@@ -103,11 +104,11 @@ export const loader = async ({ request, params }) => {
     })) : []
   }
 
- // console.dir(orderTotalsByComponent, { depth: null });
+  // console.dir(orderTotalsByComponent, { depth: null });
 
 
- 
 
+  const currentCommission = affData?.commissionCiteria === COMISSION_CRITERIA.fixed ? affData?.fixedCommission : getCurrentTier(affData?.tieredCommission, affData?.lifeTimeSubTotalValue);
 
 
   if (affData?.id) {
@@ -115,7 +116,8 @@ export const loader = async ({ request, params }) => {
       affData,
       spOrders: [],
       components: affData?.components || [],
-      shopCurrency:shopCurrency
+      shopCurrency: shopCurrency,
+      currentCommission: currentCommission
     }
   }
 
@@ -123,13 +125,13 @@ export const loader = async ({ request, params }) => {
 
   return {
     affData: {},
-    shopCurrency:shopCurrency,
+    shopCurrency: shopCurrency,
     components: [],
     spOrders: []
   }
 }
 const Affiliatedetails = () => {
-  const { affData, spOrders, components,shopCurrency } = useLoaderData();
+  const { affData, spOrders, components, shopCurrency, currentCommission } = useLoaderData();
   const navigation = useNavigation();
   const fetcher = useFetcher();
   const [showOrderDataRange, setShowOrderDataRange] = useState({
@@ -148,7 +150,7 @@ const Affiliatedetails = () => {
   //console.log(data2);
   //console.log("orderData:", spOrders);
   //console.log("components:", components);
-  console.log("affData:", affData);
+  //console.log("affData:", affData);
   //console.log("refundData:", refundData);
   const data = [
     {
@@ -187,7 +189,7 @@ const Affiliatedetails = () => {
 
   }, [fetcher.data]);
 
- 
+
 
   return (
     navigation.state === 'loading' ? <LoadingSkeleton /> :
@@ -293,6 +295,16 @@ const Affiliatedetails = () => {
                     justifyContent="start"
                     alignItems="center"
                   >
+                    <s-text type="neutral">Current Comission Rate: </s-text>
+                    <s-text>{currentCommission.type !== 'percentage' && getSymbolFromCurrency(shopCurrency)}{currentCommission.rate || currentCommission.value}{currentCommission.type === 'percentage' && '%'}</s-text>
+                  </s-stack>
+
+                  <s-stack
+                    direction="inline"
+                    gap="small-300"
+                    justifyContent="start"
+                    alignItems="center"
+                  >
                     <s-text type="neutral">Number of Assigned Components: </s-text>
                     <s-text>{affData?.components?.length}</s-text>
                   </s-stack>
@@ -382,11 +394,11 @@ const Affiliatedetails = () => {
                     gap="small"
                     alignItems="center"
                   >
-                    <s-button 
-                    disabled={pendingCommission <= 0} 
-                    commandFor="transaction-modal" 
-                    command="--show"
-                    loading={fetcher.state !== "idle" ? true : false}
+                    <s-button
+                      disabled={pendingCommission <= 0}
+                      commandFor="transaction-modal"
+                      command="--show"
+                      loading={fetcher.state !== "idle" ? true : false}
                     >Add Transaction</s-button>
                     <TransactionModal
                       name={affData?.name}
@@ -404,10 +416,40 @@ const Affiliatedetails = () => {
                   <s-table-header-row>
                     <s-table-header>Component Name</s-table-header>
                     <s-table-header>Total Sales</s-table-header>
-                    <s-table-header>Subtotal Sales</s-table-header>
+                    <s-table-header>
+                      <s-stack
+                        direction="inline"
+                        justifyContent="start"
+                        alignItems="center"
+                        gap="small-300"
+                      >
+                        <s-text>Subtotal Sales</s-text>
+                        <s-icon
+                          interestFor="subTotalSalesInfo"
+                          type="info"
+                          tone="info"
+                        />
+                      </s-stack>
+                      <s-tooltip id="subTotalSalesInfo">Subtotal sales is excluding the shipping and taxes</s-tooltip>
+                    </s-table-header>
                     <s-table-header>Fulfilled</s-table-header>
                     <s-table-header>Refund</s-table-header>
-                    <s-table-header>Commission</s-table-header>
+                    <s-table-header>
+                      <s-stack
+                        direction="inline"
+                        justifyContent="start"
+                        alignItems="center"
+                        gap="small-300"
+                      >
+                        <s-text>Comission</s-text>
+                        <s-icon
+                          interestFor="comissionInfo"
+                          type="info"
+                          tone="info"
+                        />
+                      </s-stack>
+                      <s-tooltip id="comissionInfo">Commission will calculate on the basis of Subtotal sales and deduct the refund.</s-tooltip>
+                    </s-table-header>
                   </s-table-header-row>
                   <s-table-body>
 
@@ -415,7 +457,7 @@ const Affiliatedetails = () => {
                       <s-table-row key={index}>
                         <s-table-cell>{cmp.title}</s-table-cell>
                         <s-table-cell>{currencySymbol}{cmp.lifeTimeTotalValue}</s-table-cell>
-                        <s-table-cell>{currencySymbol}{cmp?.lifeTimeSubTotalValue}</s-table-cell>
+                        <s-table-cell >{currencySymbol}{cmp?.lifeTimeSubTotalValue}</s-table-cell>
                         <s-table-cell>{currencySymbol}{cmp?.lifeTimeFulFilledValue}</s-table-cell>
                         <s-table-cell>{currencySymbol}{cmp?.lifeTimeRefundValue ?? 0}</s-table-cell>
                         <s-table-cell>
