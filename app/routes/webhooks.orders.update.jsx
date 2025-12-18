@@ -81,7 +81,7 @@ export const action = async ({ request }) => {
   if(commissionalValue <=0 ) commissionalValue = 0;
 
   let commission = 0;
-  if(isExistOrder?.affiliateId){
+  if(isExistOrder?.affiliateId && commissionalValue > 0){
     const aff = isExistOrder?.affiliate;
     
     if(aff?.commissionCiteria === COMISSION_CRITERIA.fixed){
