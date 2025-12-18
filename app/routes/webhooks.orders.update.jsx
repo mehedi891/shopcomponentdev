@@ -76,7 +76,10 @@ export const action = async ({ request }) => {
     }, 0);
   }
 
-  const commissionalValue = Number(payload?.subtotal_price_set?.shop_money?.amount) - refundValue;
+  let commissionalValue = Number(payload?.subtotal_price_set?.shop_money?.amount) - refundValue;
+
+  if(commissionalValue <=0 ) commissionalValue = 0;
+
   let commission = 0;
   if(isExistOrder?.affiliateId){
     const aff = isExistOrder?.affiliate;

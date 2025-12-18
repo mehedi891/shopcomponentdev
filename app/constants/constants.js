@@ -41,7 +41,8 @@ const PLAN_TYPE = {
 }
 const PLAN_NAME = {
   free: 'Free',
-  growth: 'Growth'
+  growth: 'Growth',
+  pro: 'Pro'
 }
 
 const PLAN_STATUS = {
@@ -55,12 +56,22 @@ const PLAN_STATUS = {
 
 const PLAN_PRICE = {
   growth_monthly: {
-    price: 29.00,
+    price: 14.99,
   },
   growth_yearly: {
-    price: 348,
+    price: 179.88,
     discountValue: 20,
-    discountedPrice: 278.4,
+    discountedPrice: 143.90,
+    discountType: 'percentage',
+    discountDuration: null,
+  },
+  pro_monthly: {
+    price: 29.99,
+  },
+  pro_yearly: {
+    price: 359.88,
+    discountValue: 20,
+    discountedPrice: 287.90,
     discountType: 'percentage',
     discountDuration: null,
   }

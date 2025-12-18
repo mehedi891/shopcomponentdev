@@ -43,10 +43,10 @@ const CreateAffiliate = () => {
   const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
   const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
     defaultValues: {
-      name: 'Mehedi Hasan',
-      email: 'mehedi@efoli.com',
+      name: '',
+      email: "",
       phone: '',
-      website: 'https://www.efoli.com',
+      website: '',
       address: '',
       notes: '',
       commissionCiteria: COMISSION_CRITERIA.fixed,
