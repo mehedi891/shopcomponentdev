@@ -208,9 +208,10 @@ const UpdateComponent = () => {
   //console.log('component:', component);
 
   useEffect(() => {
-    setDisabledContentByPlan(shopData?.plan?.planName === PLAN_NAME.free ? true : false)
-    setDisabledContentProPlan(shopData?.plan?.planName === PLAN_NAME.pro ? false : true)
-  }, [shopData?.plan?.planName]);
+    setDisabledContentByPlan(component?.shop?.plan?.planName === PLAN_NAME.free ? true : false)
+    setDisabledContentProPlan(component?.shop?.plan?.planName !== PLAN_NAME.pro ? true : false)
+    
+  }, [component?.shop]);
 
 
 
