@@ -61,7 +61,8 @@ export const action = async ({ request }) => {
 
   if (Array.isArray(payload?.refunds) && payload?.refunds?.length > 0) {
     console.log('Start Calculate refun>>>>>>>>>>>>>>>>>>>:');
-    refundValue = calculateTotalRefund(payload?.refunds || []);
+    refundValue = Number(payload?.subtotal_price_set?.shop_money?.amount) - Number(payload?.current_subtotal_price_set?.shop_money?.amount)
+    ///refundValue = calculateTotalRefund(payload?.refunds || []);
     console.log("Refunds:>>>>>>>>>>>>>>>>>", refundValue);
   }
 
