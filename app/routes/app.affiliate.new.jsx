@@ -6,7 +6,7 @@ import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, PLAN_NAME, TIERE
 import TieredCommission from "../components/TieredCommission/TieredCommission";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
-import { SaveBar } from "@shopify/app-bridge-react";
+import { SaveBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useEffect, useState } from "react";
 
 export const loader = async ({ request }) => {
@@ -34,13 +34,14 @@ export const loader = async ({ request }) => {
 }
 
 const CreateAffiliate = () => {
+  const shopify = useAppBridge();
   const { affTrackingCode, shop } = useLoaderData();
   //console.log('Shop:', shop);
   const navigation = useNavigation();
   const actionData = useActionData();
   const navigate = useNavigate();
   const submit = useSubmit();
-   const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
+  const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
   const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
   const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
     defaultValues: {
@@ -59,7 +60,7 @@ const CreateAffiliate = () => {
         value: 0,
         type: FIXED_COMISSION.percentage
       },
-      tieredCommissionType:TIERED_COMISSION_TYPE.orderAmount,
+      tieredCommissionType: TIERED_COMISSION_TYPE.orderAmount,
       tieredCommission: [
         { from: 0, to: 1, rate: 0, type: 'percentage' },
         // { from: 5, to: 10, rate: 10, type: 'percentage' },
@@ -95,7 +96,7 @@ const CreateAffiliate = () => {
 
   }, [actionData]);
   const affFormHandleSubmit = (data) => {
-    
+
     const updatedData = {
       ...data,
       tieredCommission: JSON.stringify(data.tieredCommission),
@@ -108,357 +109,42 @@ const CreateAffiliate = () => {
 
   const handleDiscard = () => {
     reset();
+    shopify.saveBar.hide('spc-save-bar_affiliate');
   }
 
-    useEffect(() => {
+  useEffect(() => {
     setDisabledContentProPlan(shop?.plan?.planName === PLAN_NAME.pro ? false : true)
   }, [shop?.plan?.planName]);
 
+  useEffect(() => {
+    if (isDirty) {
+      shopify.saveBar.show('spc-save-bar_affiliate')
+    } else {
+      shopify.saveBar.hide('spc-save-bar_affiliate')
+    }
+  }, [isDirty]);
+
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
-    // <Box>
-    //           <Card padding={'0'}>
-    //             <Box padding={'300'}>
-    //               <BlockStack gap={"100"}>
-    //                 <Text variant="headingSm">Affiliate information</Text>
-    //                 <Text variant="bodySm">Set affiliate basic information</Text>
-    //               </BlockStack>
-    //             </Box>
-    //             <Divider />
-    //             <Box padding={'300'}>
 
-    //             </Box>
-    //           </Card>
-    //         </Box>
-    // <Page >
-    //   <Layout>
-    //     <Layout.Section>
-    //       <Box paddingBlock={'400'}>
-    //         <BlockStack gap={"100"} align="center" inlineAlign="center">
-    //           <Text variant="headingXl">Turn Passion into Profit — Join the Affiliate Revolution</Text>
-    //           <Text variant="bodyLg">Simple setup, transparent tracking, and real rewards — start growing today!</Text>
-    //         </BlockStack>
-    //       </Box>
-    //     </Layout.Section>
-    //     <Layout.Section>
-    //       <Card>
-    //         <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)}>
-    //           <Box>
-    //             <Card padding={'0'}>
-    //               <Box padding={'300'}>
-    //                 <BlockStack gap={"100"}>
-    //                   <Text variant="headingSm">Affiliate information</Text>
-    //                   <Text variant="bodySm">Set affiliate basic information</Text>
-    //                 </BlockStack>
-    //               </Box>
-    //               <Divider />
-    //               <Box padding={'300'}>
-    //                 <BlockStack gap={"400"}>
-    //                   <Grid columns={6}>
-    //                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-    //                       <Controller
-    //                         name="name"
-    //                         control={control}
-    //                         rules={{
-    //                           required: "Name is required",
-    //                           maxLength: {
-    //                             value: 100,
-    //                             message: "Name cannot exceed 100 characters",
-    //                           }
-    //                         }}
-    //                         render={({ field, fieldState }) => (
-    //                           <TextField
-    //                             type="text"
-    //                             label="Name"
-    //                             name="name"
-    //                             value={field.value}
-    //                             onChange={field.onChange}
-    //                             error={fieldState.error?.message || actionData?.errors?.name}
-    //                             autoComplete="off"
-    //                             placeholder={"Enter affiliate name"}
-    //                             maxLength={150}
-    //                             showCharacterCount
-    //                             requiredIndicator
-    //                           />
-    //                         )}
-    //                       />
-    //                     </Grid.Cell>
-
-    //                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-    //                       <Controller
-    //                         name="email"
-    //                         control={control}
-    //                         rules={{
-    //                           required: "Email is required",
-    //                           maxLength: {
-    //                             value: 150,
-    //                             message: "Email cannot exceed 200 characters",
-    //                           }
-    //                         }}
-    //                         render={({ field, fieldState }) => (
-    //                           <TextField
-    //                             type="email"
-    //                             label="Email"
-    //                             name="email"
-    //                             value={field.value}
-    //                             onChange={field.onChange}
-    //                             error={fieldState.error?.message || actionData?.errors?.email}
-    //                             autoComplete="off"
-    //                             placeholder={"Enter affiliate email"}
-    //                             maxLength={200}
-    //                             requiredIndicator
-    //                           />
-    //                         )}
-    //                       />
-    //                     </Grid.Cell>
-
-    //                   </Grid>
-
-    //                   <Grid columns={6}>
-    //                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-    //                       <Controller
-    //                         name="phone"
-    //                         control={control}
-    //                         rules={{
-    //                           maxLength: {
-    //                             value: 50,
-    //                             message: "Phone number cannot exceed 50 characters",
-    //                           }
-    //                         }}
-    //                         render={({ field, fieldState }) => (
-    //                           <TextField
-    //                             type="integer"
-    //                             label="Phone (WhatsApp/others)"
-    //                             name="phone"
-    //                             value={field.value}
-    //                             onChange={field.onChange}
-    //                             error={fieldState.error?.message || actionData?.errors?.phone}
-    //                             autoComplete="off"
-    //                             placeholder={"Enter phone number"}
-    //                             maxLength={50}
-    //                           />
-    //                         )}
-    //                       />
-    //                     </Grid.Cell>
-
-    //                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-    //                       <Controller
-    //                         name="website"
-    //                         control={control}
-    //                         rulese={{
-    //                           maxLength: {
-    //                             value: 300,
-    //                             message: "Website URL cannot exceed 300 characters",
-    //                           }
-    //                         }}
-    //                         render={({ field, fieldState }) => (
-    //                           <TextField
-    //                             type="url"
-    //                             label="Website"
-    //                             name="website"
-    //                             value={field.value}
-    //                             onChange={field.onChange}
-    //                             error={fieldState.error?.message || actionData?.errors?.email}
-    //                             autoComplete="off"
-    //                             placeholder={"Enter personal website URL (e.g., https://example.com)"}
-    //                             maxLength={300}
-    //                           />
-    //                         )}
-    //                       />
-    //                     </Grid.Cell>
-
-    //                   </Grid>
-
-    //                   <Grid columns={6}>
-    //                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-    //                       <Controller
-    //                         name="address"
-    //                         control={control}
-    //                         rules={{
-    //                           maxLength: {
-    //                             value: 500,
-    //                             message: "Address cannot exceed 500 characters",
-    //                           }
-    //                         }}
-    //                         render={({ field, fieldState }) => (
-    //                           <TextField
-    //                             type="text"
-    //                             label="Address"
-    //                             name="address"
-    //                             value={field.value}
-    //                             onChange={field.onChange}
-    //                             error={fieldState.error?.message || actionData?.errors?.phone}
-    //                             autoComplete="off"
-    //                             placeholder={"Enter address details"}
-    //                             maxLength={500}
-    //                           />
-    //                         )}
-    //                       />
-    //                     </Grid.Cell>
-
-    //                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-    //                       <Controller
-    //                         name="notes"
-    //                         control={control}
-    //                         rulese={{
-    //                           maxLength: {
-    //                             value: 400,
-    //                             message: "Note cannot exceed 400 characters",
-    //                           }
-    //                         }}
-    //                         render={({ field, fieldState }) => (
-    //                           <TextField
-    //                             type="text"
-    //                             label="Additional notes"
-    //                             name="notes"
-    //                             value={field.value}
-    //                             onChange={field.onChange}
-    //                             error={fieldState.error?.message || actionData?.errors?.notes}
-    //                             autoComplete="off"
-    //                             placeholder={"Enter notes (if any)"}
-    //                             maxLength={400}
-    //                           />
-    //                         )}
-    //                       />
-    //                     </Grid.Cell>
-
-    //                   </Grid>
-
-    //                 </BlockStack>
-    //               </Box>
-
-
-
-    //             </Card>
-    //           </Box>
-
-    //           <Box paddingBlockStart={'400'} >
-    //             <Card padding={'0'}>
-    //               <Box padding={'300'}>
-    //                 <BlockStack gap={"100"}>
-    //                   <Text variant="headingSm">Commission</Text>
-    //                   <Text variant="bodySm">Set affiliate commission</Text>
-    //                 </BlockStack>
-    //               </Box>
-    //               <Divider />
-    //               <Box padding={'300'}>
-    //                 {/* {fields.map((field, i) => (
-    //                   <div key={field.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr auto", gap: 8, marginBottom: 8 }}>
-    //                     <input
-    //                       type="number"
-    //                       placeholder="From"
-    //                       {...register(`tieredCommission.${i}.from`, { valueAsNumber: true })}
-    //                       min={0}
-    //                     />
-    //                     <input
-    //                       type="number"
-    //                       placeholder="To"
-    //                       {...register(`tieredCommission.${i}.to`, { valueAsNumber: true })}
-    //                       min={0}
-    //                     />
-    //                     <input
-    //                       type="number"
-    //                       step="0.01"
-    //                       placeholder="Rate"
-    //                       {...register(`tieredCommission.${i}.rate`, { valueAsNumber: true })}
-    //                       min={0}
-    //                     />
-    //                     <select {...register(`tieredCommission.${i}.type`)}>
-    //                       <option value="percentage">percentage</option>
-    //                       <option value="fixed">fixed</option>
-    //                     </select>
-    //                     <button type="button" onClick={() => remove(i)}>Remove</button>
-    //                   </div>
-    //                 ))} */}
-
-
-    //                 <Box>
-    //                   <BlockStack gap={'100'}>
-    //                     {/* <Text variant="bodyMd" fontWeight="regular">{t("view_full_product")}</Text> */}
-    //                     <Text variant="bodyMd" fontWeight="regular">Commission criteria</Text>
-    //                     <Controller
-    //                       name="commissionCiteria"
-    //                       control={control}
-    //                       defaultValue={COMISSION_CRITERIA.tiered}
-    //                       render={({ field }) => (
-    //                         <InlineStack gap={'400'} blockAlign="center">
-    //                           <RadioButton
-    //                             name="commissionCiteria"
-    //                             label="Tiered"
-    //                             checked={field.value === COMISSION_CRITERIA.tiered}
-    //                             onChange={() => field.onChange(COMISSION_CRITERIA.tiered)}
-
-    //                           />
-    //                           <RadioButton
-    //                             name="commissionCiteria"
-    //                             label="Fixed"
-    //                             checked={field.value === COMISSION_CRITERIA.fixed}
-    //                             onChange={() => field.onChange(COMISSION_CRITERIA.fixed)}
-
-    //                           />
-    //                         </InlineStack>
-    //                       )}
-    //                     />
-
-    //                   </BlockStack>
-    //                 </Box>
-
-    //                 <Box>
-
-    //                     <BlockStack gap={'100'}>
-    //                       <Controller
-    //                         name="tieredType"
-    //                         control={control}
-    //                         defaultValue={TIERED_TYPE.quantity}
-    //                         render={({ field }) => (
-    //                           <Box paddingBlockStart={'300'} maxWidth="400px">
-    //                             <Select
-    //                               name="tieredType"
-    //                               label="Tiered type"
-    //                               value={field.value}
-    //                               onChange={field.onChange}
-    //                               options={[
-    //                                 { label: 'Quantity', value: TIERED_TYPE.quantity },
-    //                                 { label: 'Amount', value: TIERED_TYPE.amount },
-    //                               ]}
-    //                             />
-    //                           </Box>
-    //                         )}
-    //                       />
-    //                     </BlockStack>
-
-    //                 </Box>
-
-    //               </Box>
-
-    //             </Card>
-    //           </Box>
-    //           <Box paddingBlockStart={'400'} >
-    //             <Button size="large" submit variant="primary">Add affiliate</Button>
-    //           </Box>
-    //         </form>
-    //       </Card>
-    //     </Layout.Section>
-    //   </Layout>
-    // </Page>
 
     <s-page heading="EmbedUp - Sell Anywhere" inlineSize="base">
 
       {disabledContentProPlan &&
-          <s-stack paddingBlockStart="large">
-            <s-banner heading="Attention!!" tone="warning">
-              Upgrade the plan to use the Affiliate feature
-              <s-button href="/app/plans" slot="secondary-actions">Upgrade to pro</s-button>
-            </s-banner>
-          </s-stack>
-        }
+        <s-stack paddingBlockStart="large">
+          <s-banner heading="Attention!!" tone="warning">
+            Upgrade the plan to use the Affiliate feature
+            <s-button href="/app/plans" slot="secondary-actions">Upgrade to pro</s-button>
+          </s-banner>
+        </s-stack>
+      }
 
       <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
         <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
         <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
       </s-stack>
 
-      <SaveBar id="spc-save-bar">
+      <SaveBar id="spc-save-bar_affiliate">
         <button type="submit" variant="primary"
           {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
         ></button>
@@ -474,7 +160,7 @@ const CreateAffiliate = () => {
       <s-box padding="large none none none">
         <s-section >
           <s-query-container>
-            <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar onReset={() => reset()}>
+            <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} onReset={() => reset()}>
               <s-box background="base" border="base" borderRadius="large">
                 <s-stack gap="medium-400" padding="small-200 small-200 small-200 large-100">
                   <s-heading size="small">Affiliate information</s-heading>
@@ -524,7 +210,11 @@ const CreateAffiliate = () => {
                         maxLength: {
                           value: 100,
                           message: "Email cannot exceed 100 characters",
-                        }
+                        },
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: "Please enter a valid email address",
+                        },
                       }}
                       render={({ field, fieldState }) => (
 
@@ -1010,7 +700,7 @@ const CreateAffiliate = () => {
                         >
                           <s-choice value={AFFILIATE_STATUS.active} defaultSelected>Approve</s-choice>
                           <s-choice value={AFFILIATE_STATUS.pending}>Pending</s-choice>
-                          <s-choice value={AFFILIATE_STATUS.inactive}>Reject/Disabled</s-choice> 
+                          <s-choice value={AFFILIATE_STATUS.inactive}>Reject/Disabled</s-choice>
                         </s-choice-list>
                       )}
                     />

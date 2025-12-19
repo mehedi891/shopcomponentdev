@@ -5,7 +5,7 @@ import { AFFILIATE_STATUS, COMISSION_CRITERIA, FIXED_COMISSION, TIERED_COMISSION
 import TieredCommission from "../components/TieredCommission/TieredCommission";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
-import { SaveBar } from "@shopify/app-bridge-react";
+import { SaveBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useEffect, useState } from "react";
 
 export const loader = async ({ request, params }) => {
@@ -22,6 +22,7 @@ export const loader = async ({ request, params }) => {
   }
 }
 const Updateaffiliate = () => {
+  const shopify = useAppBridge();
   const { affData } = useLoaderData();
   console.log("affData:", affData);
   const navigation = useNavigation();
@@ -95,21 +96,41 @@ const Updateaffiliate = () => {
 
   const handleDiscard = () => {
     reset();
-    shopify.saveBar.hide('spc-save-bar')
+    shopify.saveBar.hide('spc-save-bar_affiliate')
   }
 
-    useEffect(() => {
+  useEffect(() => {
     if (searchParams.toString()) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [searchParams]);
 
+  useEffect(()=>{
+    if(isDirty){
+      shopify.saveBar.show('spc-save-bar_affiliate')
+    }else{
+      shopify.saveBar.hide('spc-save-bar_affiliate')
+    }
+  },[isDirty]);
+
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
     <s-page heading="EmbedUp - Sell Anywhere" inlineSize="base">
+      <SaveBar id="spc-save-bar_affiliate">
+        <button type="submit" variant="primary"
+          {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
+        ></button>
+        <button
+          type="button"
+          onClick={() => {
+            handleDiscard();
+          }}
+        >
+        </button>
+      </SaveBar>
       <s-query-container>
-        <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} data-save-bar onReset={() => reset()}>
+        <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} onReset={() => reset()}>
           <s-stack
             padding="large-100 none none none"
             direction="inline"
@@ -121,20 +142,6 @@ const Updateaffiliate = () => {
             <s-text type="strong">Update: {affData?.name}</s-text>
           </s-stack>
 
-        
-
-          <SaveBar id="spc-save-bar">
-            <button type="submit" variant="primary"
-              {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
-            ></button>
-            <button
-              type="button"
-              onClick={() => {
-                handleDiscard();
-              }}
-            >
-            </button>
-          </SaveBar>
           {showNewCreatedBanner &&
             <s-stack paddingBlockStart="large">
               <s-banner heading="Affiliated created successfully" tone="success" dismissible>
@@ -204,7 +211,11 @@ const Updateaffiliate = () => {
                         maxLength: {
                           value: 100,
                           message: "Email cannot exceed 100 characters",
-                        }
+                        },
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: "Please enter a valid email address",
+                        },
                       }}
                       render={({ field, fieldState }) => (
 
@@ -567,7 +578,7 @@ const Updateaffiliate = () => {
                           onChange={(event) => field.onChange(event.currentTarget.values[0])}
                         >
                           <s-choice value={AFFILIATE_STATUS.active} defaultSelected={watchedValues.status === AFFILIATE_STATUS.active}>Approved</s-choice>
-                           <s-choice value={AFFILIATE_STATUS.pending} defaultSelected={watchedValues.status === AFFILIATE_STATUS.pending}>Pending</s-choice>
+                          <s-choice value={AFFILIATE_STATUS.pending} defaultSelected={watchedValues.status === AFFILIATE_STATUS.pending}>Pending</s-choice>
                           <s-choice value={AFFILIATE_STATUS.inactive} defaultSelected={watchedValues.status === AFFILIATE_STATUS.inactive}>Reject/Deactive</s-choice>
                         </s-choice-list>
                       )}
