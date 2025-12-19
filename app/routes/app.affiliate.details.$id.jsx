@@ -46,6 +46,7 @@ export const loader = async ({ request, params }) => {
           title: true,
         },
       },
+      orders:true
     },
   });
 
@@ -150,7 +151,7 @@ const Affiliatedetails = () => {
   //console.log(data2);
   //console.log("orderData:", spOrders);
   //console.log("components:", components);
-  //console.log("affData:", affData);
+  console.log("affData:", affData);
   //console.log("refundData:", refundData);
   const data = [
     {

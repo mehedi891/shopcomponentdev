@@ -135,45 +135,45 @@ export const loader = async ({ request }) => {
     });
   }
 
-  if (shopData?.affiliates.length === 0) {
-    //console.log('if hitted......');
-    await db.affiliate.upsert({
-      where: {
-        shop: {
-          shopifyDomain: session.shop,
-        },
-        shopId: shopData?.id,
-        isDefault: true,
-        affTrackingCode: `spc_aff_${shopData?.id}`,
-      },
-      update: {},
-      create: {
-        name: 'EmbedUp Affiliate',
-        email: 'app@efoli.com',
-        phone: '',
-        website: 'https://www.efoli.com',
-        address: '',
-        notes: '',
-        commissionCiteria: "fixed",
-        payoutMethods: {
-          method: "others",
-          value: 'app.efoli.com',
-        },
-        fixedCommission: {
-          value: 0,
-          type: "percentage",
-        },
-        tieredCommissionType: "",
-        tieredCommission: [
-          { from: 0, to: 1, rate: 0, type: 'percentage' }
-        ],
-        status: AFFILIATE_STATUS.active,
-        affTrackingCode: `spc_aff_${shopData?.id}`,
-        shopId: shopData?.id,
-        isDefault: true,
-      },
-    });
-  }
+  // if (shopData?.affiliates.length === 0) {
+  //   //console.log('if hitted......');
+  //   await db.affiliate.upsert({
+  //     where: {
+  //       shop: {
+  //         shopifyDomain: session.shop,
+  //       },
+  //       shopId: shopData?.id,
+  //       isDefault: true,
+  //       affTrackingCode: `spc_aff_${shopData?.id}`,
+  //     },
+  //     update: {},
+  //     create: {
+  //       name: 'EmbedUp Affiliate',
+  //       email: 'app@efoli.com',
+  //       phone: '',
+  //       website: 'https://www.efoli.com',
+  //       address: '',
+  //       notes: '',
+  //       commissionCiteria: "fixed",
+  //       payoutMethods: {
+  //         method: "others",
+  //         value: 'app.efoli.com',
+  //       },
+  //       fixedCommission: {
+  //         value: 0,
+  //         type: "percentage",
+  //       },
+  //       tieredCommissionType: "",
+  //       tieredCommission: [
+  //         { from: 0, to: 1, rate: 0, type: 'percentage' }
+  //       ],
+  //       status: AFFILIATE_STATUS.active,
+  //       affTrackingCode: `spc_aff_${shopData?.id}`,
+  //       shopId: shopData?.id,
+  //       isDefault: true,
+  //     },
+  //   });
+  // }
 
 
 
