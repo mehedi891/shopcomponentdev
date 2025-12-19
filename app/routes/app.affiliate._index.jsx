@@ -197,29 +197,29 @@ const Affiliate = () => {
         >
           <s-section>
             <s-stack gap="small-100">
-              <s-text>Total Orders</s-text>
-              <s-text type="strong">{currencySymbol + totalSales ?? 0}</s-text>
+              <s-text>Total Orders Amount</s-text>
+              <s-text type="strong">{currencySymbol + (totalSales || 0).toFixed(2)}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Commission Paid</s-text>
-              <s-text type="strong">{currencySymbol + totalCommissionPaid}</s-text>
+              <s-text type="strong">{currencySymbol + (totalCommissionPaid || 0).toFixed(2)}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Pending Commission</s-text>
-              <s-text type="strong">{currencySymbol}{totalCommission - totalCommissionPaid}</s-text>
+              <s-text type="strong">{currencySymbol}{((totalCommission - totalCommissionPaid) || 0).toFixed(2)}</s-text>
             </s-stack>
           </s-section>
 
           <s-section>
             <s-stack gap="small-100">
               <s-text>Total Affiliates</s-text>
-              <s-text type="strong">{affData?.length ?? 0}</s-text>
+              <s-text type="strong">{affData?.length || 0}</s-text>
             </s-stack>
           </s-section>
         </s-grid>
@@ -268,8 +268,8 @@ const Affiliate = () => {
                       <s-table-cell>{item.name}</s-table-cell>
                       <s-table-cell>{item.email}</s-table-cell>
                       <s-table-cell>{item.totalOrderCount}</s-table-cell>
-                      <s-table-cell>{currencySymbol}{item.totalOrderValue}</s-table-cell>
-                      <s-table-cell>{currencySymbol}{item?.lifetTimetotalCommission ?? 0}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{(item.totalOrderValue || 0).toFixed(2)}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{(item.totalCommission || 0).toFixed(2)}</s-table-cell>
                       <s-table-cell>{item?.components?.length > 0 ? item?.components?.length : 0}</s-table-cell>
                       <s-table-cell>
 
