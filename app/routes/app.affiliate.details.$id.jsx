@@ -163,7 +163,7 @@ const Affiliatedetails = () => {
 
   console.log("");
 
-  const pendingCommission = (affData?.lifeTimeCommission - affData?.totalCommissionPaid) ?? 0;
+  const pendingCommission = (affData?.lifeTimeCommission - affData?.totalCommissionPaid) || 0;
 
   const affTransactionFormSubmit = (data) => {
 
@@ -349,28 +349,28 @@ const Affiliatedetails = () => {
                 <s-section>
                   <s-stack gap="small-100">
                     <s-text>Total Sales</s-text>
-                    <s-text type="strong">{currencySymbol}{affData?.lifeTimeTotalValue}</s-text>
+                    <s-text type="strong">{currencySymbol}{(affData?.lifeTimeTotalValue || 0).toFixed(2)}</s-text>
                   </s-stack>
                 </s-section>
 
                 <s-section>
                   <s-stack gap="small-100">
                     <s-text>Total Commission</s-text>
-                    <s-text type="strong">{currencySymbol}{affData?.lifeTimeCommission}</s-text>
+                    <s-text type="strong">{currencySymbol}{(affData?.lifeTimeCommission || 0).toFixed(2)}</s-text>
                   </s-stack>
                 </s-section>
 
                 <s-section>
                   <s-stack gap="small-100">
                     <s-text>Pending Commission</s-text>
-                    <s-text type="strong">{currencySymbol}{pendingCommission}</s-text>
+                    <s-text type="strong">{currencySymbol}{(pendingCommission || 0).toFixed(2)}</s-text>
                   </s-stack>
                 </s-section>
 
                 <s-section>
                   <s-stack gap="small-100">
                     <s-text>Commission Paid</s-text>
-                    <s-text type="strong">{currencySymbol}{affData?.totalCommissionPaid}</s-text>
+                    <s-text type="strong">{currencySymbol}{(affData?.totalCommissionPaid || 0).toFixed(2)}</s-text>
                   </s-stack>
                 </s-section>
               </s-grid>
@@ -457,12 +457,12 @@ const Affiliatedetails = () => {
                     {components?.map((cmp, index) => (
                       <s-table-row key={index}>
                         <s-table-cell>{cmp.title}</s-table-cell>
-                        <s-table-cell>{currencySymbol}{cmp.lifeTimeTotalValue}</s-table-cell>
-                        <s-table-cell >{currencySymbol}{cmp?.lifeTimeSubTotalValue}</s-table-cell>
-                        <s-table-cell>{currencySymbol}{cmp?.lifeTimeFulFilledValue}</s-table-cell>
-                        <s-table-cell>{currencySymbol}{cmp?.lifeTimeRefundValue ?? 0}</s-table-cell>
+                        <s-table-cell>{currencySymbol}{(cmp?.lifeTimeTotalValue || 0).toFixed(2)}</s-table-cell>
+                        <s-table-cell >{currencySymbol}{(cmp?.lifeTimeSubTotalValue || 0).toFixed(2)}</s-table-cell>
+                        <s-table-cell>{currencySymbol}{(cmp?.lifeTimeFulFilledValue || 0).toFixed(2)}</s-table-cell>
+                        <s-table-cell>{currencySymbol}{(cmp?.lifeTimeRefundValue || 0).toFixed(2)}</s-table-cell>
                         <s-table-cell>
-                          <s-table-cell>{currencySymbol}{cmp?.lifeTimeCommission}</s-table-cell>
+                          <s-table-cell>{currencySymbol}{(cmp?.lifeTimeCommission || 0).toFixed(2)}</s-table-cell>
                         </s-table-cell>
 
                       </s-table-row>
