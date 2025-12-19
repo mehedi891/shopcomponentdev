@@ -395,7 +395,7 @@ const Updateaffiliate = () => {
                       <s-box padding="small-100 none">
                         {/* Heading start */}
 
-                        <s-box padding="none none large-100 none" maxInlineSize="400px">
+                        {/* <s-box padding="none none large-100 none" maxInlineSize="400px">
                           <Controller
                             name="tieredCommissionType"
                             control={control}
@@ -406,7 +406,7 @@ const Updateaffiliate = () => {
                               </s-select>
                             )}
                           />
-                        </s-box>
+                        </s-box> */}
 
                         <s-grid
                           gridTemplateColumns="repeat(7, 1fr)"
