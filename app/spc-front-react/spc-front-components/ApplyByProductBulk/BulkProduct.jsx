@@ -3,15 +3,17 @@ import BulkProductCard from "./BulkProductCard/BulkProductCard";
 import PoweredBy from "../PoweredBy/PoweredBy";
 import CartCountBuble from "../ShoppingCart/CartCountBuble/CartCountBuble";
 import ShoppingCart from "../ShoppingCart/ShoppingCart";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ContextComponent } from "../../entryPoints/ContextWrapper/ContextWrapper";
 import { resetSelectedQuantity, showLoading } from "../utilities/utilisFnc";
 import cartLineAddFnc from "../utilities/cartLineAddFnc";
 import cartCreateFnc from "../utilities/cartCreateFnc";
+import { PLAN_NAME } from "../../../constants/constants";
+import { buildUtmParams } from "../../../utilis/generalUtils";
 
 const BulkProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType } = componentData;
-
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType,utmSource, utmMedium, utmCampaign  } = componentData;
+  const [customTrackings, setCustomTrackings] = useState("");
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
 
@@ -21,8 +23,15 @@ const BulkProduct = ({ componentData, token, store }) => {
     slider.scrollBy({ left: btnType === 'next' ? slideWidth : -slideWidth, behavior: "smooth" });
   }
 
+   useEffect(() => {
+      if(shop?.plan?.planName === PLAN_NAME.pro){
+        setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+      }
+  
+    }, [shop?.plan?.planName]);
 
-  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products) => {
+
+  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products,customTrackings) => {
     event.preventDefault();
 
     const target = event.target;
@@ -99,7 +108,7 @@ const BulkProduct = ({ componentData, token, store }) => {
     }
   }
 
-  const handleAddToCheckoutBulk = (event, token, store, tracking, customerTracking, enableQtyField, products) => {
+  const handleAddToCheckoutBulk = (event, token, store, tracking, customerTracking, enableQtyField, products,customTrackings) => {
     event.preventDefault();
 
     const target = event.target;
@@ -129,7 +138,7 @@ const BulkProduct = ({ componentData, token, store }) => {
     showLoading(event.target, true);
 
     try {
-      const checkoutUrl = `https://${store}/cart/${selectedVariants.join(',')}?access_token=${token}&attributes[SC_custom_tracking]=${customerTracking}&attributes[shopcomponent_tracking]=${tracking}&ref=shopcomponent`;
+      const checkoutUrl = `https://${store}/cart/${selectedVariants.join(',')}?access_token=${token}&attributes[EU_custom_tracking]=${customerTracking}&attributes[embedup_tracking]=${tracking}&ref=embedup&${customTrackings}`;
 
       window.open(checkoutUrl, '_top');
 
@@ -194,6 +203,7 @@ const BulkProduct = ({ componentData, token, store }) => {
           store={shop?.shopifyDomain}
           token={token}
           shoppingCartSettings={componentData?.shoppingCartSettings}
+          customTrackings={customTrackings}
         />
       </div>
 
@@ -215,7 +225,7 @@ const BulkProduct = ({ componentData, token, store }) => {
         <div className="product-card__buttons shopcomponent_pd_buttons_bulk">
           <button
             className={`product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}`}
-            onClick={(event) => { handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products) }}
+            onClick={(event) => { handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products,customTrackings) }}
             shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
           >
             <span className="spcBtn_txt"> {buttonStyleSettings.checkoutBtnTxt}</span>

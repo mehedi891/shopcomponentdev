@@ -32,7 +32,8 @@ const SHOW_COMPONENT_TITLE = {
 
 const MAX_ALLOWED_COMPONENTS = {
   free: 1,
-  growth: 10
+  growth: 15,
+  pro: 50,
 }
 
 const PLAN_TYPE = {

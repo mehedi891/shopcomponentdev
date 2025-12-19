@@ -28,11 +28,14 @@ export const loader = async ({ request }) => {
         productLayoutSettings: true,
         buttonStyleSettings: true,
         tracking: true,
+        utmSource: true,
+        utmMedium: true,
+        utmCampaign: true,
         customerTracking: true,
         shop: {
           select: {
             appDisabled: true,
-            shopifyDomain:true,
+            shopifyDomain: true,
             scAccessToken: true,
             headlessAccessToken: true,
             plan: {
@@ -53,7 +56,7 @@ export const loader = async ({ request }) => {
         status: 404
       }));
     }
-    if ( component?.status === 'activate') {
+    if (component?.status === 'activate') {
       jsonResponse = new Response(JSON.stringify({
         data: component,
         success: true,

@@ -6,7 +6,7 @@ import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
 import PageTitle from '../components/PageTitle/PageTitle';
-import { MAX_ALLOWED_COMPONENTS, PLAN_STATUS } from '../constants/constants';
+import { MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_STATUS } from '../constants/constants';
 
 export const loader = async ({ request }) => {
 
@@ -47,12 +47,13 @@ export const loader = async ({ request }) => {
   const downgrade = url.searchParams.get('downgrade');
   const planType = url.searchParams.get('planType');
   const chargeId = url.searchParams.get('charge_id');
+  const planName = url.searchParams.get('planName');
 
   if (appSubscriptions?.length > 0 && shopData?.plan?.planId !== appSubscriptions[0]?.id) {
     shopData = await db.shop.update({
       where: { id: Number(shopData.id) },
       data: {
-        maxAllowedComponents: MAX_ALLOWED_COMPONENTS.growth,
+        maxAllowedComponents: planName === PLAN_NAME.growth ? MAX_ALLOWED_COMPONENTS.growth : MAX_ALLOWED_COMPONENTS.pro,
         appPlan: appSubscriptions[0].name,
         trialDays: appSubscriptions[0].trialDays,
         planActivatedAt: isFirstInstall === 'true' ? appSubscriptions[0]?.createdAt : shopData?.planActivatedAt,
@@ -64,7 +65,7 @@ export const loader = async ({ request }) => {
               planName: appSubscriptions[0].name,
               price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
               planStatus: appSubscriptions[0].status,
-              isTestCharge:appSubscriptions[0].test,
+              isTestCharge: appSubscriptions[0].test,
               planType,
               chargeId
             },
@@ -73,7 +74,7 @@ export const loader = async ({ request }) => {
               planName: appSubscriptions[0].name,
               price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
               planStatus: appSubscriptions[0].status,
-              isTestCharge:appSubscriptions[0].test,
+              isTestCharge: appSubscriptions[0].test,
               planType,
               chargeId
             },
@@ -90,15 +91,83 @@ export const loader = async ({ request }) => {
 
 
   if (upgrade === 'true' && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions?.length > 0 && subscriptionResponseJson?.data?.app?.installation?.activeSubscriptions[0]?.status === PLAN_STATUS.active) {
-   
-    await db.component.updateMany({
+    const components = await db.component.findMany({
       where: {
         shopId: shopData.id,
       },
-      data: {
-        softDelete: false
+      select: {
+        id: true,
+      },
+      orderBy: {
+        id: 'asc'
       }
     });
+
+    if (planName === PLAN_NAME.growth) {
+      const cmpIdsArr = components.map(c => c.id);
+      const allowedIds = cmpIdsArr.slice(0, MAX_ALLOWED_COMPONENTS.growth);
+      const notAllowedIds = cmpIdsArr.slice(MAX_ALLOWED_COMPONENTS.growth, cmpIdsArr.length);
+
+      await db.component.updateMany({
+        where: {
+          shopId: shopData.id,
+          id: {
+            in: allowedIds
+          }
+        },
+        data: {
+          softDelete: false
+        }
+      });
+
+      if (notAllowedIds.length > 0) {
+        await db.component.updateMany({
+          where: {
+            shopId: shopData.id,
+            id: {
+              in: notAllowedIds
+            }
+          },
+          data: {
+            softDelete: true
+          }
+        });
+      }
+
+
+    }else if(planName === PLAN_NAME.pro){
+      const cmpIdsArr = components.map(c => c.id);
+      const allowedIds = cmpIdsArr.slice(0, MAX_ALLOWED_COMPONENTS.pro);
+      const notAllowedIds = cmpIdsArr.slice(MAX_ALLOWED_COMPONENTS.pro, cmpIdsArr.length);
+
+      await db.component.updateMany({
+        where: {
+          shopId: shopData.id,
+          id: {
+            in: allowedIds
+          }
+        },
+        data: {
+          softDelete: false
+        }
+      });
+
+      if (notAllowedIds.length > 0) {
+        await db.component.updateMany({
+          where: {
+            shopId: shopData.id,
+            id: {
+              in: notAllowedIds
+            }
+          },
+          data: {
+            softDelete: true
+          }
+        });
+      }
+
+    }
+
   }
 
   return {
@@ -111,7 +180,7 @@ export const loader = async ({ request }) => {
 
 const PlanPurchase = () => {
   const { shopData } = useLoaderData();
- 
+
   const { t } = useTranslation();
   const navigation = useNavigation();
   const navigate = useNavigate();

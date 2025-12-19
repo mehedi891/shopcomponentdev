@@ -27,6 +27,7 @@ import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import Instruction from "../components/Instruction/Instruction";
+import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {
@@ -125,6 +126,7 @@ export const loader = async ({ request }) => {
   const isFirstInstall = url.searchParams.get('isFirstInstall');
   const planType = url.searchParams.get('planType');
   const chargeId = url.searchParams.get('charge_id');
+  const planName = url.searchParams.get('planName');
 
   
   if (isFirstInstall && appSubscriptions?.length > 0) {
@@ -134,7 +136,7 @@ export const loader = async ({ request }) => {
       },
       data: {
         isFirstInstall: isFirstInstall === 'true' ? false : true,
-        maxAllowedComponents: 10,
+        maxAllowedComponents: planName === PLAN_NAME.growth ? MAX_ALLOWED_COMPONENTS.growth : MAX_ALLOWED_COMPONENTS.pro,
         appPlan: appSubscriptions[0].name,
         trialDays: appSubscriptions[0].trialDays,
         isAppliedCoupon: true,

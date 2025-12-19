@@ -939,12 +939,12 @@ export const action = async ({ request }) => {
     }
 
 
-    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}`;
+    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}&planName=${data.planName}`;
 
     if (data?.isFirstInstall === 'false') {
-      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}`;
+      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}&planName=${data.planName}`;
     } else if (data?.isFirstInstall === 'true') {
-      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/?isFirstInstall=true&planType=${data.planType}`;
+      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/?isFirstInstall=true&planType=${data.planType}&planName=${data.planName}`;
     }
 
 

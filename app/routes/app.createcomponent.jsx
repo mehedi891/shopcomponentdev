@@ -342,7 +342,7 @@ const CreateComponent = () => {
             utmMedium: '',
             utmCampaign: '',
             shopId: shopData?.id,
-            affiliateId: shopData?.affiliates[0].id || null,
+            affiliateId:  null,
             compHtml: 'EmptyHtml'
         }
     });
@@ -3881,9 +3881,10 @@ const CreateComponent = () => {
                                                                     error={fieldState?.error?.message}
                                                                 //required
                                                                 >
+                                                                     <s-option defaultSelected={watchedValues.affiliateId === null} value={null}>{"Select a affiliate"}</s-option>
                                                                     {shopData?.affiliates?.map((item) => {
                                                                         return (
-                                                                            <s-option key={item.id} disabled={item.isDefault === true} defaultSelected={item.isDefault === true} value={item.id}>{item.name}</s-option>
+                                                                            <s-option key={item.id} disabled={item.isDefault === true} value={item.id}>{item.name}</s-option>
                                                                         )
                                                                     })
                                                                     }

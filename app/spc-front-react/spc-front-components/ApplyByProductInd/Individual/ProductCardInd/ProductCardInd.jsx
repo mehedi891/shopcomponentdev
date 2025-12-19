@@ -1,6 +1,6 @@
 
 
-const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout }) => {
+const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout,customTrackings }) => {
 
 
 
@@ -20,7 +20,7 @@ const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token
   const pdCheckoutBtnHtml = `
    <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}')"
+                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
                   <span class="spcBtn_txt">${checkoutBtnTxt}</span>

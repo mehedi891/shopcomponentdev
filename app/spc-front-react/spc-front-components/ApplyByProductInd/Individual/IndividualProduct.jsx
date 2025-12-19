@@ -7,12 +7,16 @@ import { ContextComponent } from "../../../entryPoints/ContextWrapper/ContextWra
 import { getSelectedVariantId, showLoading } from "../../utilities/utilisFnc";
 import cartLineAddFnc from "../../utilities/cartLineAddFnc";
 import cartCreateFnc from "../../utilities/cartCreateFnc";
+import { PLAN_NAME } from "../../../../constants/constants";
+import { buildUtmParams } from "../../../../utilis/generalUtils";
 
 
 
 const IndividualProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType,utmSource, utmMedium, utmCampaign } = componentData;
+  //console.log("componentData222:",componentData);
   const [selectecTedProducts, setSelectecTedProducts] = useState([]);
+  const [customTrackings, setCustomTrackings] = useState("");
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
 
@@ -27,8 +31,16 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
 
   useEffect(() => {
-    setSelectecTedProducts(shop?.plan?.planName === "Free" ? addToCartType?.products?.slice(0, 3) : addToCartType?.products)
+    setSelectecTedProducts(shop?.plan?.planName === PLAN_NAME.free ? addToCartType?.products?.slice(0, 3) : addToCartType?.products);
+    if(shop?.plan?.planName === PLAN_NAME.pro){
+      setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+    }
+
   }, [addToCartType.products, shop?.plan?.planName]);
+
+  
+
+  //console.log("customTrackings:",customTrackings);
 
 
 
@@ -88,7 +100,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
     //console.log("selectedVariant:", selectedVariant);
   };
 
-  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView) => {
+  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView,customTrackings) => {
     event.preventDefault();
 
     const target = event.target;
@@ -99,12 +111,13 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
     try {
       const variantIdNum = variantId.replace('gid://shopify/ProductVariant/', '');
-      const checkoutUrl = `https://${store}/cart/${variantIdNum}:1?access_token=${token}&attributes[SC_custom_tracking]=${customerTracking}&attributes[shopcomponent_tracking]=${tracking}&ref=shopcomponent`;
+      const checkoutUrl = `https://${store}/cart/${variantIdNum}:1?access_token=${token}&attributes[EU_custom_tracking]=${customerTracking}&attributes[embedup_tracking]=${tracking}&ref=embedup&${customTrackings}`;
       // window.location.href = checkoutUrl;
       window.open(checkoutUrl, '_top');
 
       //Open new tab
       //window.open(checkoutUrl, '_blank');
+      //console.log("checkoutUrl:", checkoutUrl);
 
     } catch (error) {
       console.error("Checkout redirection error:", error);
@@ -195,6 +208,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
                 shop={shop}
                 appliesTo={appliesTo}
                 layout={layout}
+                customTrackings={customTrackings}
               />
             )}
 
@@ -209,6 +223,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
           store={shop?.shopifyDomain}
           token={token}
           shoppingCartSettings={componentData?.shoppingCartSettings}
+          customTrackings={customTrackings}
         />
 
 

@@ -1095,7 +1095,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState7(initialState) {
+        function useState9(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1107,7 +1107,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect9(create, deps) {
+        function useEffect10(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1890,7 +1890,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext6;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect9;
+        exports.useEffect = useEffect10;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -1898,7 +1898,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
         exports.useRef = useRef2;
-        exports.useState = useState7;
+        exports.useState = useState9;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -25353,7 +25353,7 @@ var GlobalStyle_default = GlobalStyle;
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/ProductCardInd/ProductCardInd.jsx
 init_define_import_meta_env();
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-var ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout }) => {
+var ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout, customTrackings }) => {
   const pdAddToCartBtnHtml = `
                 <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}"
@@ -25369,7 +25369,7 @@ var ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt, token,
   const pdCheckoutBtnHtml = `
    <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}')"
+                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
                   <span class="spcBtn_txt">${checkoutBtnTxt}</span>
@@ -26005,6 +26005,11 @@ var resetSelectedQuantity = (container) => {
 
 // app/constants/constants.js
 init_define_import_meta_env();
+var PLAN_NAME = {
+  free: "Free",
+  growth: "Growth",
+  pro: "Pro"
+};
 var BoleanOptions = {
   yes: "yes",
   no: "no"
@@ -26012,7 +26017,7 @@ var BoleanOptions = {
 
 // app/spc-front-react/spc-front-components/ShoppingCart/ShoppingCart.jsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) => {
+var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings, customTrackings }) => {
   const { cartData } = (0, import_react2.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = (0, import_react2.useState)(false);
@@ -26161,7 +26166,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
       }
     }
   };
-  const handleCheckout = async (e, notes) => {
+  const handleCheckout = async (e, notes, customTrackings2) => {
     const target = e.target;
     showLoading(target, true);
     if (cartData?.lines?.nodes?.length > 0) {
@@ -26182,7 +26187,9 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
         }
       }
       const checkoutUrl = cartData?.checkoutUrl;
-      window.open(checkoutUrl, "_top");
+      const searchParams = new URLSearchParams(checkoutUrl);
+      const newCheckoutUrl = checkoutUrl + `${searchParams?.size > 0 ? `&${customTrackings2}` : `?${customTrackings2}`}`;
+      window.open(newCheckoutUrl, "_top");
       setTimeout(() => {
         showLoading(target, false);
       }, 400);
@@ -26836,7 +26843,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) 
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_additional_text", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.additionalInfo }) }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_primary_button_container", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: (e) => {
-          handleCheckout(e, addNotes);
+          handleCheckout(e, addNotes, customTrackings);
         }, className: "spc_embedup_button spc_embedup_primary_button product-card__add-button", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: shoppingCartSettings?.shoppingCartBtnTxt ?? "Checkout" }) }) })
       ] })
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart-contents", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "spc_embedup_cart_empty", children: shoppingCartSettings?.emptyCartText }) }),
@@ -26935,11 +26942,11 @@ var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTrac
       // },
       "attributes": [
         {
-          "key": "SC_custom_tracking",
+          "key": "EU_custom_tracking",
           "value": customerTracking
         },
         {
-          "key": "shopcomponent_tracking",
+          "key": "embedup_tracking",
           "value": tracking
         }
       ]
@@ -26985,11 +26992,22 @@ var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTrac
 };
 var cartCreateFnc_default = cartCreateFnc;
 
+// app/utilis/generalUtils.js
+init_define_import_meta_env();
+function buildUtmParams({ source, medium, campaign }) {
+  return Object.entries({
+    utm_source: source,
+    utm_medium: medium,
+    utm_campaign: campaign
+  }).filter(([, value]) => value !== void 0 && value !== null && value !== "").map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`).join("&");
+}
+
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/IndividualProduct.jsx
 var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 var IndividualProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
   const [selectecTedProducts, setSelectecTedProducts] = (0, import_react3.useState)([]);
+  const [customTrackings, setCustomTrackings] = (0, import_react3.useState)("");
   const { cartModal, cartRef } = (0, import_react3.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const moveSliderPrevNext = (btnType) => {
@@ -26998,7 +27016,10 @@ var IndividualProduct = ({ componentData, token, store }) => {
     slider.scrollBy({ left: btnType === "next" ? slideWidth : -slideWidth, behavior: "smooth" });
   };
   (0, import_react3.useEffect)(() => {
-    setSelectecTedProducts(shop?.plan?.planName === "Free" ? addToCartType?.products?.slice(0, 3) : addToCartType?.products);
+    setSelectecTedProducts(shop?.plan?.planName === PLAN_NAME.free ? addToCartType?.products?.slice(0, 3) : addToCartType?.products);
+    if (shop?.plan?.planName === PLAN_NAME.pro) {
+      setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+    }
   }, [addToCartType.products, shop?.plan?.planName]);
   const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
     const target = event.target;
@@ -27047,7 +27068,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
       }
     }
   };
-  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
+  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, customTrackings2) => {
     event.preventDefault();
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
@@ -27055,7 +27076,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
     console.log("variantId:", variantId);
     try {
       const variantIdNum = variantId.replace("gid://shopify/ProductVariant/", "");
-      const checkoutUrl = `https://${store2}/cart/${variantIdNum}:1?access_token=${token2}&attributes[SC_custom_tracking]=${customerTracking}&attributes[shopcomponent_tracking]=${tracking2}&ref=shopcomponent`;
+      const checkoutUrl = `https://${store2}/cart/${variantIdNum}:1?access_token=${token2}&attributes[EU_custom_tracking]=${customerTracking}&attributes[embedup_tracking]=${tracking2}&ref=embedup&${customTrackings2}`;
       window.open(checkoutUrl, "_top");
     } catch (error) {
       console.error("Checkout redirection error:", error);
@@ -27129,7 +27150,8 @@ var IndividualProduct = ({ componentData, token, store }) => {
               checkoutBtnTxt: buttonStyleSettings.checkoutBtnTxt,
               shop,
               appliesTo,
-              layout
+              layout,
+              customTrackings
             },
             index
           )
@@ -27143,7 +27165,8 @@ var IndividualProduct = ({ componentData, token, store }) => {
           cartRef,
           store: shop?.shopifyDomain,
           token,
-          shoppingCartSettings: componentData?.shoppingCartSettings
+          shoppingCartSettings: componentData?.shoppingCartSettings,
+          customTrackings
         }
       )
     ] }),
@@ -27173,7 +27196,8 @@ init_define_import_meta_env();
 var import_react4 = __toESM(require_react(), 1);
 var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
 var IndividualCollection = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign } = componentData;
+  const [customTrackings, setCustomTrackings] = (0, import_react4.useState)("");
   const { cartModal, cartRef } = (0, import_react4.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const moveSliderPrevNext = (btnType) => {
@@ -27181,6 +27205,11 @@ var IndividualCollection = ({ componentData, token, store }) => {
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
     slider.scrollBy({ left: btnType === "next" ? slideWidth : -slideWidth, behavior: "smooth" });
   };
+  (0, import_react4.useEffect)(() => {
+    if (shop?.plan?.planName === PLAN_NAME.pro) {
+      setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+    }
+  }, [shop?.plan?.planName]);
   const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
@@ -27228,7 +27257,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
       }
     }
   };
-  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
+  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, customTrackings2) => {
     event.preventDefault();
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
@@ -27236,7 +27265,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
     console.log("variantId:", variantId);
     try {
       const variantIdNum = variantId.replace("gid://shopify/ProductVariant/", "");
-      const checkoutUrl = `https://${store2}/cart/${variantIdNum}:1?access_token=${token2}&attributes[SC_custom_tracking]=${customerTracking}&attributes[shopcomponent_tracking]=${tracking2}&ref=shopcomponent`;
+      const checkoutUrl = `https://${store2}/cart/${variantIdNum}:1?access_token=${token2}&attributes[EU_custom_tracking]=${customerTracking}&attributes[embedup_tracking]=${tracking2}&ref=embedup${customTrackings2}`;
       window.open(checkoutUrl, "_top");
     } catch (error) {
       console.error("Checkout redirection error:", error);
@@ -27289,7 +27318,8 @@ var IndividualCollection = ({ componentData, token, store }) => {
               checkoutBtnTxt: buttonStyleSettings.checkoutBtnTxt,
               shop,
               appliesTo,
-              layout
+              layout,
+              customTrackings
             },
             index
           )
@@ -27303,7 +27333,8 @@ var IndividualCollection = ({ componentData, token, store }) => {
           cartRef,
           store: shop?.shopifyDomain,
           token,
-          shoppingCartSettings: componentData?.shoppingCartSettings
+          shoppingCartSettings: componentData?.shoppingCartSettings,
+          customTrackings
         }
       )
     ] }),
@@ -27412,7 +27443,8 @@ var CartCountBuble_default = CartCountBuble;
 var import_react7 = __toESM(require_react(), 1);
 var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
 var BulkProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const [customTrackings, setCustomTrackings] = (0, import_react7.useState)("");
   const { cartModal, cartRef } = (0, import_react7.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const moveSliderPrevNext = (btnType) => {
@@ -27420,7 +27452,12 @@ var BulkProduct = ({ componentData, token, store }) => {
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
     slider.scrollBy({ left: btnType === "next" ? slideWidth : -slideWidth, behavior: "smooth" });
   };
-  const handleAddToCartBulk = async (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products) => {
+  (0, import_react7.useEffect)(() => {
+    if (shop?.plan?.planName === PLAN_NAME.pro) {
+      setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+    }
+  }, [shop?.plan?.planName]);
+  const handleAddToCartBulk = async (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, customTrackings2) => {
     event.preventDefault();
     const target = event.target;
     const mostParentContainer = target.closest(".shopcomponent_pd_container");
@@ -27483,7 +27520,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       }
     }
   };
-  const handleAddToCheckoutBulk = (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products) => {
+  const handleAddToCheckoutBulk = (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, customTrackings2) => {
     event.preventDefault();
     const target = event.target;
     const mostParentContainer = target.closest(".shopcomponent_pd_container");
@@ -27502,7 +27539,7 @@ var BulkProduct = ({ componentData, token, store }) => {
     }
     showLoading(event.target, true);
     try {
-      const checkoutUrl = `https://${store2}/cart/${selectedVariants.join(",")}?access_token=${token2}&attributes[SC_custom_tracking]=${customerTracking2}&attributes[shopcomponent_tracking]=${tracking2}&ref=shopcomponent`;
+      const checkoutUrl = `https://${store2}/cart/${selectedVariants.join(",")}?access_token=${token2}&attributes[EU_custom_tracking]=${customerTracking2}&attributes[embedup_tracking]=${tracking2}&ref=embedup&${customTrackings2}`;
       window.open(checkoutUrl, "_top");
       setTimeout(() => {
         showLoading(event.target, false);
@@ -27554,7 +27591,8 @@ var BulkProduct = ({ componentData, token, store }) => {
           cartRef,
           store: shop?.shopifyDomain,
           token,
-          shoppingCartSettings: componentData?.shoppingCartSettings
+          shoppingCartSettings: componentData?.shoppingCartSettings,
+          customTrackings
         }
       )
     ] }),
@@ -27580,7 +27618,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       {
         className: `product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}`,
         onClick: (event) => {
-          handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products);
+          handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, customTrackings);
         },
         "shopify-attr--disabled": "!product.selectedOrFirstAvailableVariant.availableForSale",
         children: [

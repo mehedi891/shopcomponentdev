@@ -91,7 +91,7 @@ async function addToCartNcheckoutIndProduct(event, accessToken, shop, tracingCod
     }
   } else if (cartBehavior === 'checkout') {
     const variantIdNum = variantId.replace('gid://shopify/ProductVariant/', '');
-    const checkoutUrl = `https://${shop}/cart/${variantIdNum}:1?access_token=${accessToken}&attributes[SC_custom_tracking]=${customertackingCode}&attributes[shopcomponent_tracking]=${tracingCode}&ref=shopcomponent`;
+    const checkoutUrl = `https://${shop}/cart/${variantIdNum}:1?access_token=${accessToken}&attributes[EU_custom_tracking]=${customertackingCode}&attributes[embedup_tracking]=${tracingCode}&ref=embedup`;
     window.location.href = checkoutUrl;
     showLoading(event.target, false);
   } else {
@@ -199,7 +199,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
         const id = variant.merchandiseId.replace('gid://shopify/ProductVariant/', '');
         return `${[id]}:${variant.quantity}`;
       });
-      const checkoutUrl = `https://${shop}/cart/${checkoutVariants.join(',')}?access_token=${accessToken}&attributes[SC_custom_tracking]=${customertackingCode}&attributes[shopcomponent_tracking]=${tracingCode}&ref=shopcomponent`;
+      const checkoutUrl = `https://${shop}/cart/${checkoutVariants.join(',')}?access_token=${accessToken}&attributes[EU_custom_tracking]=${customertackingCode}&attributes[embedup_tracking]=${tracingCode}&ref=embedup`;
       window.location.href = checkoutUrl;
       showLoading(event.target, false);
     }
@@ -279,7 +279,7 @@ async function addToCartNcheckoutBulkProduct(event, accessToken, shop, tracingCo
           return `${[id]}:${variant.quantity}`;
         });
         //console.log(checkoutVariants.join(','));
-        const checkoutUrl = `https://${shop}/cart/${checkoutVariants.join(',')}?access_token=${accessToken}&attributes[SC_custom_tracking]=${customertackingCode}&attributes[shopcomponent_tracking]=${tracingCode}&ref=shopcomponent`;
+        const checkoutUrl = `https://${shop}/cart/${checkoutVariants.join(',')}?access_token=${accessToken}&attributes[EU_custom_tracking]=${customertackingCode}&attributes[embedup_tracking]=${tracingCode}&ref=embedup`;
         window.location.href = checkoutUrl;
         showLoading(event.target, false);
       }
@@ -434,11 +434,11 @@ async function cartCreateFnc(shop, accessToken, variants, tracingCode, customert
       "lines": variants,
       "attributes": [
         {
-          "key": "SC_custom_tracking",
+          "key": "EU_custom_tracking",
           "value": customertackingCode
         },
         {
-          "key": "shopcomponent_tracking",
+          "key": "embedup_tracking",
           "value": tracingCode
         }
       ]

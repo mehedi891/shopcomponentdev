@@ -9,7 +9,7 @@ import cartNoteUpdateFnc from "../utilities/cartNoteUpdateFnc";
 import { showLoading } from "../utilities/utilisFnc";
 import { BoleanOptions } from "../../../constants/constants";
 
-const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }) => {
+const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings,customTrackings }) => {
   const { cartData } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -173,7 +173,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
     }
   }
 
-  const handleCheckout = async (e, notes) => {
+  const handleCheckout = async (e, notes,customTrackings) => {
     const target = e.target;
     showLoading(target, true);
     if (cartData?.lines?.nodes?.length > 0) {
@@ -195,7 +195,9 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
         }
       }
       const checkoutUrl = cartData?.checkoutUrl;
-      window.open(checkoutUrl, '_top');
+      const searchParams =  new URLSearchParams(checkoutUrl)
+      const newCheckoutUrl = checkoutUrl + `${searchParams?.size > 0 ? `&${customTrackings}` : `?${customTrackings}`}`;
+      window.open(newCheckoutUrl, '_top');
       setTimeout(() => {
         showLoading(target, false);
       }, 400);
@@ -902,7 +904,7 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings }
             </div>
 
             <div className="spc_embedup_primary_button_container">
-              <button onClick={(e) => { handleCheckout(e, addNotes); }} className="spc_embedup_button spc_embedup_primary_button product-card__add-button" >
+              <button onClick={(e) => { handleCheckout(e, addNotes,customTrackings); }} className="spc_embedup_button spc_embedup_primary_button product-card__add-button" >
                 <span>{shoppingCartSettings?.shoppingCartBtnTxt ?? 'Checkout'}</span>
               </button>
             </div>

@@ -7,7 +7,7 @@ export const action = async ({ request }) => {
   const { payload } = await authenticate.webhook(request);
   //console.log('Payload:', payload);
   const isSpcOrder = payload?.note_attributes?.find(
-    (item) => item.name === "shopcomponent_tracking"
+    (item) => item.name === "embedup_tracking"
   );
 
   //console.log('From orders create:::', isSpcOrder);

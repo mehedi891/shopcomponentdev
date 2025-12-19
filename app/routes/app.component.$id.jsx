@@ -200,7 +200,7 @@ const UpdateComponent = () => {
       utmCampaign: component.utmCampaign || '',
       customerTracking: component.customerTracking,
       shopId: component.shopId,
-      affiliateId: component.affiliateId || component?.shop?.affiliates[0]?.id || null,
+      affiliateId: component.affiliateId || null,
       compHtml: 'EmptyHtml'
     }
   });
@@ -3776,6 +3776,7 @@ const UpdateComponent = () => {
                                   error={fieldState?.error?.message}
                                 // required
                                 >
+                                  <s-option defaultSelected={watchedValues.affiliateId === null} value={null}>{"Select a affiliate"}</s-option>
                                   {component?.shop?.affiliates?.map((item) => {
                                     return (
                                       <s-option key={item.id} disabled={item.isDefault === true} defaultSelected={watchedValues.affiliateId === item.id} value={item.id}>{item.name}</s-option>

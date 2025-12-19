@@ -91,7 +91,7 @@ export const loader = async ({ request }) => {
     //   "estimated_taxes": false,
     //   "financial_status": "paid",
     //   "fulfillment_status": null,
-    //   "landing_site": "/cart/43237791137891:1?access_token=ddf7fe721d2fcad3aff192baf4d2ffc3&attributes[SC_custom_tracking]=GMFDJCHOWN&attributes[shopcomponent_tracking]=FOFFGJ1MSD&ref=shopcomponent",
+    //   "landing_site": "/cart/43237791137891:1?access_token=ddf7fe721d2fcad3aff192baf4d2ffc3&attributes[EU_custom_tracking]=GMFDJCHOWN&attributes[embedup_tracking]=FOFFGJ1MSD&ref=shopcomponent",
     //   "landing_site_ref": "shopcomponent",
     //   "location_id": null,
     //   "merchant_business_entity_id": "MTYyNjUxODkxODEx",
@@ -99,8 +99,8 @@ export const loader = async ({ request }) => {
     //   "name": "#1020",
     //   "note": null,
     //   "note_attributes": [
-    //     { "name": "SC_custom_tracking", "value": "5ZQUWOXPKS" },
-    //     { "name": "shopcomponent_tracking", "value": "TVUCSAEO1A" }
+    //     { "name": "EU_custom_tracking", "value": "5ZQUWOXPKS" },
+    //     { "name": "embedup_tracking", "value": "TVUCSAEO1A" }
     //   ],
     //   "number": 20,
     //   "order_number": 1020,

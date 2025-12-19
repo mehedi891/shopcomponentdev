@@ -24,7 +24,7 @@ export const action = async ({ request }) => {
   //console.dir(payload,'infinite');
 
   // const isSpcOrder = payload?.note_attributes?.find(
-  //   (item) => item.name === "shopcomponent_tracking"
+  //   (item) => item.name === "embedup_tracking"
   // );
 
   // if (!isSpcOrder) return new Response();

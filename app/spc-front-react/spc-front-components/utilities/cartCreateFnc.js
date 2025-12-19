@@ -24,11 +24,11 @@ const cartCreateFnc = async (selectedVariant, store, token, tracking, customerTr
       // },
       "attributes": [
         {
-          "key": "SC_custom_tracking",
+          "key": "EU_custom_tracking",
           "value": customerTracking
         },
         {
-          "key": "shopcomponent_tracking",
+          "key": "embedup_tracking",
           "value": tracking
         }
       ]

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import ProductCardInd from "../../ApplyByProductInd/Individual/ProductCardInd/ProductCardInd";
 import PoweredBy from "../../PoweredBy/PoweredBy";
 import GlobalStyle from "../../Styles/GlobalStyle/GlobalStyle";
@@ -7,9 +7,12 @@ import cartLineAddFnc from "../../utilities/cartLineAddFnc";
 import cartCreateFnc from "../../utilities/cartCreateFnc";
 import { ContextComponent } from "../../../entryPoints/ContextWrapper/ContextWrapper";
 import ShoppingCart from "../../ShoppingCart/ShoppingCart";
+import { PLAN_NAME } from "../../../../constants/constants";
+import { buildUtmParams } from "../../../../utilis/generalUtils";
 
 const IndividualCollection = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo } = componentData;
+  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo,utmSource, utmMedium, utmCampaign } = componentData;
+  const [customTrackings, setCustomTrackings] = useState("");
 
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -20,7 +23,12 @@ const IndividualCollection = ({ componentData, token, store }) => {
     slider.scrollBy({ left: btnType === 'next' ? slideWidth : -slideWidth, behavior: "smooth" });
   }
 
+ useEffect(() => {
+    if(shop?.plan?.planName === PLAN_NAME.pro){
+      setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+    }
 
+  }, [shop?.plan?.planName]);
 
   const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView) => {
     const target = event.target;
@@ -77,7 +85,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
     //console.log("selectedVariant:", selectedVariant);
   };
 
-  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView) => {
+  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView,customTrackings) => {
     event.preventDefault();
 
     const target = event.target;
@@ -88,7 +96,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
 
     try {
       const variantIdNum = variantId.replace('gid://shopify/ProductVariant/', '');
-      const checkoutUrl = `https://${store}/cart/${variantIdNum}:1?access_token=${token}&attributes[SC_custom_tracking]=${customerTracking}&attributes[shopcomponent_tracking]=${tracking}&ref=shopcomponent`;
+      const checkoutUrl = `https://${store}/cart/${variantIdNum}:1?access_token=${token}&attributes[EU_custom_tracking]=${customerTracking}&attributes[embedup_tracking]=${tracking}&ref=embedup${customTrackings}`;
       // window.location.href = checkoutUrl;
       window.open(checkoutUrl, '_top');
 
@@ -154,6 +162,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
               shop={shop}
               appliesTo={appliesTo}
               layout={layout}
+              customTrackings={customTrackings}
             />
           )}
 
@@ -167,6 +176,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
           store={shop?.shopifyDomain}
           token={token}
           shoppingCartSettings={componentData?.shoppingCartSettings}
+          customTrackings={customTrackings}
         />
 
       </div>
