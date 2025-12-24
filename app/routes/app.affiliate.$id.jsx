@@ -185,6 +185,11 @@ const Updateaffiliate = () => {
                         maxLength: {
                           value: 100,
                           message: "Name cannot exceed 100 characters",
+                        },
+                        validate: (v) => {
+                          const trimmed = (v ?? "").trim();
+                          if (!trimmed) return "Name cannot be empty or only spaces";
+                          return true;
                         }
                       }}
                       render={({ field, fieldState }) => (
@@ -532,6 +537,11 @@ const Updateaffiliate = () => {
                           value: 300,
                           message: "Payout details cannot exceed 300 characters",
                         },
+                        validate: (v) => {
+                          const trimmed = (v ?? "").trim();
+                          if (!trimmed) return "Payout method details cannot be empty or only spaces";
+                          return true;
+                        }
                       }}
                       render={({ field, fieldState }) => (
                         <s-box inlineSize="500px" padding="large-100 none small-100 none">

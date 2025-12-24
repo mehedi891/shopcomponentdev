@@ -85,10 +85,10 @@ const CreateAffiliate = () => {
       shopify.toast.show(actionData.message, {
         duration: 1000,
       });
-     setTimeout(()=>{
-       navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
-     },300);
-      
+      setTimeout(() => {
+        navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
+      }, 300);
+
     } else if (actionData?.success === false) {
       shopify.toast.show(actionData.message, {
         duration: 1000,
@@ -183,10 +183,13 @@ const CreateAffiliate = () => {
                       control={control}
                       rules={{
                         required: "Name is required",
-                        maxLength: {
-                          value: 100,
-                          message: "Name cannot exceed 100 characters",
-                        }
+                        maxLength: { value: 100, message: "Name cannot exceed 100 characters" },
+                        minLength: { value: 3, message: "Name must be at least 3 characters" },
+                        validate: (v) => {
+                          const trimmed = (v ?? "").trim();
+                          if (!trimmed) return "Name cannot be empty or only spaces";
+                          return true;
+                        },
                       }}
                       render={({ field, fieldState }) => (
 
@@ -562,7 +565,7 @@ const CreateAffiliate = () => {
                   <s-box padding="small-200 small-200 small-200 large-100">
 
 
-                    
+
 
 
                     <Controller
@@ -599,6 +602,11 @@ const CreateAffiliate = () => {
                           value: 300,
                           message: "Payout details cannot exceed 300 characters",
                         },
+                         validate: (v) => {
+                          const trimmed = (v ?? "").trim();
+                          if (!trimmed) return "Payout method details cannot be empty or only spaces";
+                          return true;
+                        }
                       }}
                       render={({ field, fieldState }) => (
                         <s-box inlineSize="500px" padding="large-100 none small-100 none">
