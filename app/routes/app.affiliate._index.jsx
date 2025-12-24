@@ -278,7 +278,7 @@ const Affiliate = () => {
                         >{item.status === AFFILIATE_STATUS.active ? 'Approved' : 'Inactive/Reject'}</s-badge>
                       </s-table-cell>
                       <s-table-cell>
-                        <s-button accessibilityLabel="More" commandFor={`affliate-popover_` + item.id} variant="secondary" icon="menu-horizontal" />
+                        <s-button accessibilityLabel="More" command="--show" commandFor={`affliate-popover_` + item.id} variant="secondary" icon="menu-horizontal" />
                         <s-popover id={`affliate-popover_` + item.id} inlineSize="8">
                           <s-stack slots="children" direction="block" padding="small small">
                             <s-button disabled={disabledContentProPlan} href={`/app/affiliate/details/${item.id}`} accessibilityLabel="See details" icon="info" variant="tertiary"
@@ -289,38 +289,40 @@ const Affiliate = () => {
                               onClick={() => { navigate(`/app/affiliate/${item.id}`) }}
                             >Edit Affiliate</s-button>
 
-                            <s-button disabled={disabledContentProPlan} accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} icon={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} variant="tertiary"
+                            <s-button command="--hide" commandFor={`affliate-popover_` + item.id} disabled={disabledContentProPlan} accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} icon={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} variant="tertiary"
                               onClick={() => handleStatusChange(item.id, item.status === AFFILIATE_STATUS.active ? AFFILIATE_STATUS.inactive : AFFILIATE_STATUS.active)}
                             >{item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'}</s-button>
 
-                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical" icon="delete" variant="tertiary" commandFor={`delete_modal_` + item.id}>Delete</s-button>
 
-                            <s-modal id={`delete_modal_` + item.id} heading="Delete Affiliate — This action cannot be undone" accessibilityLabel="Delete Affiliate">
-
-                              <s-paragraph>If you delete this affiliate, it will be permanently removed and cannot be restored. All associated performance data will also be permanently deleted.</s-paragraph>
-
-                              <s-button
-                                slot="secondary-actions"
-                                commandFor={`delete_modal_` + item.id}
-                              >
-                                Cancel
-                              </s-button>
-
-
-
-                              <s-button
-                                slot="primary-action"
-                                variant="primary"
-                                tone="critical"
-                                onClick={() => handleDeleteAffiliate(item.id)}
-                                loading={fetcher.state !== 'idle'}
-                              >
-                                Delete
-                              </s-button>
-                            </s-modal>
-
+                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical" icon="delete" variant="tertiary" commad="--show" commandFor={`delete_modal_` + item.id}>Delete</s-button>
+                            
                           </s-stack>
                         </s-popover>
+
+                        <s-modal id={`delete_modal_` + item.id} heading="Delete Affiliate — This action cannot be undone" accessibilityLabel="Delete Affiliate">
+
+                          <s-paragraph>If you delete this affiliate, it will be permanently removed and cannot be restored. All associated performance data will also be permanently deleted.</s-paragraph>
+
+                          <s-button
+                            slot="secondary-actions"
+                            commandFor={`delete_modal_` + item.id}
+                            commad="--hide"
+                          >
+                            Cancel
+                          </s-button>
+
+                          <s-button
+                            slot="primary-action"
+                            variant="primary"
+                            tone="critical"
+                            onClick={() => handleDeleteAffiliate(item.id)}
+                            loading={fetcher.state !== 'idle'}
+                            commandFor={`delete_modal_` + item.id}
+                            commad="--hide"
+                          >
+                            Delete
+                          </s-button>
+                        </s-modal>
 
                       </s-table-cell>
                     </s-table-row>

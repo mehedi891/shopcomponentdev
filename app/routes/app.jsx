@@ -50,7 +50,7 @@ export default function App() {
         <Link to="/app" rel="home">
         </Link>
         <Link to="/app" rel="home">
-          {t("components")}
+          Components
         </Link>
         <Link to="/app/createcomponent">{t("create_componet")}</Link>
         <Link to="/app/settings">{t("settings")}</Link>

@@ -1,33 +1,16 @@
-import {
-  Badge,
-  Banner,
-  BlockStack,
-  Box,
-  Button,
-  Card,
-  Divider,
-  Icon,
-  IndexTable,
-  InlineStack,
-  Layout,
-  Link,
-  Page,
-  Popover,
-  Spinner,
-  Text,
-} from "@shopify/polaris";
-import { DeleteIcon, DisabledIcon, DuplicateIcon, EditIcon, ExternalSmallIcon, LockFilledIcon, MenuHorizontalIcon, QuestionCircleIcon, StatusActiveIcon } from '@shopify/polaris-icons';
 import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import db from "../db.server";
-import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
-import PageTitle from "../components/PageTitle/PageTitle";
 import Instruction from "../components/Instruction/Instruction";
 import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "../constants/constants";
+import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
+import ProductAvailibilityStatus from "../components/ProductAvailibilityStatus/ProductAvailibilityStatus";
+import TermsAndConditions from "../components/TermsAndConditions/TermsAndConditions";
 
 
 export const loader = async ({ request }) => {
@@ -47,7 +30,7 @@ export const loader = async ({ request }) => {
 
   // const shop = await shopResponse.json();
 
-  
+
   let shopData = await db.shop.findUnique({
     where: {
       shopifyDomain: session.shop
@@ -128,7 +111,7 @@ export const loader = async ({ request }) => {
   const chargeId = url.searchParams.get('charge_id');
   const planName = url.searchParams.get('planName');
 
-  
+
   if (isFirstInstall && appSubscriptions?.length > 0) {
     shopData = await db.shop.update({
       where: {
@@ -147,7 +130,7 @@ export const loader = async ({ request }) => {
               planName: appSubscriptions[0].name,
               price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
               planStatus: appSubscriptions[0].status,
-              isTestCharge:appSubscriptions[0].test,
+              isTestCharge: appSubscriptions[0].test,
               planType,
               chargeId,
             },
@@ -155,7 +138,7 @@ export const loader = async ({ request }) => {
               planId: appSubscriptions[0].id,
               planName: appSubscriptions[0].name,
               price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
-              isTestCharge:appSubscriptions[0].test,
+              isTestCharge: appSubscriptions[0].test,
               planType,
               chargeId,
             },
@@ -243,7 +226,7 @@ export const loader = async ({ request }) => {
         isInstalled: true,
       },
       create: {
-        shopifyDomain:session.shop,
+        shopifyDomain: session.shop,
         publicationId: publicationjson?.data?.publication?.id,
         appCatalogId: publicationjson?.data?.publication?.catalog?.id,
         isInstalled: false,
@@ -271,7 +254,7 @@ export const loader = async ({ request }) => {
 
     {
       variables: {
-        "publicationId": shopData?.publicationId 
+        "publicationId": shopData?.publicationId
       },
     },
   );
@@ -294,7 +277,7 @@ export const loader = async ({ request }) => {
     totalPublishProduct: totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0,
     cataglogId: shopData?.appCatalogId ? shopData?.appCatalogId.replace('gid://shopify/AppCatalog/', '') : '',
     success: true,
-    appSubscriptions:appSubscriptions[0]
+    appSubscriptions: appSubscriptions[0]
   };
 };
 
@@ -306,13 +289,9 @@ export default function Index() {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const fetcher = useFetcher();
-  const [activePopoverId, setActivePopoverId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showProductStatusBanner, setShowProductStatusBanner] = useState(true);
   const [searchParams] = useSearchParams();
-  const togglePopoverActive = useCallback((id) => {
-    setActivePopoverId((prevId) => (prevId === id ? null : id));
-  }, []);
+
 
 
   useEffect(() => {
@@ -323,7 +302,6 @@ export default function Index() {
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);
-    setActivePopoverId(null);
     const updatedData = { id, status: status === 'activate' ? 'deactivate' : 'activate' };
     fetcher.submit(updatedData, { method: 'put', action: `/app/component/${id}` });
     //console.log(id, status);
@@ -331,7 +309,6 @@ export default function Index() {
 
   const handleDeleteComponent = async (id) => {
     setIsLoading(true);
-    setActivePopoverId(null);
     const updatedData = { id };
     fetcher.submit(updatedData, { method: 'delete', action: `/app/component/${id}` });
     shopify.modal.show('delete-confirmation-modal');
@@ -340,7 +317,6 @@ export default function Index() {
 
   const handleDuplicateComponent = async (id) => {
     setIsLoading(true);
-    setActivePopoverId(null);
     const updatedData = { id };
     fetcher.submit(updatedData, { method: 'post', action: `/app/component/${id}` });
   }
@@ -355,388 +331,173 @@ export default function Index() {
 
 
 
-  const rowMarkup = components?.length > 0 && components?.map(
-    (
-      { id, title, addToCartType, status, appliesTo, componentSettings, totalOrderCount, totalOrderValue },
-      index,
-    ) => (
-      <IndexTable.Row
-        id={id}
-        key={id}
-        onClick={() => navigate(`/app/component/${id}`)}
-        position={index}
-      >
-        <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="semibold">
-            {title}
-          </Text>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="semibold"> {appliesTo === 'product' ? t("applies_to_product") : t("applies_to_collection")}</Text>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="semibold"> {addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? t("individual_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? t("bulk_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</Text>
-        </IndexTable.Cell>
-
-
-        <IndexTable.Cell className="sc-addToCartType">
-          <Box paddingInlineStart={'400'}><Text>{totalOrderCount ?? 0}</Text></Box>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell className="sc-addToCartType">
-          <Box paddingInlineStart={'300'}><Text>
-            {shopData?.currencyCode + ' '
-
-            }
-            {
-              // orders?.reduce((sum, r) => {
-              //   try {
-              //     const v = Number(JSON.parse(r.orderObj)?.current_total_price ?? 0);
-              //     return sum + (Number.isFinite(v) ? v : 0);
-              //   } catch {
-              //     return sum;
-              //   }
-              // }, 0)
-              //   .toFixed(2)
-
-              totalOrderValue ?? 0
-            }
-          </Text></Box>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell className="sc-addToCartType">
-          {status === 'activate' ? <Badge tone="success">{t("activate")}</Badge> : <Badge tone="critical-strong">{t("deactivate")}</Badge>
-
-          }
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          <BlockStack inlineAlign="center">
-            <Popover
-              active={activePopoverId === id}
-              activator={
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePopoverActive(id);
-                  }}
-                  variant="tertiary"
-                  size="large"
-                  icon={MenuHorizontalIcon}
-                >
-
-                </Button>
-              }
-              autofocusTarget="first-node"
-              onClose={togglePopoverActive}
-            >
-              <Popover.Pane>
-                <Box paddingBlockEnd={'0'}>
-                  <Card padding={'300'}>
-                    <BlockStack align="start" inlineAlign="start" gap={'100'}>
-                      <Button
-                        icon={EditIcon}
-                        tone="success"
-                        variant="tertiary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/app/component/${id}`);
-                        }}
-                      >View/Edit</Button>
-
-                      <Button
-                        icon={status === 'activate' ? DisabledIcon : StatusActiveIcon}
-                        variant="tertiary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDisableStatus(id, status);
-                        }}
-                      >{status === 'activate' ? 'Deactivate' : 'Activate'}</Button>
-
-
-                      {shopData?.plan?.planName === 'Free' && components?.length > 0 ?
-                        <Button
-                          icon={LockFilledIcon}
-                          variant="tertiary"
-                          disabled
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            //handleDuplicateComponent(id);
-                          }}
-                        >{'Duplicate'}</Button>
-                        :
-                        <Button
-                          icon={DuplicateIcon}
-                          variant="tertiary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDuplicateComponent(id);
-                          }}
-                        >{'Duplicate'}</Button>
-                      }
-
-
-
-                      <Box>
-                        <Button
-                          icon={DeleteIcon}
-                          tone="critical"
-                          variant="tertiary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            //handleDeleteComponent(id);
-
-                            shopify.modal.show(`delete-confirmation-modal_${id}`);
-
-                          }}
-                        >Delete</Button>
-                        <Modal id={`delete-confirmation-modal_${id}`}>
-                          <Box paddingInline={'300'} paddingBlock={'500'} onClick={(e) => { e.stopPropagation() }}>
-                            <Text variant="bodyLg">If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</Text>
-
-                          </Box>
-
-                          <Divider />
-
-                          <Box paddingInline={'300'} paddingBlock={'300'}>
-                            <InlineStack gap={'200'} align="end">
-                              <Button variant="tertiary" onClick={(e) => {
-                                e.stopPropagation();
-                                shopify.modal.hide(`delete-confirmation-modal_${id}`);
-                              }}>Cancel</Button>
-
-                              {status === 'activate' &&
-                                <Button
-                                  size="slim"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDisableStatus(id, status);
-                                  }}
-                                  variant="secondary">Disable instead</Button>
-                              }
-                              <Button tone={"critical"}
-                                size="slim"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteComponent(id);
-                                }}
-                                variant="primary">Delete component</Button>
-
-                            </InlineStack>
-                          </Box>
-
-                          <TitleBar title="Delete component? Embeds may break" />
-
-
-
-                        </Modal>
-                      </Box>
-
-                    </BlockStack>
-                  </Card>
-                </Box>
-
-              </Popover.Pane>
-            </Popover>
-          </BlockStack>
-        </IndexTable.Cell>
-      </IndexTable.Row>
-    ),
-  );
-
-
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
 
-      <Page
-        fullWidth
-      //   title="Bring your products to where your audience already is"
-      //   subtitle="Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront."
-      // backAction={{ onAction: () => navigate('/app') }}
+      <s-page
+        inlineSize="large"
       >
+        <s-query-container>
+          <s-stack
+            gap="small-300"
+            paddingBlockEnd="base"
+            paddingBlockStart="large"
+          >
+            <s-text type="strong">Bring your products to where your audience already is</s-text>
+            <s-text>Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront.</s-text>
+          </s-stack>
 
-        <PageTitle
-          title="Bring your products to where your audience already is"
-          subtitle="Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront."
-          btnDisabled={false}
-          backBtnShow={false}
-        />
-
-
-
-        <Layout>
-          <Layout.Section variant="fullWidth">
+          <s-stack
+            paddingBlockEnd="large"
+          >
             <Instruction />
-          </Layout.Section>
-          <Layout.Section>
-            <Box>
-              <Card>
-                {components && components?.length > 0 ?
-                  <Box>
-                    <Box paddingBlockEnd={'200'} paddingInlineEnd={'200'}>
-                      <InlineStack align="space-between" blockAlign="center">
-                        <Text variant="headingLg">
-                          {t("components")}
-                        </Text>
-                        <InlineStack align="end" blockAlign="center">
-                          {isLoading &&
-                            <Spinner
-                              accessibilityLabel="Loading form field"
-                              hasFocusableParent={true}
-                              size="small"
-                            />
-                          }
+          </s-stack>
 
-                          {shopData?.plan.planName === 'Free' && components?.length > 0 ?
-                            <InlineStack blockAlign="center" gap={'150'}>
-                              <UpgradeTooltip />
-                              <Button
-                                disabled
-                                size="large"
-                                variant="primary"
-                                onClick={() => {
-                                  navigate('/app/createcomponent');
-                                }}
-                              >{t("create_componet")}</Button>
-                            </InlineStack>
-                            :
-                            <Button
-                              size="large"
-                              variant="primary"
-                              onClick={() => {
-                                navigate('/app/createcomponent');
-                              }}
-                            >{t("create_componet")}</Button>
-                          }
-                        </InlineStack>
-                      </InlineStack>
-                    </Box>
-
-                    <IndexTable
-                      selectable={false}
-                      resourceName={{ singular: 'component', plural: 'components' }}
-                      itemCount={components?.length}
-                      headings={[
-                        { title: 'Component Name' },
-                        { title: 'Applies to' },
-                        { title: 'Add to cart type' },
-                        { title: 'Total orders', alignment: 'start' },
-                        { title: 'Value', alignment: 'start' },
-                        { title: 'Status' },
-                        { title: 'Actions', alignment: 'center' },
-                      ]}
-                    >
-                      {rowMarkup}
-                    </IndexTable>
-                  </Box>
-                  :
-                  <Box>
-                    <BlockStack align="center" gap={'100'} inlineAlign="center">
-                      <img src="/images/emptyState.png" alt="No Components Found" width={'250'} height={'250'} />
-
-                      <Text>
-                        Create a component from products or a collection and embed it on any website, blog, or landing page.
-                      </Text>
-
-                      <Box paddingBlockStart={'400'} paddingBlockEnd={'500'}>
-                        <Button variant="primary" url="/app/createcomponent">{t("create_componet")}</Button>
-                      </Box>
-                    </BlockStack>
-                  </Box>
-                }
-
-
-
-              </Card>
-            </Box>
-
-            <Box paddingBlock={'400'}>
-              <Box width="100%">
-                <Card>
-                  <BlockStack gap={'300'}>
-                    <InlineStack align="space-between" blockAlign="center">
-                      <Text variant="headingMd">Product status</Text>
-                      <Link removeUnderline target="_blank" url={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/bulk/product?resource_name=Product&edit=status`}>Manage availability</Link>
-                    </InlineStack>
-                    {showProductStatusBanner &&
-                      <Banner
-                        tone="info"
-                        onDismiss={() => { setShowProductStatusBanner(false) }}
-                      >
-                        <Text>Product publishing to EmbedUp can take 30 minutes to update. Once your products are successfully published your products will be visible on EmbedUp</Text>
-                      </Banner>
+          <s-box paddingBlockEnd="large">
+            {components?.length > 0 ?
+              <s-section padding="none">
+                <s-stack
+                  direction="inline"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  padding="small small"
+                >
+                  <s-text type="strong">Componets</s-text>
+                  <s-stack
+                    direction="inline"
+                    gap="small"
+                    alignItems="center"
+                  >
+                    {isLoading &&
+                      <s-spinner accessibilityLabel="Loading" size="base" />
                     }
-                    <Text><Text as="span" fontWeight="bold">{totalPublishProduct}</Text> products are available to EmbedUp</Text>
+                    {shopData?.plan.planName === PLAN_NAME.free && components?.length > 0 &&
+                      <UpgradeTooltip />
+                    }
+                    <s-button icon="plus" accessibilityLabel="Create Component" variant="primary" onClick={() => navigate('/app/createcomponent')}>Create Component</s-button>
+                  </s-stack>
+                </s-stack>
+                <s-table
+                  loading={fetcher.state !== 'idle'}
+                >
+                  <s-table-header-row>
+                    <s-table-header listSlot="primary">Component Name</s-table-header>
+                    <s-table-header listSlot="inline">Applies to</s-table-header>
+                    <s-table-header listSlot="labeled">Total orders</s-table-header>
+                    <s-table-header listSlot="labeled">Value</s-table-header>
+                    <s-table-header listSlot="labeled">Status</s-table-header>
+                    <s-table-header listSlot="labeled">Actions</s-table-header>
+                  </s-table-header-row>
 
-                    <BlockStack gap={'300'} align="start">
-                      <InlineStack gap={'400'} blockAlign="center">
-                        <Badge
-                          tone="success"
-                          progress="complete"
-                          size="medium"
-                        >
-                          Published
-                        </Badge>
-                        <Link removeUnderline target="_blank" url={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_all=${cataglogId}`}>{totalPublishProduct} products</Link>
-                      </InlineStack>
-                      {totalPd - totalPublishProduct >= 0 &&
-                        <InlineStack gap={'400'} blockAlign="center">
-                          <Badge
-                            tone="critical-strong"
-                            progress="incomplete"
-                            size="medium"
-                          >
-                            Not published
-                          </Badge>
-                          <Link removeUnderline target="_blank" url={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_not=${cataglogId}`}>{totalPd - totalPublishProduct} products</Link>
-                        </InlineStack>
-                      }
+                  <s-table-body>
+                    {components.map((
+                      { id, title, addToCartType, status, appliesTo, componentSettings, totalOrderCount, totalOrderValue },
+                      index,
+                    ) => (
+                      <s-table-row key={id}
+                        clickDelegate={'spc_cmp_' + id}
+                      >
+                        <s-table-cell><s-link id={'spc_cmp_' + id} accessibilityLabel="Edit Component" onClick={() => navigate(`/app/component/${id}`)} /> {title}</s-table-cell>
+                        <s-table-cell>
+                          <s-text>{appliesTo === 'product' ? t("applies_to_product") : t("applies_to_collection")}</s-text>
+                        </s-table-cell>
+                        <s-table-cell>
+                          <s-text>{addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? t("individual_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? t("bulk_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</s-text>
+                        </s-table-cell>
+                        <s-table-cell>
+                          {shopData?.currencyCode + ' '}
+                          {
+                            totalOrderValue ?? 0
+                          }
+                        </s-table-cell>
+                        <s-table-cell>
+                          {status === 'activate' ? <s-badge tone="success">{t("activate")}</s-badge> : <s-badge tone="critical-strong">{t("deactivate")}</s-badge>}
+                        </s-table-cell>
+                        <s-table-cell>
+                          <s-button accessibilityLabel="More" variant="tertiary" icon="menu-horizontal"
+                            commandFor={`component-popover_` + id}
+                            command='--show'
+                          />
+                          <s-popover id={`component-popover_` + id} inlineSize="8">
+                            <s-stack slots="children" direction="block" padding="small small">
+                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details" icon="edit" variant="tertiary"
+                              >
+                                View/Edit
+                              </s-button>
 
-                    </BlockStack>
-                  </BlockStack>
-                </Card>
-              </Box>
-            </Box>
+                              <s-button
+                                icon={status === 'activate' ? 'disabled' : 'check-circle'}
+                                variant="tertiary"
+                                accessibilityLabel="Status Change"
+                                onClick={() => {
+                                  handleDisableStatus(id, status);
+                                }}
+                                commandFor={`component-popover_` + id}
+                                command='--hide'
+                              >{status === 'activate' ? 'Deactivate' : 'Activate'}</s-button>
 
-            <Box paddingBlockEnd={'400'}>
-              <Card>
-                <BlockStack gap={'100'}>
-                  <Text variant="headingMd">Terms and conditions</Text>
-                  <Text variant="bodyLg">View EmbedUp terms and conditions here at anytime</Text>
+                              <s-button
+                                icon={'duplicate'}
+                                variant="tertiary"
+                                accessibilityLabel="Duplicate"
+                                disabled={shopData?.plan?.planName === PLAN_NAME.free && components?.length > 0 ? true : false}
+                                commandFor={`component-popover_` + id}
+                                command='--hide'
+                                onClick={() => {
+                                  handleDuplicateComponent(id);
+                                }}
+                              >{'Duplicate'}</s-button>
 
-                </BlockStack>
-                <Box paddingBlockStart={'400'}>
+                              <s-button
+                                icon="delete"
+                                tone="critical"
+                                variant="tertiary"
+                                accessibilityLabel="Delete"
+                                commandFor={`component_delete_modal_` + id}
+                                command='--show'
+                              >Delete</s-button>
+                            </s-stack>
+                          </s-popover>
 
-                  <InlineStack gap={'100'}>
-                    <Text>You have accepted the</Text>
-                    <Link removeUnderline target="_blank" url="https://embedup.com/terms-conditions/">EmbedUp terms and conditions
-                    </Link>
-                    <Box maxWidth="20px"><Icon tone="interactive" source={ExternalSmallIcon} /></Box>
-                  </InlineStack>
-                </Box>
-              </Card>
-            </Box>
+                          <s-modal id={`component_delete_modal_` + id} heading="Delete component — This action cannot be undone" accessibilityLabel="Delete Component">
+                            <s-text>If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</s-text>
+                            <s-button accessibilityLabel="Cancel" commandFor={`component_delete_modal_` + id} command='--hide' slot="secondary-actions">Cancel</s-button>
+                            <s-button
+                              slot="primary-action"
+                              variant="primary"
+                              tone="critical"
+                              accessibilityLabel="Delete"
+                              onClick={() => handleDeleteComponent(id)}
+                              commandFor={`component_delete_modal_` + id}
+                              command='--hide'
+                            >Delete</s-button>
+                          </s-modal>
+                        </s-table-cell>
+                      </s-table-row>
+                    ))}
+                  </s-table-body>
+                </s-table>
+              </s-section> :
+              <EmptyStateGeneric
+                title="Create a component"
+                text=" Create a component from products or a collection and embed it on any website, blog, or landing page."
+                btnText="Create component"
+                btnHref="/app/createcomponent"
+              />
+            }
+          </s-box>
 
-            <InlineStack align="center">
-              <Box paddingBlockEnd={'400'} maxWidth="max-content">
-                <Card>
-                  <InlineStack gap={'100'}>
-                    <Box maxWidth="20px">
-                      <Icon
-                        tone="success"
-                        source={QuestionCircleIcon}
-                      />
-                    </Box>
-                    <Text>Learn more about</Text>
-                    <Link removeUnderline target="_blank" url="https://embedup.com/terms-conditions/">showing your products in EmbedUp</Link>
-                  </InlineStack>
-                </Card>
-              </Box>
-            </InlineStack>
-          </Layout.Section>
-        </Layout>
-      </Page>
+          <ProductAvailibilityStatus
+            manageUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/bulk/product?resource_name=Product&edit=status`}
+            totalPublishProductCount={totalPublishProduct}
+            publishPdUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_all=${cataglogId}`}
+            notPublishPdUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_not=${cataglogId}`}
+            notPublishPdCount = {totalPd - totalPublishProduct >= 0 ? totalPd - totalPublishProduct : 0}
+          />
+
+          <TermsAndConditions/>
+
+        </s-query-container>
+      </s-page>
   );
 }

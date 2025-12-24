@@ -1,88 +1,85 @@
-import { Modal, TitleBar, useAppBridge } from "@shopify/app-bridge-react"
-import { BlockStack, Box, Card, InlineStack, Link, List, Text } from "@shopify/polaris"
+
 
 const Instruction = () => {
-  const shopify = useAppBridge();
-  const handleInstructionModal = () => {
-    shopify.modal.show("video-tutorial-modal-instruction");
-  }
-
-   
-    // useEffect(() => {
-    //   shopify.webVitals.onReport()
-    // },[])
-    
   
+
+
   return (
-    <Box>
-      <Modal id="video-tutorial-modal-instruction">
-        <TitleBar title="Video Tutorial">
-        </TitleBar>
-        <Box>
-          <InlineStack>
-            <iframe width="100%" height="400px" src="https://www.youtube.com/embed/j3Br-xr-mps" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
-          </InlineStack>
-        </Box>
-      </Modal>
-      <Card>
-        <Box paddingBlockEnd={'200'}>
-          <Text variant="headingMd">How to Create & Embed Your Component</Text>
-        </Box>
-        <InlineStack align="start" gap={'400'} blockAlign="center">
-          <Box className="Polaris-Box howToEmbedBox">
-            <Card background="bg-surface-secondary">
-              <Box paddingBlock={'300'}>
-                <List type="number" gap="loose">
-                  <List.Item>
-                    <BlockStack gap={"50"}>
-                      <Text variant="headingSm">Create a component</Text>
-                      <Text variant="bodyMd">Select your desired products,collections,and layout. <Text as="span"><Link removeUnderline url="https://embedup.com/academy/how-to-display-your-store-products-on-other-websites-outside-of-shopify/" target="_blank"> [See how →]</Link></Text></Text>
-                    </BlockStack>
-                  </List.Item>
-                  <List.Item>
-                    <BlockStack gap={"50"}>
-                      <Text variant="headingSm">Customize settings</Text>
-                      <Text variant="bodyMd">Adjust design, and options to match your store’s needs. </Text>
-                    </BlockStack>
-                  </List.Item>
-                  <List.Item>
-                    <BlockStack gap={"50"}>
-                      <Text variant="headingSm">Save your component</Text>
-                      <Text variant="bodyMd">Your component is now ready to use.</Text>
-                    </BlockStack>
-                  </List.Item>
-                  <List.Item>
-                    <BlockStack gap={"50"}>
-                      <Text variant="headingSm">Copy the embed code</Text>
-                      <Text variant="bodyMd">One click to copy your unique code snippet.</Text>
-                    </BlockStack>
-                  </List.Item>
-                  <List.Item>
-                    <BlockStack gap={"50"}>
-                      <Text variant="headingSm">Embed anywhere</Text>
-                      <Text variant="bodyMd">Paste the code into your external website, blog, or landing page.
-                        {/* <Text as="span"><Link url="#" target="_blank"> See Guideline</Link></Text> */}
-                      </Text>
-                    </BlockStack>
-                  </List.Item>
-                </List>
-              </Box>
-            </Card>
-          </Box>
+    <s-banner heading="How to Create & Embed Your Component" tone="info" dismissible>
+
+      <s-modal id="video-tutorial-modal-instruction" heading="Video Tutorial">
+        <iframe width="100%" height="400px" src="https://www.youtube.com/embed/j3Br-xr-mps" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+      </s-modal>
+
+      <s-grid
+        gridTemplateColumns="@container (inline-size < 500px) 1fr,1fr 1fr"
+        gap="base"
+        alignItems="center"
+      >
+
+        <s-stack
+          background="subdued"
+          padding="large-300 base"
+          borderRadius="large"
+        >
+          <s-ordered-list>
+            <s-list-item>
+              <s-stack>
+                <s-text type="strong">Create a component</s-text>
+                <s-text>Select your desired products,collections,and layout. <s-link
+                  href="https://embedup.com/academy/how-to-display-your-store-products-on-other-websites-outside-of-shopify/"
+                  target="_blank"
+                >[See how →]</s-link></s-text>
+              </s-stack>
+            </s-list-item>
+            <s-list-item>
+              <s-stack>
+                <s-text type="strong">Customize settings</s-text>
+                <s-text>Adjust design, and options to match your store’s needs.</s-text>
+              </s-stack>
+            </s-list-item>
+            <s-list-item>
+              <s-stack>
+                <s-text type="strong">Save your component</s-text>
+                <s-text>Your component is now ready to use.</s-text>
+              </s-stack>
+            </s-list-item>
+
+            <s-list-item>
+              <s-stack>
+                <s-text type="strong">Copy the embed code</s-text>
+                <s-text>One click to copy your unique code snippet.</s-text>
+              </s-stack>
+            </s-list-item>
+
+            <s-list-item>
+              <s-stack>
+                <s-text type="strong">Embed anywhere</s-text>
+                <s-text>Paste the code into your external website, blog, or landing page.</s-text>
+              </s-stack>
+            </s-list-item>
 
 
+          </s-ordered-list>
+        </s-stack>
 
-          <Box className="Polaris-Box spc_videoThumbnail" minWidth="49%" maxWidth="500px">
-            <Link onClick={handleInstructionModal}>
-              <img style={{borderRadius: "var(--p-border-radius-300)"}} src={"/images/demo_video_f.webp"} alt="Demo" height="275px" width="auto" loading="lazy" />
-            </Link>
-          </Box>
+        <s-link
+          commandFor="video-tutorial-modal-instruction"
+          command="--show"
+        >
+          <s-image
+            src="/images/demo_video_f.webp"
+            alt="Demo"
+            loading="lazy"
+            borderRadius="large"
+            aspectRatio="16/8"
+            inlineSize="fill"
+            objectFit="contain"
+          />
+        </s-link>
+      </s-grid>
 
-
-        </InlineStack>
-
-      </Card>
-    </Box>
+    </s-banner>
   )
 }
 
