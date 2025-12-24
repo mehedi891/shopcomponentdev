@@ -1,11 +1,9 @@
 
 
-const Instruction = () => {
-  
-
+const Instruction = ({bannerRef,showInstructionBanner}) => {
 
   return (
-    <s-banner heading="How to Create & Embed Your Component" tone="info" dismissible>
+    <s-banner hidden={showInstructionBanner ? false : true} ref={bannerRef} heading="How to Create & Embed Your Component" tone="info" dismissible>
 
       <s-modal id="video-tutorial-modal-instruction" heading="Video Tutorial">
         <iframe width="100%" height="400px" src="https://www.youtube.com/embed/j3Br-xr-mps" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>

@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
@@ -290,6 +290,9 @@ export default function Index() {
   const { t } = useTranslation();
   const fetcher = useFetcher();
   const [isLoading, setIsLoading] = useState(false);
+  const [showInstructionBanner, setShowInstructionBanner] = useState(false);
+    const bannerRef = useRef(null);
+
   const [searchParams] = useSearchParams();
 
 
@@ -299,6 +302,38 @@ export default function Index() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const isShowBanner = localStorage.getItem('showInstructionBanner');
+    if (isShowBanner === 'false') {
+      setShowInstructionBanner(false);
+      
+    } else {
+      setShowInstructionBanner(true);
+    }
+
+    const el = bannerRef.current;
+    if (!el) return;
+
+    const onDismiss = () => {
+      localStorage.setItem('showInstructionBanner', false);
+      setShowInstructionBanner(false);
+    };
+    el.addEventListener("dismiss", onDismiss);
+
+   
+
+    return () => {
+      
+      el.removeEventListener("afterhide", onDismiss);
+    };
+  }, []);
+
+  useEffect(() => {
+
+   
+   
+  }, []);
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);
@@ -350,7 +385,11 @@ export default function Index() {
           <s-stack
             paddingBlockEnd="large"
           >
-            <Instruction />
+            <Instruction 
+            bannerRef={bannerRef}
+            showInstructionBanner={showInstructionBanner}
+            />
+            
           </s-stack>
 
           <s-box paddingBlockEnd="large">
@@ -492,10 +531,10 @@ export default function Index() {
             totalPublishProductCount={totalPublishProduct}
             publishPdUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_all=${cataglogId}`}
             notPublishPdUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_not=${cataglogId}`}
-            notPublishPdCount = {totalPd - totalPublishProduct >= 0 ? totalPd - totalPublishProduct : 0}
+            notPublishPdCount={totalPd - totalPublishProduct >= 0 ? totalPd - totalPublishProduct : 0}
           />
 
-          <TermsAndConditions/>
+          <TermsAndConditions />
 
         </s-query-container>
       </s-page>

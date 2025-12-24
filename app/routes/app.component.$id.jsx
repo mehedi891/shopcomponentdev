@@ -4075,6 +4075,12 @@ export const action = async ({ request, params }) => {
         status: STATUS.deactivate,
         customerTracking: (original.customerTracking || '') + '_DP',
         tracking: (original.tracking || '') + '_DP',
+        totalOrderCount:0,
+        totalOrderValue:0,
+        affiliateId:null,
+        
+
+
       };
       await db.component.create({
         data: newComponentData,
