@@ -90,7 +90,7 @@ const Updateaffiliate = () => {
       fixedCommission: JSON.stringify(data.fixedCommission)
     };
     //console.log('Affiliate form data submitted:', updatedData);
-    submit(updatedData, { method: 'post', });
+    submit(updatedData, { method: 'post'});
     setShowNewCreatedBanner(false);
   }
 

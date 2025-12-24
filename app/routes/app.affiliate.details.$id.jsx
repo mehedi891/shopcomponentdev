@@ -46,7 +46,7 @@ export const loader = async ({ request, params }) => {
           title: true,
         },
       }
-      
+
     },
   });
 
@@ -55,6 +55,7 @@ export const loader = async ({ request, params }) => {
   affOrderTotals = await db.order.aggregate({
     where: {
       affiliateId: Number(id),
+      isCancelled: false
     },
     _sum: {
       totalValue: true,
@@ -70,6 +71,7 @@ export const loader = async ({ request, params }) => {
       by: ['componentId'],
       where: {
         affiliateId: Number(id),
+        isCancelled: false
       },
       _sum: {
         totalValue: true,

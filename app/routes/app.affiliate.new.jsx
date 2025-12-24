@@ -87,8 +87,8 @@ const CreateAffiliate = () => {
       });
      setTimeout(()=>{
        navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
-     },100);
-      console.log('appp:',`/app/affiliate/${actionData?.data?.id}?new_created=true`);
+     },300);
+      
     } else if (actionData?.success === false) {
       shopify.toast.show(actionData.message, {
         duration: 1000,
@@ -107,7 +107,7 @@ const CreateAffiliate = () => {
       fixedCommission: JSON.stringify(data.fixedCommission)
     };
     //console.log('Affiliate form data submitted:', updatedData);
-    submit(updatedData, { method: 'post', });
+    submit(updatedData, { method: 'post', replace: true });
   }
 
   const handleDiscard = () => {

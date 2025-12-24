@@ -1,14 +1,15 @@
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const TransactionModal = ({
   name = "",
   email = "",
   pendingCommission = 0,
-  affiliateId=null,
+  affiliateId = null,
   affTransactionFormSubmit,
-  currencySymbol="$",
+  currencySymbol = "$",
 }) => {
-  const {  handleSubmit, control,watch } = useForm({
+  const { handleSubmit, setError, control, watch, formState: { errors, isDirty } } = useForm({
     defaultValues: {
       commissionPaid: pendingCommission,
       transactionDetails: "",
@@ -16,7 +17,23 @@ const TransactionModal = ({
     }
   });
 
-const watchedValues = watch();
+  const watchedValues = watch();
+
+  useEffect(() => {
+    const inpAmnt = watchedValues.commissionPaid
+    if (Number(inpAmnt) <= 0) {
+      setError('commissionPaid', { message: "Amount to pay must be greater than 0" });
+    } else if (Number(inpAmnt) > Number(pendingCommission)) {
+      setError('commissionPaid', { message: `Amount to pay must be less than or equal to pending commission: ${currencySymbol + pendingCommission}` });
+    }else{
+      setError('commissionPaid',{message:null})
+
+    }
+  }, [watchedValues.commissionPaid]);
+
+
+
+
   return (
     <s-modal id="transaction-modal" heading="Payment Details for Affiliate">
       <form method="post" onSubmit={handleSubmit(affTransactionFormSubmit)}>
@@ -72,6 +89,11 @@ const watchedValues = watch();
               name="commissionPaid"
               control={control}
               rules={{
+                required: "Amount to pay is required",
+                min: {
+                  value: 1,
+                  message: "Amount to pay must be greater than 0",
+                },
                 maxLength: {
                   value: 100,
                   message: "Transaction details cannot exceed 100 characters",
@@ -79,13 +101,15 @@ const watchedValues = watch();
               }}
               render={({ field, fieldState }) => (
                 <s-number-field
+                  name="commissionPaid"
                   label="Amount to Pay"
                   prefix={currencySymbol}
                   value={field.value}
-                  details="Input amount between to pay"
+                   details={`Input amount between 1 and ${pendingCommission}`}
                   min={1}
+                  error={fieldState.error?.message || errors.commissionPaid?.message}
                   max={pendingCommission}
-                  onChange={(value) => field.onChange(value)}
+                  onInput={(e) => { field.onChange(e.target.value); }}
                 />
               )}
             />
@@ -125,7 +149,7 @@ const watchedValues = watch();
             gap="small-300"
             justifyContent="end"
           >
-            <s-button  commandFor="transaction-modal" command="--hide">
+            <s-button commandFor="transaction-modal" command="--hide">
               Cancel
             </s-button>
             <s-button
@@ -133,8 +157,9 @@ const watchedValues = watch();
               commandFor="transaction-modal"
               command="--hide"
               type="submit"
+              disabled={errors?.commissionPaid?.message === null ? false : true}
             >
-              Pay now {watchedValues.commissionPaid ? ` ${currencySymbol+watchedValues.commissionPaid}` : ""}
+              Pay now {watchedValues.commissionPaid ? ` ${currencySymbol + watchedValues.commissionPaid}` : ""}
             </s-button>
 
           </s-stack>

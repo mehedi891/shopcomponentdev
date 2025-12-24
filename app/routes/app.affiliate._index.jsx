@@ -77,7 +77,8 @@ export const loader = async ({ request }) => {
       where: {
         affiliateId: {
           in: affData.map(aff => aff.id)
-        }
+        },
+        isCancelled: false
       },
       _sum: {
         commission: true,
@@ -85,6 +86,8 @@ export const loader = async ({ request }) => {
 
       }
     });
+
+    //console.log('affSalesData',affSalesData);
 
     if (affSalesData?.length > 0) {
       affData = affData.map(aff => {
@@ -113,22 +116,13 @@ export const loader = async ({ request }) => {
 const Affiliate = () => {
   const { affData, shopCurrency, shopData } = useLoaderData();
 
+  //console.log('affData:',affData);
 
   const navigation = useNavigation();
   const navigate = useNavigate();
   const fetcher = useFetcher();
   const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
-  const tableHeaders = [
-    "ID",
-    "Name",
-    "Email",
-    "Total Orders",
-    "Total Sales",
-    "Total Commission",
-    "Assign Component",
-    "Status",
-    "More"
-  ]
+  
 
   const handleStatusChange = (id, status) => {
     const updatedData = { status: status };
@@ -233,7 +227,7 @@ const Affiliate = () => {
                   {fetcher.state !== 'idle' &&
                     <s-spinner accessibilityLabel="Loading" size="base" />
                   }
-                  <s-button icon="plus" variant="primary"
+                  <s-button icon="plus" variant="primary" accessibilityLabel="Create new affiliate"
                     onClick={() => { navigate('/app/affiliate/new') }}
                   >Create new</s-button>
                 </s-stack>
@@ -242,11 +236,15 @@ const Affiliate = () => {
               <s-table variant="auto" loading={fetcher.state !== 'idle' || disabledContentProPlan}>
 
                 <s-table-header-row>
-                  {tableHeaders.map((title, index) => (
-                    <s-table-header listSlot={index === 0 ? "primary" : index === 1 ? "secondary" : "labeled"} key={index}>{title}</s-table-header>
-                  ))
-
-                  }
+                  <s-table-header listSlot="primary">ID</s-table-header>
+                  <s-table-header listSlot="inline">Name</s-table-header>
+                  <s-table-header listSlot="labeled">Email</s-table-header>
+                  <s-table-header listSlot="labeled">Total Orders</s-table-header>
+                  <s-table-header listSlot="labeled">Total Sales</s-table-header>
+                  <s-table-header listSlot="labeled">Total Commission</s-table-header>
+                  <s-table-header listSlot="labeled">Assign Component</s-table-header>
+                  <s-table-header listSlot="labeled">Status</s-table-header>
+                  <s-table-header listSlot="labeled">More</s-table-header>
                 </s-table-header-row>
 
                 <s-table-body>
@@ -268,8 +266,8 @@ const Affiliate = () => {
                       <s-table-cell>{item.name}</s-table-cell>
                       <s-table-cell>{item.email}</s-table-cell>
                       <s-table-cell>{item.totalOrderCount}</s-table-cell>
-                      <s-table-cell>{currencySymbol}{(item.totalOrderValue || 0).toFixed(2)}</s-table-cell>
-                      <s-table-cell>{currencySymbol}{(item.totalCommission || 0).toFixed(2)}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{(item?.totalOrderValue || 0).toFixed(2)}</s-table-cell>
+                      <s-table-cell>{currencySymbol}{(item?.lifetTimetotalCommission || 0).toFixed(2)}</s-table-cell>
                       <s-table-cell>{item?.components?.length > 0 ? item?.components?.length : 0}</s-table-cell>
                       <s-table-cell>
 
@@ -295,7 +293,7 @@ const Affiliate = () => {
 
 
                             <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical" icon="delete" variant="tertiary" commad="--show" commandFor={`delete_modal_` + item.id}>Delete</s-button>
-                            
+
                           </s-stack>
                         </s-popover>
 
