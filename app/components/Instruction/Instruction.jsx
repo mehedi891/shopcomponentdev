@@ -19,7 +19,7 @@ const Instruction = () => {
 
         <s-stack
           background="subdued"
-          padding="large-300 base"
+          padding="small-300 small"
           borderRadius="large"
         >
           <s-ordered-list>

@@ -335,7 +335,7 @@ export default function Index() {
     navigation.state === "loading" ? <LoadingSkeleton /> :
 
       <s-page
-        inlineSize="large"
+        inlineSize="base"
       >
         <s-query-container>
           <s-stack
