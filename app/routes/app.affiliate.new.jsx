@@ -74,7 +74,7 @@ const CreateAffiliate = () => {
 
 
 
-  const { fields, append, remove, insert, replace } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "tieredCommission",
   });
@@ -85,7 +85,10 @@ const CreateAffiliate = () => {
       shopify.toast.show(actionData.message, {
         duration: 1000,
       });
-      navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
+     setTimeout(()=>{
+       navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
+     },100);
+      console.log('appp:',`/app/affiliate/${actionData?.data?.id}?new_created=true`);
     } else if (actionData?.success === false) {
       shopify.toast.show(actionData.message, {
         duration: 1000,
@@ -129,38 +132,38 @@ const CreateAffiliate = () => {
 
 
     <s-page heading="EmbedUp - Sell Anywhere" inlineSize="base">
+      <s-query-container>
+        <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} onReset={() => reset()}>
+          {disabledContentProPlan &&
+            <s-stack paddingBlockStart="large">
+              <s-banner heading="Attention!!" tone="warning">
+                Upgrade the plan to use the Affiliate feature
+                <s-button href="/app/plans" slot="secondary-actions">Upgrade to pro</s-button>
+              </s-banner>
+            </s-stack>
+          }
 
-      {disabledContentProPlan &&
-        <s-stack paddingBlockStart="large">
-          <s-banner heading="Attention!!" tone="warning">
-            Upgrade the plan to use the Affiliate feature
-            <s-button href="/app/plans" slot="secondary-actions">Upgrade to pro</s-button>
-          </s-banner>
-        </s-stack>
-      }
+          <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
+            <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
+            <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
+          </s-stack>
 
-      <s-stack gap="small-200" padding="large-200 none none none" alignItems="center">
-        <s-heading>Turn Passion into Profit — Join the Affiliate Revolution</s-heading>
-        <s-text>Simple setup, transparent tracking, and real rewards — start growing today!</s-text>
-      </s-stack>
+          <SaveBar id="spc-save-bar_affiliate">
+            <button type="submit" variant="primary"
+              {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
+            ></button>
+            <button
+              type="button"
+              onClick={() => {
+                handleDiscard();
+              }}
+            >
+            </button>
+          </SaveBar>
 
-      <SaveBar id="spc-save-bar_affiliate">
-        <button type="submit" variant="primary"
-          {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
-        ></button>
-        <button
-          type="button"
-          onClick={() => {
-            handleDiscard();
-          }}
-        >
-        </button>
-      </SaveBar>
+          <s-box padding="large none none none">
+            <s-section >
 
-      <s-box padding="large none none none">
-        <s-section >
-          <s-query-container>
-            <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} onReset={() => reset()}>
               <s-box background="base" border="base" borderRadius="large">
                 <s-stack gap="medium-400" padding="small-200 small-200 small-200 large-100">
                   <s-heading size="small">Affiliate information</s-heading>
@@ -559,63 +562,7 @@ const CreateAffiliate = () => {
                   <s-box padding="small-200 small-200 small-200 large-100">
 
 
-                    {/* {payoutMethods.length > 0 &&
-                      payoutMethods.map((method, index) => (
-                        <s-stack key={index}>
-                          <Controller
-                            name="payoutMethods.method"
-                            rules={{
-                              required:"Please select Method"
-                            }}
-                            control={control}
-                            render={({ field }) => (
-                              <s-checkbox
-                                label={method}
-                                value={method}
-                                key={`${method}-${watchedValues.payoutMethods.method}`}
-                                name="payoutMethods.method"
-                                checked={field.value === method}
-                                required
-                                onChange={(e) => {
-                                  //console.log('values:',e.target.value);
-                                  field.onChange(e.target.value);
-                                }}
-                              />
-                            )}
-                          />
-
-                          {watchedValues.payoutMethods.method === method && (
-                            <Controller
-                              name="payoutMethods.value"
-                              control={control}
-                              rules={{
-                                required: "Payout method details are required",
-                                maxLength: {
-                                  value: 100,
-                                  message: "Payout details cannot exceed 100 characters",
-                                },
-                              }}
-                              render={({ field, fieldState }) => (
-                                <s-box inlineSize="500px" padding="none none small-100 large-100">
-                                  <s-text-field
-                                    label="Payment details"
-                                    labelAccessibilityVisibility="exclusive"
-                                    name="payoutMethods.value"
-                                    placeholder={`Enter ${method} details`}
-                                    value={field.value ?? ''}
-                                    error={fieldState.error?.message || actionData?.errors?.payoutMethods?.value}
-                                    maxLength={100}
-                                    minLength={3}
-                                    required
-                                    onChange={(value) => field.onChange(value)}
-                                  />
-                                </s-box>
-                              )}
-                            />
-                          )}
-                        </s-stack>
-                      ))
-                    } */}
+                    
 
 
                     <Controller
@@ -713,11 +660,11 @@ const CreateAffiliate = () => {
                 <s-button disabled={disabledContentProPlan} type="submit" variant="primary" loading={navigation.state == 'submitting'}>Add Affiliate</s-button>
 
               </s-box>
-            </form>
-          </s-query-container>
-        </s-section>
-      </s-box>
 
+            </s-section>
+          </s-box>
+        </form>
+      </s-query-container>
     </s-page>
 
 

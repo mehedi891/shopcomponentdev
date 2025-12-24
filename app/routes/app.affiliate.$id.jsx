@@ -105,32 +105,33 @@ const Updateaffiliate = () => {
     }
   }, [searchParams]);
 
-  useEffect(()=>{
-    if(isDirty){
+  useEffect(() => {
+    if (isDirty) {
       shopify.saveBar.show('spc-save-bar_affiliate')
-    }else{
+    } else {
       shopify.saveBar.hide('spc-save-bar_affiliate')
     }
-  },[isDirty]);
+  }, [isDirty]);
 
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
     <s-page heading="EmbedUp - Sell Anywhere" inlineSize="base">
-      <SaveBar id="spc-save-bar_affiliate">
-        <button type="submit" variant="primary"
-          {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
-        ></button>
-        <button
-          type="button"
-          onClick={() => {
-            handleDiscard();
-          }}
-        >
-        </button>
-      </SaveBar>
+
       <s-query-container>
         <form method="post" onSubmit={handleSubmit(affFormHandleSubmit)} onReset={() => reset()}>
+          <SaveBar id="spc-save-bar_affiliate">
+            <button type="submit" variant="primary"
+              {...(navigation.state === 'submitting' ? { 'loading': '' } : {})}
+            ></button>
+            <button
+              type="button"
+              onClick={() => {
+                handleDiscard();
+              }}
+            >
+            </button>
+          </SaveBar>
           <s-stack
             padding="large-100 none none none"
             direction="inline"
