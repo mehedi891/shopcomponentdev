@@ -168,15 +168,13 @@ export default function ComponentList() {
   }, [fetcher?.data]);
 
 
- useEffect(() => {
-    // extra guard, just in case
-    // if (typeof window === "undefined") return;
-    // if (!shopify?.webVitals) return;
-    shopify.webVitals.onReport((metric) => {
-      console.log("Web Vitals CMP LIST:", metric);
-    });
+//  useEffect(() => {
+    
+//     shopify.webVitals.onReport((metric) => {
+//       console.log("Web Vitals CMP LIST:", metric);
+//     });
 
-  }, [shopify]);
+//   }, [shopify]);
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
 

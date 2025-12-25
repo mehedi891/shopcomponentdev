@@ -365,15 +365,12 @@ export default function Index() {
   }, [fetcher?.data]);
 
 
-  useEffect(() => {
-    // extra guard, just in case
-    // if (typeof window === "undefined") return;
-    // if (!shopify?.webVitals) return;
-    shopify.webVitals.onReport((metric) => {
-      console.log("Web Vitals Index:", metric);
-    });
+  // useEffect(() => {
+  //   shopify.webVitals.onReport((metric) => {
+  //     console.log("Web Vitals Index:", metric);
+  //   });
 
-  }, [shopify]);
+  // }, [shopify]);
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
