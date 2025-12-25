@@ -2162,15 +2162,15 @@ const CreateComponent = () => {
                             </Layout.Section>
                         }
 
-                        {shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === PLAN_NAME.growth &&
+                        {shopData?.components?.length >= shopData?.maxAllowedComponents &&
                             <Layout.Section variant="fullWidth">
                                 <Banner
-                                    title={"Maximum Component Limit (10)"}
+                                    title={`Maximum Component Limit (${shopData?.maxAllowedComponents})`}
                                     tone="info"
 
                                 >
                                     <InlineStack gap={'300'} align="start">
-                                        <Text>The maximum number of components you can create is 10. Once this limit is reached, no additional components can be added unless you delete or modify existing ones.</Text>
+                                        <Text>The maximum number of components you can create is {shopData?.maxAllowedComponents}. Once this limit is reached, no additional components can be added unless you delete or modify existing ones.</Text>
                                     </InlineStack>
                                 </Banner>
                             </Layout.Section>
@@ -3914,7 +3914,7 @@ const CreateComponent = () => {
                                     </InlineStack>
                                 </InlineStack>
 
-                                : shopData?.components?.length >= shopData?.maxAllowedComponents && shopData?.plan?.planName === PLAN_NAME.growth ?
+                                : shopData?.components?.length >= shopData?.maxAllowedComponents ?
                                     <InlineStack align="end" blockAlign="center" gap={'150'}>
                                         {/* <UpgradeTooltip /> */}
 
