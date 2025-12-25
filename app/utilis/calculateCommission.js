@@ -17,10 +17,13 @@ function calculateTierCommission(tiers, lifeTimesubTotalAmount, commissionalValu
   if (!Array.isArray(tiers) || tiers.length === 0) return 0;
   const subTotalAmount = Number(lifeTimesubTotalAmount);
   const commissionalValueNum = Number(commissionalValue);
-  let tieredCommission = tiers.find(c => Number(c.from) <= subTotalAmount && Number(c.to) >= subTotalAmount) || [];
-  if (tieredCommission?.length === 0) {
-    tieredCommission = tiers[tiers.length - 1];
-  }
+  // let tieredCommission = tiers.find(c => Number(c.from) <= subTotalAmount && Number(c.to) >= subTotalAmount) || [];
+  // if (tieredCommission?.length === 0) {
+  //   tieredCommission = tiers[tiers.length - 1];
+  // }
+
+  const tieredCommission = getCurrentTier(tiers, subTotalAmount) ; 
+
   if (tieredCommission?.type) {
     const commissionType = tieredCommission.type;
     const rate = Number(tieredCommission.rate);
@@ -38,7 +41,7 @@ function calculateTierCommission(tiers, lifeTimesubTotalAmount, commissionalValu
 
 function getCurrentTier(tiers, lifeTimesubTotalAmount) {
   const subTotalAmount = Number(lifeTimesubTotalAmount);
-  let tieredCommission = tiers.find(c => Number(c.from) <= subTotalAmount && Number(c.to) >= subTotalAmount) || [];
+  let tieredCommission = tiers.find(c =>  Number(c.to) >= subTotalAmount) || [];
   if (tieredCommission?.length === 0) {
     tieredCommission = tiers[tiers.length - 1];
   }
