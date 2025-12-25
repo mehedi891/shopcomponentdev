@@ -377,13 +377,12 @@ const Plans = () => {
       "Email support"
     ],
     growth: [
-      "10 component with max 10 product variant limit per component.",
+      "15 component with max 10 product variant limit per component.",
       "Inventory tracking before order",
       "Email component code",
       "Implement restrictions",
       "Add all products to cart at a single click",
       "Preset qty per product/variant",
-      "Layout customization",
       "Custom CSS",
       "Layout customization"
     ],

@@ -291,7 +291,7 @@ export default function Index() {
   const fetcher = useFetcher();
   const [isLoading, setIsLoading] = useState(false);
   const [showInstructionBanner, setShowInstructionBanner] = useState(false);
-    const bannerRef = useRef(null);
+  const bannerRef = useRef(null);
 
   const [searchParams] = useSearchParams();
 
@@ -307,7 +307,7 @@ export default function Index() {
     const isShowBanner = localStorage.getItem('showInstructionBanner');
     if (isShowBanner === 'false') {
       setShowInstructionBanner(false);
-      
+
     } else {
       setShowInstructionBanner(true);
     }
@@ -321,18 +321,18 @@ export default function Index() {
     };
     el.addEventListener("dismiss", onDismiss);
 
-   
+
 
     return () => {
-      
+
       el.removeEventListener("afterhide", onDismiss);
     };
   }, []);
 
   useEffect(() => {
 
-   
-   
+
+
   }, []);
 
   const handleDisableStatus = async (id, status) => {
@@ -365,6 +365,15 @@ export default function Index() {
   }, [fetcher?.data]);
 
 
+  useEffect(() => {
+    // extra guard, just in case
+    // if (typeof window === "undefined") return;
+    // if (!shopify?.webVitals) return;
+    shopify.webVitals.onReport((metric) => {
+      console.log("Web Vitals Index:", metric);
+    });
+
+  }, [shopify]);
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -385,11 +394,11 @@ export default function Index() {
           <s-stack
             paddingBlockEnd="large"
           >
-            <Instruction 
-            bannerRef={bannerRef}
-            showInstructionBanner={showInstructionBanner}
+            <Instruction
+              bannerRef={bannerRef}
+              showInstructionBanner={showInstructionBanner}
             />
-            
+
           </s-stack>
 
           <s-box paddingBlockEnd="large">
@@ -441,11 +450,11 @@ export default function Index() {
                         <s-table-cell>
                           <s-text>{appliesTo === 'product' ? t("applies_to_product") : t("applies_to_collection")}</s-text>
                         </s-table-cell>
-                       
+
                         <s-table-cell>
                           <s-text>{addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? t("individual_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? t("bulk_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</s-text>
                         </s-table-cell>
-                         <s-table-cell>{totalOrderCount}</s-table-cell>
+                        <s-table-cell>{totalOrderCount}</s-table-cell>
                         <s-table-cell>
                           {shopData?.currencyCode + ' '}
                           {

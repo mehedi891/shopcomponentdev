@@ -168,7 +168,15 @@ export default function ComponentList() {
   }, [fetcher?.data]);
 
 
+ useEffect(() => {
+    // extra guard, just in case
+    // if (typeof window === "undefined") return;
+    // if (!shopify?.webVitals) return;
+    shopify.webVitals.onReport((metric) => {
+      console.log("Web Vitals CMP LIST:", metric);
+    });
 
+  }, [shopify]);
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
 
@@ -327,6 +335,7 @@ export default function ComponentList() {
               />
             }
           </s-box>
+          <s-box paddingBlockEnd="large-300"></s-box>
         </s-query-container>
       </s-page>
   );
