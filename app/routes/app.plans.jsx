@@ -1,10 +1,11 @@
 import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { authenticate } from "../shopify.server";
+import crypto from "crypto";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
-import { ADD_TO_CART_TYPE, AFFILIATE_STATUS, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
+import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {

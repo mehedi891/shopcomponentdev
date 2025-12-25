@@ -3,7 +3,6 @@ import db from "../db.server";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { AFFILIATE_STATUS, COMISSION_CRITERIA } from "../constants/constants";
-
 import { useEffect, useState } from "react";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import { capitalizeFirstCaracter } from "../utilis/generalUtils";
