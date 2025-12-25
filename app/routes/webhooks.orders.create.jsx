@@ -143,27 +143,6 @@ export const action = async ({ request }) => {
           }
         });
 
-        await tx.affiliateOrdersByMonth.upsert({
-          where: {
-            monthYear_shopId_affiliateId: {
-              monthYear: currDate,
-              shopId: shopId,
-              affiliateId: component.affiliateId,
-            }
-          },
-          update: {
-            totalOrders: { increment: 1 },
-            totalValue: { increment: totalPrice },
-          },
-          create: {
-            monthYear: currDate,
-            totalOrders: 1,
-            totalValue: totalPrice,
-            affiliateId: component.affiliateId,
-            shopId: shopId
-          },
-        });
-
       }
     });
 

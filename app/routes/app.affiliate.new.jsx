@@ -87,7 +87,7 @@ const CreateAffiliate = () => {
       });
       setTimeout(() => {
         navigate(`/app/affiliate/${actionData?.data?.id}?new_created=true`);
-      }, 300);
+      }, 500);
 
     } else if (actionData?.success === false) {
       shopify.toast.show(actionData.message, {

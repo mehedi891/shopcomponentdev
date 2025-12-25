@@ -49,7 +49,7 @@ export default function App() {
       <NavMenu>
         <Link to="/app" rel="home">
         </Link>
-        <Link to="/app" rel="home">
+        <Link to="/app/componentslist" >
           Components
         </Link>
         <Link to="/app/createcomponent">{t("create_componet")}</Link>

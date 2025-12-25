@@ -219,7 +219,7 @@ export const loader = async ({ request }) => {
 
 const CreateComponent = () => {
     const { trackingCode, shopData } = useLoaderData();
-    console.log('shopData:', shopData);
+    //console.log('shopData:', shopData);
     const navigate = useNavigate();
     const actionData = useActionData();
     const [toogleOpen, setToogleOpen] = useState({

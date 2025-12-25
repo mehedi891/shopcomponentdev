@@ -24,7 +24,7 @@ export const loader = async ({ request, params }) => {
 const Updateaffiliate = () => {
   const shopify = useAppBridge();
   const { affData } = useLoaderData();
-  console.log("affData:", affData);
+  //console.log("affData:", affData);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const actionData = useActionData();
@@ -34,7 +34,7 @@ const Updateaffiliate = () => {
   const params = new URLSearchParams(location.search);
   const [showNewCreatedBanner, setShowNewCreatedBanner] = useState(params.get("new_created") === "true");
   const payoutMethods = ['Paypal', 'Debit card', 'Bank transfer', 'Other'];
-  const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue, } = useForm({
+  const { register, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, } = useForm({
     defaultValues: {
       name: affData?.name || "",
       email: affData?.email || "",
@@ -68,20 +68,11 @@ const Updateaffiliate = () => {
   });
   const watchedValues = watch();
 
-  useEffect(() => {
-    if (actionData?.success) {
-      shopify.toast.show(actionData.message, {
-        duration: 1000,
-      });
-    } else if (actionData?.success === false) {
-      shopify.toast.show(actionData.message, {
-        duration: 1000,
-      });
 
-    }
+  
 
 
-  }, [actionData]);
+
   const affFormHandleSubmit = (data) => {
     const updatedData = {
       ...data,
@@ -90,7 +81,7 @@ const Updateaffiliate = () => {
       fixedCommission: JSON.stringify(data.fixedCommission)
     };
     //console.log('Affiliate form data submitted:', updatedData);
-    submit(updatedData, { method: 'post'});
+    submit(updatedData, { method: 'post' });
     setShowNewCreatedBanner(false);
   }
 
@@ -106,13 +97,38 @@ const Updateaffiliate = () => {
   }, [searchParams]);
 
   useEffect(() => {
+  if (actionData?.success) {
+    shopify.toast.show(actionData.message, { duration: 1000 });
+
+    const current = getValues();
+    reset(current);
+
+  } else if (actionData?.success === false) {
+    shopify.toast.show(actionData.message, { duration: 1000 });
+  }
+}, [actionData, getValues, reset, shopify]);
+
+
+  useEffect(() => {
     if (isDirty) {
-      shopify.saveBar.show('spc-save-bar_affiliate')
+      shopify.saveBar.show('spc-save-bar_affiliate');
+     
     } else {
-      shopify.saveBar.hide('spc-save-bar_affiliate')
+      reset(getValues());
+      
     }
   }, [isDirty]);
 
+
+    useEffect(() => {
+      if (window) {
+        window.addEventListener('popstate', function (event) {
+          reset(getValues());
+        });
+      }
+    }, []);
+
+   
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
@@ -139,7 +155,7 @@ const Updateaffiliate = () => {
             justifyContent="start"
             alignItems="center"
           >
-            <s-button disabled={isDirty} onClick={() => navigate('/app/affiliate')} accessibilityLabel="Back to affiliate" icon="arrow-left" variant="tertiary"></s-button>
+            <s-button disabled={isDirty ? true : false} onClick={() => navigate('/app/affiliate')} accessibilityLabel="Back to affiliate" icon="arrow-left" variant="tertiary"></s-button>
             <s-text type="strong">Update: {affData?.name}</s-text>
           </s-stack>
 
@@ -663,26 +679,28 @@ export const action = async ({ request, params }) => {
       }
     }
   } else if (request.method === 'DELETE') {
-    // const component = await db.component.updateMany({
-    //   where:{
-    //     affiliateId: Number(id)
-    //   },
-    //   data: {
-    //     affiliateId: null
-    //   }
-    // })
+    try {
+      const affData = await db.affiliate.delete({
+        where: {
+          id: Number(id)
+        }
+      });
 
-    const affData = await db.affiliate.delete({
-      where: {
-        id: Number(id)
+     
+      if (affData?.id) {
+        return {
+          success: true,
+          message: "Affiliate deleted successfully."
+        }
       }
-    });
-    if (affData?.id) {
+    } catch (error) {
+      
       return {
-        success: true,
-        message: "Affiliate deleted successfully."
-      }
+          success: false,
+          message: "Something went wrong. Please try again."
+        }
     }
+
   } else {
     return {
       success: false,

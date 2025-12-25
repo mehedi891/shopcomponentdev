@@ -27,7 +27,7 @@ export const loader = async ({ request }) => {
 
     return {
         shopData: shop,
-        
+
     };
 }
 
@@ -59,62 +59,63 @@ const Settings = () => {
 
 
     return (navigation.state === "loading" ? <LoadingSkeleton /> :
-        <Page narrowWidth>
-            <Layout>
-                <Layout.Section>
-                    <BlockStack gap={'300'} align="center" inlineAlign="center">
-                        {/* <Box width="100%">
-                            <Card>
-                                <HeadlessVerify
-                                    showBanner={shopData?.headlessAccessToken ? false : true}
-                                    defaultToken={shopData?.headlessAccessToken ? shopData?.headlessAccessToken : ''}
-                                    pageName={'settings'}
-                                />
-                            </Card>
-                        </Box> */}
+        // <Page narrowWidth>
+        //     <Layout>
+        //         <Layout.Section>
+        //             <BlockStack gap={'300'} align="center" inlineAlign="center">
 
-                        {/* <Box paddingBlock={'200'}>
-                            <Card>  
-                                <BlockStack gap={'150'}>
-                                    <Text>App Created Token : <strong>8ac8662f5be86692a174712ebc1fe14a</strong></Text>
-                                    <Text>Headless App Token : <strong>40e54142b7de3372a26b591477308f56</strong></Text>
-                                    </BlockStack>
-                            </Card>
-                        </Box> */}
+        //                 <Box width="100%">
+        //                     <Card>
+        //                         <BlockStack gap={'200'}>
+        //                             <Text>Disable App</Text>
+        //                             <Box>
+        //                                 <InlineStack gap={'150'} blockAlign="center">
+        //                                     <RadioButton
+        //                                         name="appDisable"
+        //                                         value="no"
+        //                                         label="No"
+        //                                         checked={disableApp === "no"}
+        //                                         onChange={() => handlechangeAppDisabled('no')}
+        //                                     />
 
-                        <Box width="100%">
-                            <Card>
-                                <BlockStack gap={'200'}>
-                                    <Text>Disable App</Text>
-                                    <Box>
-                                        <InlineStack gap={'150'} blockAlign="center">
-                                            <RadioButton
-                                                name="appDisable"
-                                                value="no"
-                                                label="No"
-                                                checked={disableApp === "no"}
-                                                onChange={() => handlechangeAppDisabled('no')}
-                                            />
+        //                                     <RadioButton
+        //                                         name="appDisable"
+        //                                         value="yes"
+        //                                         label="Yes"
+        //                                         checked={disableApp === "yes"}
+        //                                         onChange={() => handlechangeAppDisabled('yes')}
+        //                                     />
 
-                                            <RadioButton
-                                                name="appDisable"
-                                                value="yes"
-                                                label="Yes"
-                                                checked={disableApp === "yes"}
-                                                onChange={() => handlechangeAppDisabled('yes')}
-                                            />
+        //                                 </InlineStack>
+        //                             </Box>
+        //                         </BlockStack>
+        //                     </Card>
+        //                 </Box>
+        //             </BlockStack>
+        //         </Layout.Section>
+        //     </Layout>
+        // </Page>
 
-                                        </InlineStack>
-                                    </Box>
-                                </BlockStack>
-                            </Card>
-                        </Box>
-
-                    </BlockStack>
-                </Layout.Section>
-
-            </Layout>
-        </Page>
+        <s-page
+        inlineSize="small"
+        >
+            <s-query-container>
+                <s-stack padding="large-100 none large none">
+                    <s-section>
+                        <s-choice-list
+                            label="Disable App"
+                            name="appDisable"
+                            details="Warning: Disabling the app will stop all components from working and remove them from all embedded locations."
+                            onChange={(e) => handlechangeAppDisabled(e.target.values[0])}
+                        >
+                            
+                            <s-choice defaultSelected={disableApp === "no"} value="no">No</s-choice>
+                            <s-choice defaultSelected={disableApp === "yes"}  value="yes">Yes</s-choice>
+                        </s-choice-list>
+                    </s-section>
+                </s-stack>
+            </s-query-container>
+        </s-page>
     )
 }
 

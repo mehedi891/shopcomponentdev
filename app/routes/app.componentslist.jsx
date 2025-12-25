@@ -1,16 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
-import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
-import { useEffect, useRef, useState } from "react";
+import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
-import Instruction from "../components/Instruction/Instruction";
-import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "../constants/constants";
+import {  PLAN_NAME } from "../constants/constants";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
-import ProductAvailibilityStatus from "../components/ProductAvailibilityStatus/ProductAvailibilityStatus";
-import TermsAndConditions from "../components/TermsAndConditions/TermsAndConditions";
+
 
 
 export const loader = async ({ request }) => {
@@ -18,17 +16,6 @@ export const loader = async ({ request }) => {
   const { session, admin, billing, redirect } = await authenticate.admin(request);
   const { hasActivePayment, appSubscriptions } = await billing.check();
 
-  // const shopResponse = await admin.graphql(
-  //   `#graphql
-  //           query shopInfo{
-  //               shop{
-  //                 id
-  //               }
-  //       }`,
-
-  // );
-
-  // const shop = await shopResponse.json();
 
 
   let shopData = await db.shop.findUnique({
@@ -105,52 +92,7 @@ export const loader = async ({ request }) => {
     });
   }
 
-  const url = new URL(request.url);
-  const isFirstInstall = url.searchParams.get('isFirstInstall');
-  const planType = url.searchParams.get('planType');
-  const chargeId = url.searchParams.get('charge_id');
-  const planName = url.searchParams.get('planName');
-
-
-  if (isFirstInstall && appSubscriptions?.length > 0) {
-    shopData = await db.shop.update({
-      where: {
-        shopifyDomain: session.shop,
-      },
-      data: {
-        isFirstInstall: isFirstInstall === 'true' ? false : true,
-        maxAllowedComponents: planName === PLAN_NAME.growth ? MAX_ALLOWED_COMPONENTS.growth : MAX_ALLOWED_COMPONENTS.pro,
-        appPlan: appSubscriptions[0].name,
-        trialDays: appSubscriptions[0].trialDays,
-        isAppliedCoupon: true,
-        plan: {
-          upsert: {
-            create: {
-              planId: appSubscriptions[0].id,
-              planName: appSubscriptions[0].name,
-              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
-              planStatus: appSubscriptions[0].status,
-              isTestCharge: appSubscriptions[0].test,
-              planType,
-              chargeId,
-            },
-            update: {
-              planId: appSubscriptions[0].id,
-              planName: appSubscriptions[0].name,
-              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
-              isTestCharge: appSubscriptions[0].test,
-              planType,
-              chargeId,
-            },
-          },
-        },
-      },
-      include: {
-        plan: true
-      }
-    });
-  }
-
+ 
 
   const components = await db.component.findMany({
     where: {
@@ -163,102 +105,7 @@ export const loader = async ({ request }) => {
   });
 
 
-  const totalPdJson = await admin.graphql(
-    `#graphql
-            query {
-                productsCount(query:null) {
-                count
-                }
-            }`,
-  );
-  const totalproduct = await totalPdJson.json();
-
-
-  if (!shopData?.publicationId) {
-    const appResponse = await admin.graphql(
-      `#graphql
-            query ($apiKey: String!) {
-              appByKey(apiKey: $apiKey) {
-                id
-                title
-                installation {
-                  publication {
-                    id
-                  }
-                }
-              }
-            }
-  `,
-      {
-        variables: { apiKey: process.env.SHOPIFY_API_KEY },
-      }
-    );
-
-    const appResponseJson = await appResponse.json();
-
-    const publication = await admin.graphql(
-      `#graphql
-  query publication($id: ID!) {
-    publication(id: $id) {
-      id
-    catalog{
-      id
-    }
-    }
-  }`,
-      {
-        variables: {
-          "id": appResponseJson?.data?.appByKey?.installation?.publication?.id
-        },
-      },
-    );
-
-    const publicationjson = await publication.json();
-
-
-    shopData = await db.shop.upsert({
-      where: {
-        shopifyDomain: session.shop,
-      },
-      update: {
-        publicationId: publicationjson?.data?.publication?.id,
-        appCatalogId: publicationjson?.data?.publication?.catalog?.id,
-        isInstalled: true,
-      },
-      create: {
-        shopifyDomain: session.shop,
-        publicationId: publicationjson?.data?.publication?.id,
-        appCatalogId: publicationjson?.data?.publication?.catalog?.id,
-        isInstalled: false,
-      },
-      include: {
-        components: {
-          orderBy: {
-            id: 'desc',
-          },
-        },
-        plan: true
-      }
-    });
-
-  }
-
-  const totalPublishSpc = await admin.graphql(
-    `#graphql
-  query PublishedProductCount($publicationId: ID!) {
-    publishedProductsCount(publicationId: $publicationId) {
-      count
-      precision
-    }
-  }`,
-
-    {
-      variables: {
-        "publicationId": shopData?.publicationId
-      },
-    },
-  );
-  const totalPublishSpcJson = await totalPublishSpc.json();
+ 
 
 
 
@@ -273,67 +120,23 @@ export const loader = async ({ request }) => {
     shopData: shopData,
     components: components || [],
     hasActivePayment,
-    totalPd: totalproduct?.data?.productsCount?.count ?? 0,
-    totalPublishProduct: totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0,
-    cataglogId: shopData?.appCatalogId ? shopData?.appCatalogId.replace('gid://shopify/AppCatalog/', '') : '',
     success: true,
     appSubscriptions: appSubscriptions[0]
   };
 };
 
-export default function Index() {
+export default function ComponentList() {
   const shopify = useAppBridge();
-  const { shopData, components, totalPd, totalPublishProduct, cataglogId } = useLoaderData();
+  const { shopData, components} = useLoaderData();
   //console.log('components:', components);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
   const fetcher = useFetcher();
   const [isLoading, setIsLoading] = useState(false);
-  const [showInstructionBanner, setShowInstructionBanner] = useState(false);
-    const bannerRef = useRef(null);
+ 
 
-  const [searchParams] = useSearchParams();
-
-
-
-  useEffect(() => {
-    if (searchParams.toString()) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    const isShowBanner = localStorage.getItem('showInstructionBanner');
-    if (isShowBanner === 'false') {
-      setShowInstructionBanner(false);
-      
-    } else {
-      setShowInstructionBanner(true);
-    }
-
-    const el = bannerRef.current;
-    if (!el) return;
-
-    const onDismiss = () => {
-      localStorage.setItem('showInstructionBanner', false);
-      setShowInstructionBanner(false);
-    };
-    el.addEventListener("dismiss", onDismiss);
-
-   
-
-    return () => {
-      
-      el.removeEventListener("afterhide", onDismiss);
-    };
-  }, []);
-
-  useEffect(() => {
-
-   
-   
-  }, []);
+ 
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);
@@ -378,18 +181,15 @@ export default function Index() {
             paddingBlockEnd="base"
             paddingBlockStart="large"
           >
-            <s-text type="strong">Bring your products to where your audience already is</s-text>
+            <s-text type="strong">Showcase your products exactly where your audience already spends their time.</s-text>
             <s-text>Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront.</s-text>
           </s-stack>
 
           <s-stack
             paddingBlockEnd="large"
           >
-            <Instruction 
-            bannerRef={bannerRef}
-            showInstructionBanner={showInstructionBanner}
-            />
             
+
           </s-stack>
 
           <s-box paddingBlockEnd="large">
@@ -441,11 +241,10 @@ export default function Index() {
                         <s-table-cell>
                           <s-text>{appliesTo === 'product' ? t("applies_to_product") : t("applies_to_collection")}</s-text>
                         </s-table-cell>
-                       
                         <s-table-cell>
                           <s-text>{addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? t("individual_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? t("bulk_add_to_cart") : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</s-text>
                         </s-table-cell>
-                         <s-table-cell>{totalOrderCount}</s-table-cell>
+                        <s-table-cell>{totalOrderCount}</s-table-cell>
                         <s-table-cell>
                           {shopData?.currencyCode + ' '}
                           {
@@ -528,17 +327,6 @@ export default function Index() {
               />
             }
           </s-box>
-
-          <ProductAvailibilityStatus
-            manageUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/bulk/product?resource_name=Product&edit=status`}
-            totalPublishProductCount={totalPublishProduct}
-            publishPdUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_all=${cataglogId}`}
-            notPublishPdUrl={`https://admin.shopify.com/store/${shopData.shopifyDomain.replace('.myshopify.com', '')}/products?catalogs_ids_not=${cataglogId}`}
-            notPublishPdCount={totalPd - totalPublishProduct >= 0 ? totalPd - totalPublishProduct : 0}
-          />
-
-          <TermsAndConditions />
-
         </s-query-container>
       </s-page>
   );

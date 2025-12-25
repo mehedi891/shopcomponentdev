@@ -21,6 +21,7 @@ import { emptyStateHtml } from "../webcomponentsHtml/emptyState";
 import { stylesPdT1 } from "../webcomponentsHtml/stylesProduct";
 import { floatingCartCountBuble } from "../webcomponentsHtml/generalHTML";
 import db from "../db.server";
+import crypto from "crypto";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
@@ -210,7 +211,7 @@ const UpdateComponent = () => {
   useEffect(() => {
     setDisabledContentByPlan(component?.shop?.plan?.planName === PLAN_NAME.free ? true : false)
     setDisabledContentProPlan(component?.shop?.plan?.planName !== PLAN_NAME.pro ? true : false)
-    
+
   }, [component?.shop]);
 
 
@@ -4030,23 +4031,29 @@ export const action = async ({ request, params }) => {
   } else if (request.method === 'DELETE') {
     //console.log('Delelte:',id);
     try {
-      await db.component.delete({
+      const cmp = await db.component.delete({
         where: {
           id: Number(id),
         },
       });
 
+      console.log("CMPPPP::",cmp);
+      if (cmp?.id) {
+        return {
+          success: true,
+          message: "Component deleted successfully"
+        }
+      }
+
     } catch (error) {
+      console.log("ERRRRRR::::>>>", error);
       return {
         success: false,
         message: "There was an error deleting the component",
         error: error
       }
     }
-    return {
-      success: true,
-      message: "Component deleted successfully"
-    }
+
   } else if (request.method === 'POST') {
     try {
       const original = await db.component.findUnique({
@@ -4061,6 +4068,8 @@ export const action = async ({ request, params }) => {
           message: 'Original component not found',
         };
       }
+
+      const csTracking = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
       // Destructure to exclude non-writable fields
       const {
         id: _,
@@ -4073,18 +4082,26 @@ export const action = async ({ request, params }) => {
         ...clonableData,
         title: 'Copy ' + original.title,
         status: STATUS.deactivate,
-        customerTracking: (original.customerTracking || '') + '_DP',
-        tracking: (original.tracking || '') + '_DP',
-        totalOrderCount:0,
-        totalOrderValue:0,
-        affiliateId:null,
-        
+        customerTracking: ( csTracking || '') + '_DP',
+        tracking: (csTracking || '') + '_DP',
+        totalOrderCount: 0,
+        totalOrderValue: 0,
+        affiliateId: null,
+
 
 
       };
-      await db.component.create({
+      const createComp = await db.component.create({
         data: newComponentData,
       });
+
+      if (!createComp?.id) {
+        return {
+          success: false,
+          message: "There was an error duplicating the component",
+        };
+      }
+      
       return {
         success: true,
         message: "Component duplicated successfully"

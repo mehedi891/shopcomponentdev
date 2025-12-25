@@ -163,7 +163,7 @@ const Affiliatedetails = () => {
     },
   ];
 
-  console.log("");
+ 
 
   const pendingCommission = (affData?.lifeTimeCommission - affData?.totalCommissionPaid) || 0;
 
