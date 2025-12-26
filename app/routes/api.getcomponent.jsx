@@ -13,6 +13,9 @@ export const loader = async ({ request }) => {
         id: Number(id),
         softDelete: false,
         status: 'activate',
+        shop: {
+          appDisabled: false
+        }
       },
       select: {
         id: true,
