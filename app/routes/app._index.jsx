@@ -159,8 +159,18 @@ export const loader = async ({ request }) => {
     },
     orderBy: {
       id: 'desc',
-    }
+    },
+    take:5,
   });
+
+  // const cmpCount = await db.component.count({
+  //   where: {
+  //     shopId: shopData.id,
+  //     softDelete: false,
+  //   }
+  // });
+
+  // console.log("cmpCount:",cmpCount);
 
 
   const totalPdJson = await admin.graphql(
@@ -324,8 +334,7 @@ export default function Index() {
 
 
     return () => {
-
-      el.removeEventListener("afterhide", onDismiss);
+      el.removeEventListener("dismiss", onDismiss);
     };
   }, []);
 
@@ -372,6 +381,8 @@ export default function Index() {
 
   // }, [shopify]);
 
+  console.log("f State:",fetcher.state);
+
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
 
@@ -416,6 +427,7 @@ export default function Index() {
                     {isLoading &&
                       <s-spinner accessibilityLabel="Loading" size="base" />
                     }
+                    <s-button accessibilityLabel="Show all components"  href={`/app/componentslist`} variant="secondary">Show all components</s-button>
                     {shopData?.plan.planName === PLAN_NAME.free && components?.length > 0 &&
                       <UpgradeTooltip />
                     }

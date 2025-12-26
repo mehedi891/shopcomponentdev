@@ -2,11 +2,11 @@ import { useTranslation } from "react-i18next";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
-import {  PLAN_NAME } from "../constants/constants";
+import { PLAN_NAME } from "../constants/constants";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 
 
@@ -18,16 +18,18 @@ export const loader = async ({ request }) => {
 
 
 
+
+
   let shopData = await db.shop.findUnique({
     where: {
       shopifyDomain: session.shop
     },
     include: {
-      components: {
-        orderBy: {
-          id: 'desc',
-        },
-      },
+      // components: {
+      //   orderBy: {
+      //     id: 'desc',
+      //   },
+      // },
       plan: true
     }
   });
@@ -92,7 +94,7 @@ export const loader = async ({ request }) => {
     });
   }
 
- 
+
 
   const components = await db.component.findMany({
     where: {
@@ -105,7 +107,7 @@ export const loader = async ({ request }) => {
   });
 
 
- 
+
 
 
 
@@ -118,7 +120,7 @@ export const loader = async ({ request }) => {
 
   return {
     shopData: shopData,
-    components: components || [],
+    componentsList: components || [],
     hasActivePayment,
     success: true,
     appSubscriptions: appSubscriptions[0]
@@ -127,16 +129,38 @@ export const loader = async ({ request }) => {
 
 export default function ComponentList() {
   const shopify = useAppBridge();
-  const { shopData, components} = useLoaderData();
+  const { shopData, componentsList } = useLoaderData();
   //console.log('components:', components);
+  const [components, setComponents] = useState(componentsList);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
   const fetcher = useFetcher();
   const [isLoading, setIsLoading] = useState(false);
- 
+  const tableRef = useRef(null);
 
- 
+  useEffect(()=>{
+    setComponents(componentsList);
+  },[componentsList]);
+
+  // const nextPageFnc = () => {
+  //   console.log("Next page click");
+  // }
+
+  // const prevPageFnc = () => {
+  //   console.log("Prev page click");
+  // }
+
+  // useEffect(() => {
+  //   const el = tableRef.current;
+  //   if (!el) return;
+  //   el.addEventListener("nextpage", nextPageFnc);
+  //   el.addEventListener("previouspage", prevPageFnc);
+  //   return () => {
+  //     el.removeEventListener("nextpage", nextPageFnc);
+  //     el.removeEventListener("previouspage", prevPageFnc);
+  //   };
+  // }, []);
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);
@@ -168,13 +192,13 @@ export default function ComponentList() {
   }, [fetcher?.data]);
 
 
-//  useEffect(() => {
-    
-//     shopify.webVitals.onReport((metric) => {
-//       console.log("Web Vitals CMP LIST:", metric);
-//     });
+  //  useEffect(() => {
 
-//   }, [shopify]);
+  //     shopify.webVitals.onReport((metric) => {
+  //       console.log("Web Vitals CMP LIST:", metric);
+  //     });
+
+  //   }, [shopify]);
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
 
@@ -194,7 +218,7 @@ export default function ComponentList() {
           <s-stack
             paddingBlockEnd="large"
           >
-            
+
 
           </s-stack>
 
@@ -223,7 +247,11 @@ export default function ComponentList() {
                   </s-stack>
                 </s-stack>
                 <s-table
+                  ref={tableRef}
                   loading={fetcher.state !== 'idle'}
+                  // hasPreviousPage
+                  // hasNextPage
+                  // paginate
                 >
                   <s-table-header-row>
                     <s-table-header listSlot="primary">Component Name</s-table-header>
@@ -337,4 +365,13 @@ export default function ComponentList() {
         </s-query-container>
       </s-page>
   );
+}
+
+export const action = async ({ request }) => {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+
+
+
+  return data;
 }
