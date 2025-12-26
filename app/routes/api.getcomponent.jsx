@@ -70,7 +70,7 @@ export const loader = async ({ request }) => {
       jsonResponse = new Response(JSON.stringify({
         data: {},
         success: false,
-        message: "ShopComponent is disabled",
+        message: "EmbedUp is disabled",
         status: 401
       }));
     }

@@ -694,7 +694,7 @@ export const action = async ({ request, params }) => {
         }
       }
     } catch (error) {
-      
+      console.log("Error DeletingAff:::>>>",error);
       return {
           success: false,
           message: "Something went wrong. Please try again."
