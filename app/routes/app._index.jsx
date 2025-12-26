@@ -11,6 +11,7 @@ import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "../constants/constants";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import ProductAvailibilityStatus from "../components/ProductAvailibilityStatus/ProductAvailibilityStatus";
 import TermsAndConditions from "../components/TermsAndConditions/TermsAndConditions";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 
 export const loader = async ({ request }) => {
@@ -465,10 +466,7 @@ export default function Index() {
                         </s-table-cell>
                         <s-table-cell>{totalOrderCount}</s-table-cell>
                         <s-table-cell>
-                          {shopData?.currencyCode + ' '}
-                          {
-                            totalOrderValue ?? 0
-                          }
+                          {getSymbolFromCurrency(shopData?.currencyCode)+(totalOrderValue || 0).toFixed(2)}
                         </s-table-cell>
                         <s-table-cell>
                           {status === 'activate' ? <s-badge tone="success">{t("activate")}</s-badge> : <s-badge tone="critical-strong">{t("deactivate")}</s-badge>}

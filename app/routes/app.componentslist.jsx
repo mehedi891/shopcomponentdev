@@ -8,6 +8,7 @@ import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import { PLAN_NAME } from "../constants/constants";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 
 
@@ -280,10 +281,8 @@ export default function ComponentList() {
                         </s-table-cell>
                         <s-table-cell>{totalOrderCount}</s-table-cell>
                         <s-table-cell>
-                          {shopData?.currencyCode + ' '}
-                          {
-                            totalOrderValue ?? 0
-                          }
+                          {getSymbolFromCurrency(shopData?.currencyCode)+(totalOrderValue || 0).toFixed(2)}
+                          
                         </s-table-cell>
                         <s-table-cell>
                           {status === 'activate' ? <s-badge tone="success">{t("activate")}</s-badge> : <s-badge tone="critical-strong">{t("deactivate")}</s-badge>}
