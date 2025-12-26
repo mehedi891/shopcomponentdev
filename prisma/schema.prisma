@@ -224,7 +224,7 @@ model Affiliate {
 model AffiliateTransaction {
   id                 Int       @id @default(autoincrement())
   affiliateId        Int
-  affiliate          Affiliate @relation(fields: [affiliateId], references: [id])
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
   commissionPaid     Float     @default(0.00)
   transactionDetails String?
   createdAt          DateTime  @default(now())
