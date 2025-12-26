@@ -393,7 +393,7 @@ const Plans = () => {
       "UTM campaign",
       "Affiliate: Create and manage your affiliates",
       "Affiliate Performance",
-      "Assign Affiliate to component",
+      "Assign components to affiliate",
       "Analytics: UTM tracking, campaign performance, visitor to conversion."
     ]
   }
