@@ -3,10 +3,24 @@ import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 export const loader = async ({ request, params }) => {
-  await authenticate.admin(request);
+ const {admin}  = await authenticate.admin(request);
   const affiliateId = Number(params.id);
+
+    const response = await admin.graphql(
+    `#graphql
+      query{
+        shop{
+          currencyCode
+        }
+      }
+    `
+  );
+
+  const data = await response.json();
+  const shopCurrency = data.data.shop.currencyCode;
 
   const transactions = await db.affiliateTransaction.findMany({
     where: {
@@ -20,11 +34,12 @@ export const loader = async ({ request, params }) => {
   return {
     transactions: transactions || [],
     affiliateId: affiliateId,
+    shopCurrency:shopCurrency || 'USD'
   };
 }
 
 const AffiliateTransaction = () => {
-  const { transactions,affiliateId } = useLoaderData();
+  const { transactions,affiliateId,shopCurrency } = useLoaderData();
   const navigation = useNavigation();
   const navigate = useNavigate();
   return (
@@ -61,7 +76,7 @@ const AffiliateTransaction = () => {
                     <s-table-row key={transaction.id}>
                       <s-table-cell>{transaction.createdAt.split("T")[0]}</s-table-cell>
                       <s-table-cell><s-text>{transaction.transactionDetails}</s-text></s-table-cell>
-                      <s-table-cell>${transaction.commissionPaid}</s-table-cell>
+                      <s-table-cell>{getSymbolFromCurrency(shopCurrency || '')}{transaction.commissionPaid}</s-table-cell>
                     </s-table-row>
                   ))
 
