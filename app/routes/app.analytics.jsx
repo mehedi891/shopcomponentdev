@@ -641,7 +641,7 @@ const Analytics = () => {
                       <s-stack
                         maxInineSize="70%"
                       >
-                        <s-link href="#" target="_blank">{item?.name}</s-link>
+                        <s-link href={`/app/affiliate/details/${item?.id}`}>{item?.name}</s-link>
                       </s-stack>
                       <s-text>{getSymbolFromCurrency(fData?.shopData?.currencyCode || 'USD') + (item?.totalOrderValue || 0).toFixed(2)}</s-text>
                     </s-stack>
