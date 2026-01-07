@@ -382,7 +382,7 @@ const Analytics = () => {
                     labelFormatter: (key) => new Date(key).toLocaleDateString(),
                   }}
                   yAxisOptions={{
-                    labelFormatter: (value) => `$${value}`,
+                    labelFormatter: (value) => `${getSymbolFromCurrency(fData?.shopData?.currencyCode || "USD")}${value}`,
                   }}
                   emptyStateText="No Sales found"
                   errorText="Something went wrong"
