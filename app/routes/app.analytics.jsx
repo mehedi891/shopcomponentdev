@@ -275,7 +275,7 @@ const Analytics = () => {
             gap="small-300"
             alignItems="center"
           >
-              <s-icon type="foreground" />
+              <s-icon type="file-list" />
               <s-text>{(selectComponent.title || '').length > 40
                 ? selectComponent.title.substring(0, 40) + "..."
                 : selectComponent.title}</s-text>
@@ -348,7 +348,8 @@ const Analytics = () => {
         </s-grid>
 
         <s-grid
-          gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+          // gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+          gridTemplateColumns="@container (inline-size < 600px) 1fr, 1fr 1fr 1fr"
           gap="base"
           padding="large-100 none large-100 none"
         >
