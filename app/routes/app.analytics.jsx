@@ -560,7 +560,7 @@ const Analytics = () => {
                           data: fData?.analyticsData?.uniqueVisitorChartData || [],
                           color: 'green',
                           isComparison: true,
-                          name: 'Today'
+                          name: showOrderDataRange.title || 'Today'
                         },
 
                       ]}
@@ -614,7 +614,7 @@ const Analytics = () => {
                           data: fData?.analyticsData?.addToCartClickChartData || [],
                           color: 'green',
                           isComparison: false,
-                          name: 'Today'
+                          name: showOrderDataRange.title || 'Today'
                         },
 
 
@@ -653,8 +653,8 @@ const Analytics = () => {
                       alignItems="center"
                     >
                       <s-text size="small">Top Affiliates</s-text>
-                      <s-icon type="info" tone="info" interestFor="spc_traffic_source_tooltip" />
-                      <s-tooltip id="spc_traffic_source_tooltip">Only top 5 affiliates are shown</s-tooltip>
+                      <s-icon type="info" tone="info" interestFor="spc_traffic_top_affilite" />
+                      <s-tooltip id="spc_traffic_top_affilite">Top 5 affiliates are shown.Others will show on affiliate page.</s-tooltip>
 
                     </s-stack>
                     <s-text type="strong">{fData?.affiliateDataFirstFive?.length || 0}</s-text>

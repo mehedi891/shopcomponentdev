@@ -380,7 +380,7 @@ export default function Index() {
   //     console.log("Web Vitals Index:", metric);
   //   });
 
-  // }, [shopify]);
+  // }, []);
 
   console.log("f State:", fetcher.state);
 
@@ -403,10 +403,16 @@ export default function Index() {
           <s-stack
             paddingBlockEnd="large"
           >
-            <Instruction
-              bannerRef={bannerRef}
-              showInstructionBanner={showInstructionBanner}
-            />
+            {showInstructionBanner &&
+              <div
+                style={{ minHeight: '310px' }}
+              >
+                <Instruction
+                  bannerRef={bannerRef}
+                  showInstructionBanner={showInstructionBanner}
+                />
+              </div>
+            }
 
           </s-stack>
 
@@ -522,15 +528,15 @@ export default function Index() {
                                   handleDuplicateComponent(id);
                                 }}
                               >
-                                 <s-stack
+                                <s-stack
                                   direction="inline"
                                   gap="small-300"
                                   alignItems="center"
                                 >
-                                  <s-icon type={'duplicate'}/>
+                                  <s-icon type={'duplicate'} />
                                   <s-text>{'Duplicate'}</s-text>
                                 </s-stack>
-                                </s-button>
+                              </s-button>
 
                               <s-button
                                 tone="critical"
@@ -539,15 +545,15 @@ export default function Index() {
                                 commandFor={`component_delete_modal_` + id}
                                 command='--show'
                               >
-                                 <s-stack
+                                <s-stack
                                   direction="inline"
                                   gap="small-300"
                                   alignItems="center"
                                 >
-                                  <s-icon tone="critical" type={'delete'}/>
+                                  <s-icon tone="critical" type={'delete'} />
                                   <s-text tone="critical" >{'Delete'}</s-text>
                                 </s-stack>
-                                </s-button>
+                              </s-button>
                             </s-stack>
                           </s-popover>
 

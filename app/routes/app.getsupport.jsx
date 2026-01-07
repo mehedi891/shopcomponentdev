@@ -1,182 +1,134 @@
-import { useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
-import { Bleed, BlockStack, Box, Button, Card, Grid, Icon, Layout, Page, Text } from "@shopify/polaris"
+import { useNavigate, useNavigation } from "@remix-run/react";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
-import { ChatIcon, PhoneIcon, EmailIcon, LogoYoutubeIcon, NoteIcon } from "@shopify/polaris-icons";
-import { Trans, useTranslation } from "react-i18next";
-import { authenticate } from "../shopify.server";
-import db from "../db.server";
 
-
-export const loader = async ({ request }) => {
-  const { session, redirect } = await authenticate.admin(request);
-
-  const shop = await db.shop.findUnique({
-    where: {
-      shopifyDomain: session.shop
-    },
-    include: {
-      plan: true
-    }
-  });
-
-  if (!shop?.plan) {
-    throw redirect('/app/plans')
-  }
-
-  return {
-    shopData: shop
-  };
-}
-
-const Getsupport = () => {
-  //const { shopData } = useLoaderData();
-  //console.log(shopData);
+const GetSupport = () => {
+  const navgate = useNavigate();
   const navigation = useNavigation();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
+
+  const supportOptions = [
+    {
+      title: 'Live Chat Support',
+      description: 'Need quick assistance? Chat live with our expert support team for instant solutions!',
+      icon: 'chat-new',
+      btnText: 'Chat with us',
+      isOnclick: true,
+      href: "#"
+    },
+    {
+      title: 'Schedule a Call',
+      description: 'Prefer a conversation? Schedule a call with our technical experts at a time that works for you!',
+      icon: 'phone',
+      btnText: 'Book a Call',
+      isOnclick: false,
+      href: "https://calendly.com/efolisupport/45min"
+    },
+    {
+       title: 'Email Support',
+      description: "Need detailed assistance? Reach out via email support@embedup.com, and we'll get back to you promptly.",
+      icon: 'email',
+      btnText: 'Email us',
+      isOnclick: false,
+      href: "mailto:support@embedup.com"
+    },
+     {
+       title: 'YouTube Tutorials',
+      description: "Discover our wide range of video tutorials created to assist you in managing discounts.",
+      icon: 'video-list',
+      btnText: 'Watch videos',
+      isOnclick: false,
+      href: "https://www.youtube.com/@EmbedUpApp"
+    },
+    {
+       title: 'Help Docs',
+      description: "Explore our in-depth help documentation for step-by-step guidance and solutions.",
+      icon: 'note',
+      btnText: 'Browse docs',
+      isOnclick: false,
+      href: "https://embedup.com/academy/"
+    }
+  ]
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
-    <Page
-      title={t("get_support")}
-      backAction={{ onAction: () => navigate('/app') }}
-      fullWidth={false}
+    <s-page
+      inlineSize="base"
     >
-      <Layout>
-        <Layout.Section>
-          <Bleed>
-            <BlockStack gap={600}>
-              <Grid>
-                <Grid.Cell columnSpan={{ xs: 6, lg: 10 }}>
-                  <BlockStack gap={400}>
-                    <Box padding={200}></Box>
-                    <Text variant="headingXl" as="h4">{t("need_assistance_header")}</Text>
-                    <Text variant="headingLg" as="h5" fontWeight="regular" tone="subdued">Whether you need a quick fix or detailed guidance, explore our range of support options to find what works best for you.</Text>
-                    <Box padding={200}></Box>
-                  </BlockStack>
-                  <Grid>
-                    <Grid.Cell columnSpan={{ xs: 6, md: 3, lg: 4 }}>
-                      <Card padding={0}>
-                        <BlockStack gap={400} inlineAlign="start">
-                          <Box paddingBlock={600} paddingInline={300} width="100%" background="bg-surface-secondary">
-                            <div className="supportIcon">
-                              <Icon source={ChatIcon} />
-                            </div>
-                            <Text variant="headingLg" as="h5">{t("live_chat_support")}</Text>
-                          </Box>
-                          <Box paddingBlockEnd={600} paddingInline={300}>
-                            <Box minHeight="6rem">
-                              <Text variant="bodyLg" as="p">{t("live_chat_description")}</Text>
-                            </Box>
-                            <Button size="large" onClick={() => {javascript:void(Tawk_API.toggle())}}>{t("start_chat")}</Button>
-                          </Box>
-                        </BlockStack>
-                      </Card>
-                    </Grid.Cell>
-                    <Grid.Cell columnSpan={{ xs: 6, md: 3, lg: 4 }}>
-                      <Card padding={0}>
-                        <BlockStack gap={400} inlineAlign="start">
-                          <Box paddingBlock={600} paddingInline={300} width="100%" background="bg-surface-secondary">
-                            <div className="supportIcon">
-                              <Icon source={PhoneIcon} />
-                            </div>
-                            <Text variant="headingLg" as="h5">{t("call_schedule")}</Text>
-                          </Box>
-                          <Box paddingBlockEnd={600} paddingInline={300}>
-                            <Box minHeight="6rem">
-                              <Text variant="bodyLg" as="p">{t("call_schedule_description")}</Text>
-                            </Box>
-                            <Button size="large" url="https://calendly.com/efolisupport" target="_blank">{t("book_call")}</Button>
-                          </Box>
-                        </BlockStack>
-                      </Card>
-                    </Grid.Cell>
-                    {/* <Grid.Cell columnSpan={{ xs: 6, md: 3, lg: 4 }}>
-                        <Card padding={0}>
-                          <BlockStack gap={400} inlineAlign="start">
-                            <Box paddingBlock={600} paddingInline={300} width="100%" background="bg-surface-secondary">
-                              <div className="supportIcon">
-                                <Icon source={SendIcon} />
-                              </div>
-                              <Text variant="headingLg" as="h5">{t("create_a_ticket")}</Text>
-                            </Box>
-                            <Box paddingBlockEnd={600} paddingInline={300}>
-                              <Box minHeight="6rem">
-                                <Text variant="bodyLg" as="p">{t("create_ticket_description")}</Text>
-                              </Box>
-                              <Button size="large" url="/app/tickets">{t("create_support_ticket")}</Button>
-                            </Box>
-                          </BlockStack>
-                        </Card>
-                      </Grid.Cell> */}
-                    <Grid.Cell columnSpan={{ xs: 6, md: 3, lg: 4 }}>
-                      <Card padding={0}>
-                        <BlockStack gap={400} inlineAlign="start">
-                          <Box paddingBlock={600} paddingInline={300} width="100%" background="bg-surface-secondary">
-                            <div className="supportIcon">
-                              <Icon source={EmailIcon} />
-                            </div>
-                            <Text variant="headingLg" as="h5">{t("email_support")}</Text>
-                          </Box>
-                          <Box paddingBlockEnd={600} paddingInline={300}>
-                            <Box minHeight="6rem">
-                              <div id="supportEmailDescription">
-                                <Trans
-                                  i18nKey="email_support_description"
-                                  values={{ email: "support@embedup.com" }}
-                                  components={{ strong: <strong /> }}
-                                />
-                              </div>
-                            </Box>
-                            <Button onClick={() => { }} id="4" size="large" url={`mailto:support@embedup.com`} target="_blank">{t("email_us")}</Button>
-                          </Box>
-                        </BlockStack>
-                      </Card>
-                    </Grid.Cell>
-                    <Grid.Cell columnSpan={{ xs: 6, md: 3, lg: 4 }}>
-                      <Card padding={0}>
-                        <BlockStack gap={400} inlineAlign="start">
-                          <Box paddingBlock={600} paddingInline={300} width="100%" background="bg-surface-secondary">
-                            <div className="supportIcon">
-                              <Icon source={LogoYoutubeIcon} />
-                            </div>
-                            <Text variant="headingLg" as="h5">{t("youtube_tutorials")}</Text>
-                          </Box>
-                          <Box paddingBlockEnd={600} paddingInline={300}>
-                            <Box minHeight="6rem">
-                              <Text variant="bodyLg" as="p">{t("discover_our_wide_range_of_video_tutorials")}</Text>
-                            </Box>
-                            <Button url="https://www.youtube.com/@EmbedUpApp" target="_blank" size="large">{t("watch_videos")}</Button>
-                          </Box>
-                        </BlockStack>
-                      </Card>
-                    </Grid.Cell>
-                    <Grid.Cell columnSpan={{ xs: 6, md: 3, lg: 4 }}>
-                      <Card padding={0}>
-                        <BlockStack gap={400} inlineAlign="start">
-                          <Box paddingBlock={600} paddingInline={300} width="100%" background="bg-surface-secondary">
-                            <div className="supportIcon">
-                              <Icon source={NoteIcon} />
-                            </div>
-                            <Text variant="headingLg" as="h5">{t("help_docs")}</Text>
-                          </Box>
-                          <Box paddingBlockEnd={600} paddingInline={300}>
-                            <Box minHeight="6rem">
-                              <Text variant="bodyLg" as="p">{t("explore_our_in_depth_help_documentation")}</Text>
-                            </Box>
-                            <Button url="https://embedup.com/academy/" target="_blank" size="large">{t("browse_docs")}</Button>
-                          </Box>
-                        </BlockStack>
-                      </Card>
-                    </Grid.Cell>
-                  </Grid>
-                </Grid.Cell>
-              </Grid>
-            </BlockStack>
-          </Bleed>
-        </Layout.Section>
-      </Layout>
-    </Page>
+      <s-query-container>
+        <s-stack
+          padding="large-100 none none none"
+          direction="inline"
+          gap="small"
+          justifyContent="start"
+          alignItems="center"
+        >
+          <s-button onClick={() => navgate('/app')} accessibilityLabel="Back to analytics" icon="arrow-left" variant="tertiary"></s-button>
+          <s-text type="strong">Get Support</s-text>
+        </s-stack>
+        <s-stack
+          gap="small-300"
+          paddingBlockEnd="base"
+          paddingBlockStart="small"
+        >
+          <s-heading>Need assistance? We're here to help!</s-heading>
+          <s-text>Whether you need a quick fix or detailed guidance, explore our range of support options to find what works best for you.</s-text>
+        </s-stack>
+
+        <s-grid
+          gridTemplateColumns="repeat(auto-fill,minmax(300px,1fr))"
+          gap="base"
+          padding="large-100 none large-100 none"
+        >
+
+          {supportOptions.map((item,index)=>(
+              <s-grid-item key={index}>
+              <s-stack
+                justifyContent="space-between"
+                gap="small"
+                background="base"
+                borderRadius="large"
+                border="base"
+                blockSize="215px"
+              >
+                <s-stack
+                  direction="inline"
+                  gap="small-300"
+                  alignItems="center"
+                  justifyContent="start"
+                  background="strong"
+                  padding="base small-200"
+                  borderRadius="large large none none"
+                >
+                  <s-icon type={item.icon} />
+                  <s-heading>{item.title}</s-heading>
+                </s-stack>
+                <s-stack
+                  padding="none small base small"
+                  justifyContent="space-between"
+                  gap="large"
+                >
+                  <s-text>{item.description}</s-text>
+                  {item.isOnclick ? 
+                  <s-button
+                    onClick={() => { javascript: void (Tawk_API.toggle()) }}
+                  >{item.btnText}</s-button>
+                  :
+                   <s-button
+                    href={item.href}
+                  >{item.btnText}</s-button>
+                  }
+                </s-stack>
+              </s-stack>
+            </s-grid-item>
+          ))
+
+            
+
+          }
+
+
+        </s-grid>
+      </s-query-container>
+    </s-page>
   )
 }
 
-export default Getsupport
+export default GetSupport
