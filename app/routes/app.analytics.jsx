@@ -312,7 +312,7 @@ const Analytics = () => {
 
         {/* <s-button onClick={requestData}>Submit</s-button> */}
 
-        <s-grid
+        {/* <s-grid
           gridTemplateColumns="repeat(auto-fit, minmax(150px, 1fr))"
           gap="base"
           padding="none none large-100 none"
@@ -345,7 +345,7 @@ const Analytics = () => {
             </s-stack>
           </s-section>
 
-        </s-grid>
+        </s-grid> */}
 
         <s-grid
           // gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
@@ -382,7 +382,7 @@ const Analytics = () => {
                     labelFormatter: (key) => new Date(key).toLocaleDateString(),
                   }}
                   yAxisOptions={{
-                    labelFormatter: (value) => `${getSymbolFromCurrency(fData?.shopData?.currencyCode || "USD")}${value}`,
+                    labelFormatter: (value) => `$${value}`,
                   }}
                   emptyStateText="No Sales found"
                   errorText="Something went wrong"
