@@ -1,12 +1,14 @@
 import { useFetcher, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { authenticate } from "../shopify.server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import db from "../db.server";
 import getSymbolFromCurrency from "currency-symbol-map";
 import ClientOnlyCmp from "../components/ClientOnlyCmp/ClientOnlyCmp";
 import { BarChart, LineChart, StackedAreaChart } from "@shopify/polaris-viz";
 import redis from "../utilis/redis.init";
+import AnalyticsUpgrade from "../components/AnalyticsUpgrade/AnalyticsUpgrade";
+import { PLAN_NAME } from "../constants/constants";
 
 
 export const loader = async ({ request }) => {
@@ -170,6 +172,8 @@ const Analytics = () => {
     title: "All Components",
     value: null
   });
+  const [disabledContentByPlan, setDisabledContentByPlan] = useState(false);
+  const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
   const fetcher = useFetcher();
   const { analyticsData } = useLoaderData();
 
@@ -219,7 +223,12 @@ const Analytics = () => {
     },
   ]
 
+  useEffect(() => {
+    setDisabledContentByPlan(fData?.shopData?.plan?.planName === PLAN_NAME.free ? true : false)
+    setDisabledContentProPlan(fData?.shopData?.plan?.planName !== PLAN_NAME.pro ? true : false)
+  }, [fData?.shopData]);
 
+  //console.log("disCon:",disabledContentByPlan,'Pro::',disabledContentProPlan);
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
     <s-page
@@ -239,7 +248,7 @@ const Analytics = () => {
           <s-button
             commandFor="order_date_picker"
             variant="secondary"
-            loading = {fetcher?.state !== 'idle' ? true : false}
+            loading={fetcher?.state !== 'idle' ? true : false}
           ><s-stack
             direction="inline"
             gap="small-300"
@@ -253,17 +262,17 @@ const Analytics = () => {
           <s-popover id="order_date_picker">
             <s-stack direction="block" padding="small-300">
               {orderRange.map((item, index) => (
-                <s-button 
-                key={index} 
-                disabled={(fetcher?.state !== 'idle') || (item.title === showOrderDataRange.title ) ? true : false}
-                commandFor="order_date_picker"
-                 onClick={() => {
-                  setShowOrderDataRange(item);
-                  requestData({
-                    componentId: selectComponent.value || null,
-                    days: item.value
-                  });
-                }} variant="tertiary">{item.title}</s-button>
+                <s-button
+                  key={index}
+                  disabled={(fetcher?.state !== 'idle') || (item.title === showOrderDataRange.title) ? true : false}
+                  commandFor="order_date_picker"
+                  onClick={() => {
+                    setShowOrderDataRange(item);
+                    requestData({
+                      componentId: selectComponent.value || null,
+                      days: item.value
+                    });
+                  }} variant="tertiary">{item.title}</s-button>
               ))}
             </s-stack>
           </s-popover>
@@ -273,7 +282,7 @@ const Analytics = () => {
           <s-button
             commandFor="select_component"
             variant="secondary"
-            loading = {fetcher?.state !== 'idle' ? true : false}
+            loading={fetcher?.state !== 'idle' ? true : false}
           ><s-stack
             direction="inline"
             gap="small-300"
@@ -300,7 +309,7 @@ const Analytics = () => {
               }} variant="tertiary">All Components</s-button>
 
               {fData?.shopData?.components?.map((component) => (
-                <s-button key={component.id} disabled={(fetcher?.state !== 'idle') || (component.title === selectComponent.title ) ? true : false} commandFor="select_component" onClick={() => {
+                <s-button key={component.id} disabled={(fetcher?.state !== 'idle') || (component.title === selectComponent.title) ? true : false} commandFor="select_component" onClick={() => {
                   setSelectComponent({ title: component.title, value: component.id });
                   requestData({
                     componentId: component.id,
@@ -444,227 +453,260 @@ const Analytics = () => {
           </s-grid-item>
 
           <s-grid-item>
-            <s-box
-              background="base"
-              borderRadius="small-100"
-              padding="small-200"
-              overflox="visible"
-              maxBlockSize="300px"
-              minBlockSize="290px"
-            >
-              <s-stack
-                gap="small-300"
-                padding="small-300 none none small"
-              >
-                <s-stack
-                  direction="inline"
-                  gap="small-300"
-                  alignItems="center"
+            <div style={{ display: 'grid' }}>
+              <div style={{ gridArea: '1/1' }}>
+                <s-box
+                  background="base"
+                  borderRadius="small-100"
+                  padding="small-200"
+                  overflox="visible"
+                  maxBlockSize="300px"
+                  minBlockSize="290px"
                 >
-                  <s-text size="small">Traffic Sources</s-text>
-                  <s-icon type="info" tone="info" interestFor="spc_traffic_source_tooltip" />
-                  <s-tooltip id="spc_traffic_source_tooltip">Traffic Source will show the lifetime total unique visitors by Components</s-tooltip>
-
-                </s-stack>
-                <s-text type="strong">{fData?.analyticsData?.trafficSources?.length || 0}</s-text>
-              </s-stack>
-
-
-
-              <div style={{ maxHeight: '230px', overflow: 'auto' }}>
-                <s-stack
-
-                  padding="small-300 none none small"
-
-                >
-                  {fData?.analyticsData?.trafficSources.map((item, index) => (
+                  <s-stack
+                    gap="small-300"
+                    padding="small-300 none none small"
+                  >
                     <s-stack
-                      key={index}
                       direction="inline"
+                      gap="small-300"
                       alignItems="center"
-                      justifyContent="space-between"
-                      padding="small-200 small small-200 small"
-                      background={index % 2 === 0 ? 'base' : 'subdued'}
-                      borderRadius="small"
                     >
-                      <s-stack
-                        maxInineSize="70%"
-                      >
-                        <s-link href={item?.trafficSource || '#'} target="_blank"><s-text size="small">{(item?.trafficSource || '').slice(0, 40).concat('...')}</s-text></s-link>
-                      </s-stack>
-                      <s-text>{item?.lifeTimeTotalUniqueVisits || 0}</s-text>
+                      <s-text size="small">Traffic Sources</s-text>
+                      <s-icon type="info" tone="info" interestFor="spc_traffic_source_tooltip" />
+                      <s-tooltip id="spc_traffic_source_tooltip">Traffic Source will show the lifetime total unique visitors by Components</s-tooltip>
+
                     </s-stack>
-                  ))
-
-                  }
-
-
-
-                </s-stack>
-              </div>
-
-
-            </s-box>
-          </s-grid-item>
-
-          <s-grid-item>
-            <s-box
-              background="base"
-              borderRadius="small-100"
-              padding="small-200"
-              minBlockSize="290px"
-            >
-              <s-stack
-                gap="small-300"
-                padding="small-300 none large-200 small"
-              >
-                <s-text size="small">Visitors</s-text>
-                <s-text type="strong">{fData?.analyticsData?.totalVisitors || 0}</s-text>
-              </s-stack>
-
-
-              <ClientOnlyCmp>
-                <StackedAreaChart
-                  xAxisOptions={{
-                    labelFormatter: (x) => {
-                      return `${x}`
-                    }
-                  }}
-                  emptyStateText="Visitor not Found"
-                  yAxisOptions={{
-                    labelFormatter: (y) => {
-                      return `${y}`
-                    }
-                  }}
-                  data={[
-                    {
-                      data: fData?.analyticsData?.uniqueVisitorChartData || [],
-                      color: 'green',
-                      isComparison: true,
-                      name: 'Today'
-                    },
-
-                  ]}
-
-                />
-              </ClientOnlyCmp>
-
-
-            </s-box>
-          </s-grid-item>
-
-          <s-grid-item>
-            <s-box
-              background="base"
-              borderRadius="small-100"
-              padding="small-200"
-            >
-              <s-stack
-                gap="small-300"
-                padding="small-300 none large-200 small"
-              >
-                <s-text size="small">Add to Cart Click</s-text>
-                <s-text type="strong">{fData?.analyticsData?.totalAddToCartClickCount || 0}</s-text>
-              </s-stack>
-
-
-              <ClientOnlyCmp>
-                <LineChart
-                  xAxisOptions={{
-                    labelFormatter: (x) => {
-                      return `${x}`
-                    }
-                  }}
-                  emptyStateText="Commision not Found"
-                  yAxisOptions={{
-                    labelFormatter: (y) => {
-                      return `${y}`
-                    }
-                  }}
-                  data={[
-                    {
-                      data: fData?.analyticsData?.addToCartClickChartData || [],
-                      color: 'green',
-                      isComparison: false,
-                      name: 'Today'
-                    },
-
-
-                  ]}
-
-                />
-              </ClientOnlyCmp>
-
-
-            </s-box>
-          </s-grid-item>
-
-          <s-grid-item>
-            <s-box
-              background="base"
-              borderRadius="small-100"
-              padding="small-200"
-              overflox="visible"
-              maxBlockSize="300px"
-              minBlockSize="290px"
-            >
-              <s-stack
-                gap="small-300"
-                padding="small-300 none none small"
-              >
-                <s-stack
-                  direction="inline"
-                  gap="small-300"
-                  alignItems="center"
-                >
-                  <s-text size="small">Top Affiliates</s-text>
-                  <s-icon type="info" tone="info" interestFor="spc_traffic_source_tooltip" />
-                  <s-tooltip id="spc_traffic_source_tooltip">Only top 5 affiliates are shown</s-tooltip>
-
-                </s-stack>
-                <s-text type="strong">{fData?.affiliateDataFirstFive?.length || 0}</s-text>
-              </s-stack>
+                    <s-text type="strong">{fData?.analyticsData?.trafficSources?.length || 0}</s-text>
+                  </s-stack>
 
 
 
-              <div style={{ maxHeight: '230px', overflow: 'auto' }}>
-                <s-stack
-
-                  padding="small-300 none none small"
-
-                >
-                  {fData?.affiliateDataFirstFive.map((item, index) => (
+                  <div style={{ maxHeight: '230px', overflow: 'auto' }}>
                     <s-stack
-                      key={index}
-                      direction="inline"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      padding="base small small-200 base"
-                      background={index % 2 === 0 ? 'base' : 'subdued'}
-                      borderRadius="small"
+
+                      padding="small-300 none none small"
+
                     >
-                      <s-stack
-                        maxInineSize="70%"
-                      >
-                        <s-link href={`/app/affiliate/details/${item?.id}`}>{item?.name}</s-link>
-                      </s-stack>
-                      <s-text>{getSymbolFromCurrency(fData?.shopData?.currencyCode || 'USD') + (item?.totalOrderValue || 0).toFixed(2)}</s-text>
+                      {fData?.analyticsData?.trafficSources.map((item, index) => (
+                        <s-stack
+                          key={index}
+                          direction="inline"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          padding="small-200 small small-200 small"
+                          background={index % 2 === 0 ? 'base' : 'subdued'}
+                          borderRadius="small"
+                        >
+                          <s-stack
+                            maxInineSize="70%"
+                          >
+                            <s-link href={item?.trafficSource || '#'} target="_blank"><s-text size="small">{(item?.trafficSource || '').slice(0, 40).concat('...')}</s-text></s-link>
+                          </s-stack>
+                          <s-text>{item?.lifeTimeTotalUniqueVisits || 0}</s-text>
+                        </s-stack>
+                      ))
+
+                      }
+
+
+
                     </s-stack>
-                  ))
-
-                  }
+                  </div>
 
 
-
-                </s-stack>
+                </s-box>
               </div>
+              {disabledContentByPlan &&
+                <AnalyticsUpgrade />
+              }
+            </div>
+
+          </s-grid-item>
+
+          <s-grid-item>
+            <div style={{ display: 'grid' }}>
+              <div style={{ gridArea: '1/1' }}>
+                <s-box
+                  background="base"
+                  borderRadius="small-100"
+                  padding="small-200"
+                  minBlockSize="290px"
+                >
+                  <s-stack
+                    gap="small-300"
+                    padding="small-300 none large-200 small"
+                  >
+                    <s-text size="small">Visitors</s-text>
+                    <s-text type="strong">{fData?.analyticsData?.totalVisitors || 0}</s-text>
+                  </s-stack>
 
 
-            </s-box>
+                  <ClientOnlyCmp>
+                    <StackedAreaChart
+                      xAxisOptions={{
+                        labelFormatter: (x) => {
+                          return `${x}`
+                        }
+                      }}
+                      emptyStateText="Visitor not Found"
+                      yAxisOptions={{
+                        labelFormatter: (y) => {
+                          return `${y}`
+                        }
+                      }}
+                      data={[
+                        {
+                          data: fData?.analyticsData?.uniqueVisitorChartData || [],
+                          color: 'green',
+                          isComparison: true,
+                          name: 'Today'
+                        },
+
+                      ]}
+
+                    />
+                  </ClientOnlyCmp>
+
+
+                </s-box>
+
+              </div>
+              {disabledContentByPlan &&
+                <AnalyticsUpgrade />
+              }
+            </div>
+
+          </s-grid-item>
+
+          <s-grid-item>
+            <div style={{ display: 'grid' }}>
+              <div style={{ gridArea: '1/1' }}>
+                <s-box
+                  background="base"
+                  borderRadius="small-100"
+                  padding="small-200"
+                >
+                  <s-stack
+                    gap="small-300"
+                    padding="small-300 none large-200 small"
+                  >
+                    <s-text size="small">Add to Cart Click</s-text>
+                    <s-text type="strong">{fData?.analyticsData?.totalAddToCartClickCount || 0}</s-text>
+                  </s-stack>
+
+
+                  <ClientOnlyCmp>
+                    <LineChart
+                      xAxisOptions={{
+                        labelFormatter: (x) => {
+                          return `${x}`
+                        }
+                      }}
+                      emptyStateText="Commision not Found"
+                      yAxisOptions={{
+                        labelFormatter: (y) => {
+                          return `${y}`
+                        }
+                      }}
+                      data={[
+                        {
+                          data: fData?.analyticsData?.addToCartClickChartData || [],
+                          color: 'green',
+                          isComparison: false,
+                          name: 'Today'
+                        },
+
+
+                      ]}
+
+                    />
+                  </ClientOnlyCmp>
+
+
+                </s-box>
+              </div>
+              {disabledContentByPlan &&
+                <AnalyticsUpgrade />
+              }
+            </div>
+          </s-grid-item>
+
+          <s-grid-item>
+            <div style={{ display: 'grid' }}>
+              <div style={{ gridArea: '1/1' }}>
+                <s-box
+                  background="base"
+                  borderRadius="small-100"
+                  padding="small-200"
+                  overflox="visible"
+                  maxBlockSize="300px"
+                  minBlockSize="290px"
+                >
+                  <s-stack
+                    gap="small-300"
+                    padding="small-300 none none small"
+                  >
+                    <s-stack
+                      direction="inline"
+                      gap="small-300"
+                      alignItems="center"
+                    >
+                      <s-text size="small">Top Affiliates</s-text>
+                      <s-icon type="info" tone="info" interestFor="spc_traffic_source_tooltip" />
+                      <s-tooltip id="spc_traffic_source_tooltip">Only top 5 affiliates are shown</s-tooltip>
+
+                    </s-stack>
+                    <s-text type="strong">{fData?.affiliateDataFirstFive?.length || 0}</s-text>
+                  </s-stack>
+
+
+
+                  <div style={{ maxHeight: '230px', overflow: 'auto' }}>
+                    <s-stack
+
+                      padding="small-300 none none small"
+
+                    >
+                      {fData?.affiliateDataFirstFive.map((item, index) => (
+                        <s-stack
+                          key={index}
+                          direction="inline"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          padding="base small small-200 base"
+                          background={index % 2 === 0 ? 'base' : 'subdued'}
+                          borderRadius="small"
+                        >
+                          <s-stack
+                            maxInineSize="70%"
+                          >
+                            <s-link href={`/app/affiliate/details/${item?.id}`}>{item?.name}</s-link>
+                          </s-stack>
+                          <s-text>{getSymbolFromCurrency(fData?.shopData?.currencyCode || 'USD') + (item?.totalOrderValue || 0).toFixed(2)}</s-text>
+                        </s-stack>
+                      ))
+
+                      }
+
+
+
+                    </s-stack>
+                  </div>
+
+
+                </s-box>
+              </div>
+              {disabledContentProPlan &&
+                <AnalyticsUpgrade />
+              }
+            </div>
           </s-grid-item>
 
 
         </s-grid>
+
+
 
 
 

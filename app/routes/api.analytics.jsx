@@ -7,7 +7,6 @@ export const action = async ({ request }) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
-  console.log("dataFOrm", data);
   const days = Number(data?.days) || 0;
   const componentId = data?.componentId ? JSON.parse(data?.componentId) : null;
   console.log("componentID:",componentId);
