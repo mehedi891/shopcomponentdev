@@ -253,7 +253,11 @@ const Analytics = () => {
           <s-popover id="order_date_picker">
             <s-stack direction="block" padding="small-300">
               {orderRange.map((item, index) => (
-                <s-button key={index} commandFor="order_date_picker" onClick={() => {
+                <s-button 
+                key={index} 
+                disabled={(fetcher?.state !== 'idle') || (item.title === showOrderDataRange.title ) ? true : false}
+                commandFor="order_date_picker"
+                 onClick={() => {
                   setShowOrderDataRange(item);
                   requestData({
                     componentId: selectComponent.value || null,
@@ -296,7 +300,7 @@ const Analytics = () => {
               }} variant="tertiary">All Components</s-button>
 
               {fData?.shopData?.components?.map((component) => (
-                <s-button key={component.id} commandFor="select_component" onClick={() => {
+                <s-button key={component.id} disabled={(fetcher?.state !== 'idle') || (component.title === selectComponent.title ) ? true : false} commandFor="select_component" onClick={() => {
                   setSelectComponent({ title: component.title, value: component.id });
                   requestData({
                     componentId: component.id,
@@ -382,7 +386,7 @@ const Analytics = () => {
                     labelFormatter: (key) => new Date(key).toLocaleDateString(),
                   }}
                   yAxisOptions={{
-                    labelFormatter: (value) => `$${value}`,
+                    labelFormatter: (value) => `${getSymbolFromCurrency(fData?.shopData?.currencyCode || "USD")}${value}`,
                   }}
                   emptyStateText="No Sales found"
                   errorText="Something went wrong"
