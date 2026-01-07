@@ -31,7 +31,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var define_import_meta_env_default;
 var init_define_import_meta_env = __esm({
   "<define:import.meta.env>"() {
-    define_import_meta_env_default = { VITE_SHOPIFY_APP_URL: "http://localhost:3000" };
+    define_import_meta_env_default = { VITE_SHOPIFY_APP_URL: "http://localhost:3000", VITE_DATA_API: "http://localhost:4001/api/v1" };
   }
 });
 
@@ -1103,7 +1103,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef2(initialValue) {
+        function useRef5(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
@@ -1897,7 +1897,7 @@ var require_react_development = __commonJS({
         exports.useLayoutEffect = useLayoutEffect;
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
-        exports.useRef = useRef2;
+        exports.useRef = useRef5;
         exports.useState = useState9;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
@@ -25353,11 +25353,11 @@ var GlobalStyle_default = GlobalStyle;
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/ProductCardInd/ProductCardInd.jsx
 init_define_import_meta_env();
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-var ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout, customTrackings }) => {
+var ProductCardInd = ({ componentId, product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout, customTrackings }) => {
   const pdAddToCartBtnHtml = `
                 <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}')"
+                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}')"
                
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -25369,7 +25369,7 @@ var ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt, token,
   const pdCheckoutBtnHtml = `
    <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}')"
+                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}','${componentId}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
                   <span class="spcBtn_txt">${checkoutBtnTxt}</span>
@@ -26015,9 +26015,55 @@ var BoleanOptions = {
   no: "no"
 };
 
+// app/utilis/storeAnalyticsDataToServer.js
+init_define_import_meta_env();
+var storeAnalyticsDataToServer = async ({
+  shopifyDomain,
+  trafficSource,
+  componentId,
+  day,
+  isIncImpression,
+  impressionIncVal,
+  isIncUniqueVisitor,
+  uniqueVisitorIncVal,
+  isIncAddToCartClick,
+  addTocartClickIncVal,
+  isIncCheckoutClick,
+  checkoutClickIncVal
+}) => {
+  const data = {
+    shopifyDomain,
+    trafficSource,
+    componentId,
+    day,
+    isIncImpression,
+    impressionIncVal,
+    isIncUniqueVisitor,
+    uniqueVisitorIncVal,
+    isIncAddToCartClick,
+    addTocartClickIncVal,
+    isIncCheckoutClick,
+    checkoutClickIncVal
+  };
+  console.log("apiUri:", define_import_meta_env_default.VITE_DATA_API);
+  try {
+    const res = await fetch(`${define_import_meta_env_default.VITE_DATA_API}/queue/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    console.log("result:", result);
+  } catch (error) {
+    console.log("Something wen't wrong", error);
+  }
+};
+
 // app/spc-front-react/spc-front-components/ShoppingCart/ShoppingCart.jsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings, customTrackings }) => {
+var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings, customTrackings, componentId, day, trafficSource }) => {
   const { cartData } = (0, import_react2.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = (0, import_react2.useState)(false);
@@ -26189,10 +26235,11 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings, cu
       const checkoutUrl = cartData?.checkoutUrl;
       const searchParams = new URLSearchParams(checkoutUrl);
       const newCheckoutUrl = checkoutUrl + `${searchParams?.size > 0 ? `&${customTrackings2}` : `?${customTrackings2}`}`;
+      storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
       window.open(newCheckoutUrl, "_top");
       setTimeout(() => {
         showLoading(target, false);
-      }, 400);
+      }, 100);
     }
   };
   const shoppingCartStyle = `
@@ -27005,11 +27052,49 @@ function buildUtmParams({ source, medium, campaign }) {
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/IndividualProduct.jsx
 var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 var IndividualProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
   const [selectecTedProducts, setSelectecTedProducts] = (0, import_react3.useState)([]);
   const [customTrackings, setCustomTrackings] = (0, import_react3.useState)("");
   const { cartModal, cartRef } = (0, import_react3.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
+  const divRef = (0, import_react3.useRef)(null);
+  const [hasViewed, setHasViewed] = (0, import_react3.useState)(false);
+  let trafficSource = "";
+  if (typeof window !== "undefined") {
+    const { origin, pathname } = window.location;
+    trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
+  }
+  const date = /* @__PURE__ */ new Date();
+  const day = date.toISOString().split("T")[0];
+  (0, import_react3.useEffect)(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!hasViewed) {
+            console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + ".myshopify.com", trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            setHasViewed(true);
+          } else {
+            console.log("Element is in the viewport again (re-entered)");
+          }
+        } else {
+          console.log("Element is not in the viewport");
+        }
+      },
+      {
+        threshold: 0.2
+        // Trigger when 20% of the element is visible
+      }
+    );
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, [hasViewed]);
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
@@ -27021,7 +27106,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
   }, [addToCartType.products, shop?.plan?.planName]);
-  const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
+  const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, componentId) => {
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
     const isExistCart = localStorage.getItem("shopcomponent_cartId") ? localStorage.getItem("shopcomponent_cartId") : null;
@@ -27067,13 +27152,13 @@ var IndividualProduct = ({ componentData, token, store }) => {
         cartModal?.current?.showModal();
       }
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: true, addTocartClickIncVal: 1, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
   };
-  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, customTrackings2) => {
+  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, customTrackings2, componentId) => {
     event.preventDefault();
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
     showLoading(target, true);
-    console.log("variantId:", variantId);
     try {
       const variantIdNum = variantId.replace("gid://shopify/ProductVariant/", "");
       const checkoutUrl = `https://${store2}/cart/${variantIdNum}:1?access_token=${token2}&attributes[EU_custom_tracking]=${customerTracking}&attributes[embedup_tracking]=${tracking2}&ref=embedup&${customTrackings2}`;
@@ -27083,6 +27168,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
     } finally {
       showLoading(target, false);
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
   };
   const handleOpenQuickView = async (event, appliesTo2) => {
     event.preventDefault();
@@ -27128,7 +27214,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { children: [
     /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_pd_container", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_pd_container", ref: divRef, children: [
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_title_N_description", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_title", children: title }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_description", children: description })
@@ -27151,7 +27237,8 @@ var IndividualProduct = ({ componentData, token, store }) => {
               shop,
               appliesTo,
               layout,
-              customTrackings
+              customTrackings,
+              componentId: id
             },
             index
           )
@@ -27166,7 +27253,10 @@ var IndividualProduct = ({ componentData, token, store }) => {
           store: shop?.shopifyDomain,
           token,
           shoppingCartSettings: componentData?.shoppingCartSettings,
-          customTrackings
+          customTrackings,
+          componentId: id,
+          day,
+          trafficSource
         }
       )
     ] }),
@@ -27196,10 +27286,48 @@ init_define_import_meta_env();
 var import_react4 = __toESM(require_react(), 1);
 var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
 var IndividualCollection = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign } = componentData;
   const [customTrackings, setCustomTrackings] = (0, import_react4.useState)("");
   const { cartModal, cartRef } = (0, import_react4.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
+  const divRef = (0, import_react4.useRef)(null);
+  const [hasViewed, setHasViewed] = (0, import_react4.useState)(false);
+  let trafficSource = "";
+  if (typeof window !== "undefined") {
+    const { origin, pathname } = window.location;
+    trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
+  }
+  const date = /* @__PURE__ */ new Date();
+  const day = date.toISOString().split("T")[0];
+  (0, import_react4.useEffect)(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!hasViewed) {
+            console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + ".myshopify.com", trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            setHasViewed(true);
+          } else {
+            console.log("Element is in the viewport again (re-entered)");
+          }
+        } else {
+          console.log("Element is not in the viewport");
+        }
+      },
+      {
+        threshold: 0.2
+        // Trigger when 20% of the element is visible
+      }
+    );
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, [hasViewed]);
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
@@ -27210,7 +27338,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
   }, [shop?.plan?.planName]);
-  const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView) => {
+  const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, componentId) => {
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
     const isExistCart = localStorage.getItem("shopcomponent_cartId") ? localStorage.getItem("shopcomponent_cartId") : null;
@@ -27256,8 +27384,9 @@ var IndividualCollection = ({ componentData, token, store }) => {
         cartModal?.current?.showModal();
       }
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: true, addTocartClickIncVal: 1, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
   };
-  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, customTrackings2) => {
+  const handleAddToCheckout = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, customTrackings2, componentId) => {
     event.preventDefault();
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
@@ -27272,6 +27401,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
     } finally {
       showLoading(target, false);
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
   };
   (0, import_react4.useEffect)(() => {
     if (window && !window.spcAddToCartIndFnc && !window.spcAddToCheckoutFnc) {
@@ -27283,7 +27413,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
       };
     }
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { ref: divRef, children: [
     /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
     /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       GlobalStyle_default,
@@ -27319,7 +27449,8 @@ var IndividualCollection = ({ componentData, token, store }) => {
               shop,
               appliesTo,
               layout,
-              customTrackings
+              customTrackings,
+              componentId: id
             },
             index
           )
@@ -27334,7 +27465,10 @@ var IndividualCollection = ({ componentData, token, store }) => {
           store: shop?.shopifyDomain,
           token,
           shoppingCartSettings: componentData?.shoppingCartSettings,
-          customTrackings
+          customTrackings,
+          componentId: id,
+          day,
+          trafficSource
         }
       )
     ] }),
@@ -27443,10 +27577,48 @@ var CartCountBuble_default = CartCountBuble;
 var import_react7 = __toESM(require_react(), 1);
 var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
 var BulkProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
   const [customTrackings, setCustomTrackings] = (0, import_react7.useState)("");
   const { cartModal, cartRef } = (0, import_react7.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
+  const divRef = (0, import_react7.useRef)(null);
+  const [hasViewed, setHasViewed] = (0, import_react7.useState)(false);
+  let trafficSource = "";
+  if (typeof window !== "undefined") {
+    const { origin, pathname } = window.location;
+    trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
+  }
+  const date = /* @__PURE__ */ new Date();
+  const day = date.toISOString().split("T")[0];
+  (0, import_react7.useEffect)(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!hasViewed) {
+            console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + ".myshopify.com", trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            setHasViewed(true);
+          } else {
+            console.log("Element is in the viewport again (re-entered)");
+          }
+        } else {
+          console.log("Element is not in the viewport");
+        }
+      },
+      {
+        threshold: 0.2
+        // Trigger when 20% of the element is visible
+      }
+    );
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, [hasViewed]);
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
@@ -27457,7 +27629,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
   }, [shop?.plan?.planName]);
-  const handleAddToCartBulk = async (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, customTrackings2) => {
+  const handleAddToCartBulk = async (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, componentId) => {
     event.preventDefault();
     const target = event.target;
     const mostParentContainer = target.closest(".shopcomponent_pd_container");
@@ -27519,8 +27691,9 @@ var BulkProduct = ({ componentData, token, store }) => {
         cartModal?.current?.showModal();
       }
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: true, addTocartClickIncVal: 1, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
   };
-  const handleAddToCheckoutBulk = (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, customTrackings2) => {
+  const handleAddToCheckoutBulk = (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, customTrackings2, componentId) => {
     event.preventDefault();
     const target = event.target;
     const mostParentContainer = target.closest(".shopcomponent_pd_container");
@@ -27549,8 +27722,9 @@ var BulkProduct = ({ componentData, token, store }) => {
     } finally {
       showLoading(event.target, false);
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "shopcomponent_pd_container", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "shopcomponent_pd_container", ref: divRef, children: [
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       GlobalStyle_default,
@@ -27592,7 +27766,10 @@ var BulkProduct = ({ componentData, token, store }) => {
           store: shop?.shopifyDomain,
           token,
           shoppingCartSettings: componentData?.shoppingCartSettings,
-          customTrackings
+          customTrackings,
+          componentId: id,
+          day,
+          trafficSource
         }
       )
     ] }),
@@ -27601,7 +27778,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       {
         className: `product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}`,
         onClick: (event) => {
-          handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products);
+          handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, id);
         },
         "shopify-attr--disabled": "!product.selectedOrFirstAvailableVariant.availableForSale",
         children: [
@@ -27618,7 +27795,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       {
         className: `product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}`,
         onClick: (event) => {
-          handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, customTrackings);
+          handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, customTrackings, id);
         },
         "shopify-attr--disabled": "!product.selectedOrFirstAvailableVariant.availableForSale",
         children: [

@@ -3,35 +3,85 @@ import BulkProductCard from "./BulkProductCard/BulkProductCard";
 import PoweredBy from "../PoweredBy/PoweredBy";
 import CartCountBuble from "../ShoppingCart/CartCountBuble/CartCountBuble";
 import ShoppingCart from "../ShoppingCart/ShoppingCart";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ContextComponent } from "../../entryPoints/ContextWrapper/ContextWrapper";
 import { resetSelectedQuantity, showLoading } from "../utilities/utilisFnc";
 import cartLineAddFnc from "../utilities/cartLineAddFnc";
 import cartCreateFnc from "../utilities/cartCreateFnc";
 import { PLAN_NAME } from "../../../constants/constants";
 import { buildUtmParams } from "../../../utilis/generalUtils";
+import { storeAnalyticsDataToServer } from "../../../utilis/storeAnalyticsDataToServer";
 
 const BulkProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType,utmSource, utmMedium, utmCampaign  } = componentData;
+  const { id,title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
   const [customTrackings, setCustomTrackings] = useState("");
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
+  const divRef = useRef(null);
+  const [hasViewed, setHasViewed] = useState(false);
 
+
+
+
+  let trafficSource = '';
+  if (typeof window !== "undefined") {
+    const { origin, pathname } = window.location;
+    // Remove trailing slash if it exists in the pathname
+    trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
+  }
+  const date = new Date()
+  const day = date.toISOString().split('T')[0];
+
+
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // If the element is in view
+          if (!hasViewed) {
+            console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + '.myshopify.com', trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            setHasViewed(true);
+          } else {
+            console.log("Element is in the viewport again (re-entered)");
+          }
+        } else {
+          // If the element is out of view
+          console.log("Element is not in the viewport");
+        }
+      },
+      {
+        threshold: 0.2, // Trigger when 20% of the element is visible
+      }
+    );
+
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+
+    // Cleanup observer on unmount
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, [hasViewed]);
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
     const slideWidth = slider.querySelector(".product-card").offsetWidth + 16;
     slider.scrollBy({ left: btnType === 'next' ? slideWidth : -slideWidth, behavior: "smooth" });
   }
 
-   useEffect(() => {
-      if(shop?.plan?.planName === PLAN_NAME.pro){
-        setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
-      }
-  
-    }, [shop?.plan?.planName]);
+  useEffect(() => {
+    if (shop?.plan?.planName === PLAN_NAME.pro) {
+      setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
+    }
+
+  }, [shop?.plan?.planName]);
 
 
-  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products,customTrackings) => {
+  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products,componentId) => {
     event.preventDefault();
 
     const target = event.target;
@@ -106,9 +156,11 @@ const BulkProduct = ({ componentData, token, store }) => {
         cartModal?.current?.showModal();
       }
     }
+
+    storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId:Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: true, addTocartClickIncVal: 1, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
   }
 
-  const handleAddToCheckoutBulk = (event, token, store, tracking, customerTracking, enableQtyField, products,customTrackings) => {
+  const handleAddToCheckoutBulk = (event, token, store, tracking, customerTracking, enableQtyField, products, customTrackings,componentId) => {
     event.preventDefault();
 
     const target = event.target;
@@ -154,12 +206,14 @@ const BulkProduct = ({ componentData, token, store }) => {
       showLoading(event.target, false);
     }
 
+    storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId:Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
+
   }
 
 
 
   return (
-    <div className="shopcomponent_pd_container">
+    <div className="shopcomponent_pd_container" ref={divRef}>
 
       <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country="US" language="en"></shopify-store>
       <GlobalStyle
@@ -204,6 +258,9 @@ const BulkProduct = ({ componentData, token, store }) => {
           token={token}
           shoppingCartSettings={componentData?.shoppingCartSettings}
           customTrackings={customTrackings}
+          componentId={id}
+          day={day}
+          trafficSource={trafficSource}
         />
       </div>
 
@@ -212,7 +269,7 @@ const BulkProduct = ({ componentData, token, store }) => {
         <div className="product-card__buttons shopcomponent_pd_buttons_bulk">
           <button
             className={`product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}`}
-            onClick={(event) => { handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products) }}
+            onClick={(event) => { handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products,id) }}
             shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
           >
             <span className="spcBtn_txt"> {buttonStyleSettings.addToCartBtnTxt}</span>
@@ -225,7 +282,7 @@ const BulkProduct = ({ componentData, token, store }) => {
         <div className="product-card__buttons shopcomponent_pd_buttons_bulk">
           <button
             className={`product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}`}
-            onClick={(event) => { handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products,customTrackings) }}
+            onClick={(event) => { handleAddToCheckoutBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, customTrackings,id) }}
             shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
           >
             <span className="spcBtn_txt"> {buttonStyleSettings.checkoutBtnTxt}</span>

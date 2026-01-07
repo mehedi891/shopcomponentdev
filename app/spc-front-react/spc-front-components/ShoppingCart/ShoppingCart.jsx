@@ -8,8 +8,9 @@ import cartApplyDiscountCodeFnc from "../utilities/cartApplyDiscountCodeFnc";
 import cartNoteUpdateFnc from "../utilities/cartNoteUpdateFnc";
 import { showLoading } from "../utilities/utilisFnc";
 import { BoleanOptions } from "../../../constants/constants";
+import { storeAnalyticsDataToServer } from "../../../utilis/storeAnalyticsDataToServer";
 
-const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings,customTrackings }) => {
+const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings,customTrackings,componentId,day,trafficSource }) => {
   const { cartData } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -197,10 +198,15 @@ const ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings,c
       const checkoutUrl = cartData?.checkoutUrl;
       const searchParams =  new URLSearchParams(checkoutUrl)
       const newCheckoutUrl = checkoutUrl + `${searchParams?.size > 0 ? `&${customTrackings}` : `?${customTrackings}`}`;
+      
+      storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId:Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
+
+     
+      
       window.open(newCheckoutUrl, '_top');
       setTimeout(() => {
         showLoading(target, false);
-      }, 400);
+      }, 100);
 
     }
   }

@@ -1,13 +1,13 @@
 
 
-const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout,customTrackings }) => {
+const ProductCardInd = ({ componentId,product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout,customTrackings }) => {
 
 
 
   const pdAddToCartBtnHtml = `
                 <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}')"
+                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}')"
                
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -20,7 +20,7 @@ const ProductCardInd = ({ product, tracking, componentSettings, viewBtnTxt,token
   const pdCheckoutBtnHtml = `
    <button
                 class="product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}')"
+                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}','${componentId}')"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
                   <span class="spcBtn_txt">${checkoutBtnTxt}</span>

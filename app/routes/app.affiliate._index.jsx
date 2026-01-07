@@ -122,7 +122,7 @@ const Affiliate = () => {
   const navigate = useNavigate();
   const fetcher = useFetcher();
   const [disabledContentProPlan, setDisabledContentProPlan] = useState(false);
-  
+
 
   const handleStatusChange = (id, status) => {
     const updatedData = { status: status };
@@ -279,20 +279,56 @@ const Affiliate = () => {
                         <s-button accessibilityLabel="More" command="--show" commandFor={`affliate-popover_` + item.id} variant="secondary" icon="menu-horizontal" />
                         <s-popover id={`affliate-popover_` + item.id} inlineSize="8">
                           <s-stack slots="children" direction="block" padding="small small">
-                            <s-button disabled={disabledContentProPlan} href={`/app/affiliate/details/${item.id}`} accessibilityLabel="See details" icon="info" variant="tertiary"
+                            <s-button disabled={disabledContentProPlan} href={`/app/affiliate/details/${item.id}`} accessibilityLabel="See details" variant="tertiary"
                             >
-                              View details
+
+                              <s-stack
+                                direction="inline"
+                                gap="small-300"
+                                alignItems="center"
+                              >
+                                <s-icon type="info" />
+                                <s-text>{'View details'}</s-text>
+                              </s-stack>
                             </s-button>
-                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Edit" icon="edit" variant="tertiary"
+                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Edit" variant="tertiary"
                               onClick={() => { navigate(`/app/affiliate/${item.id}`) }}
-                            >Edit Affiliate</s-button>
+                            >
 
-                            <s-button command="--hide" commandFor={`affliate-popover_` + item.id} disabled={disabledContentProPlan} accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} icon={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} variant="tertiary"
+                              <s-stack
+                                direction="inline"
+                                gap="small-300"
+                                alignItems="center"
+                              >
+                                <s-icon type="edit" />
+                                <s-text>{'Edit Affiliate'}</s-text>
+                              </s-stack>
+                            </s-button>
+
+                            <s-button command="--hide" commandFor={`affliate-popover_` + item.id} disabled={disabledContentProPlan} accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} variant="tertiary"
                               onClick={() => handleStatusChange(item.id, item.status === AFFILIATE_STATUS.active ? AFFILIATE_STATUS.inactive : AFFILIATE_STATUS.active)}
-                            >{item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'}</s-button>
+                            >
+                              <s-stack
+                                direction="inline"
+                                gap="small-300"
+                                alignItems="center"
+                              >
+                                <s-icon type={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} />
+                                <s-text>{item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'}</s-text>
+                              </s-stack>
+                            </s-button>
 
 
-                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical" icon="delete" variant="tertiary" commad="--show" commandFor={`delete_modal_` + item.id}>Delete</s-button>
+                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical"  variant="tertiary" commad="--show" commandFor={`delete_modal_` + item.id}>
+                              <s-stack
+                                direction="inline"
+                                gap="small-300"
+                                alignItems="center"
+                              >
+                                <s-icon tone="critical" type={'delete'} />
+                                <s-text tone="critical" >{'Delete'}</s-text>
+                              </s-stack>
+                            </s-button>
 
                           </s-stack>
                         </s-popover>

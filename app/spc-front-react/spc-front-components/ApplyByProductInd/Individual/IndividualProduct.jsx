@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import PoweredBy from "../../PoweredBy/PoweredBy";
 import GlobalStyle from "../../Styles/GlobalStyle/GlobalStyle";
 import ProductCardInd from "./ProductCardInd/ProductCardInd";
@@ -9,17 +9,120 @@ import cartLineAddFnc from "../../utilities/cartLineAddFnc";
 import cartCreateFnc from "../../utilities/cartCreateFnc";
 import { PLAN_NAME } from "../../../../constants/constants";
 import { buildUtmParams } from "../../../../utilis/generalUtils";
+import { storeAnalyticsDataToServer } from "../../../../utilis/storeAnalyticsDataToServer";
 
 
 
 const IndividualProduct = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType,utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
   //console.log("componentData222:",componentData);
   const [selectecTedProducts, setSelectecTedProducts] = useState([]);
   const [customTrackings, setCustomTrackings] = useState("");
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
+  const divRef = useRef(null);
+  const [hasViewed, setHasViewed] = useState(false);
 
+
+
+
+  let trafficSource = '';
+  if (typeof window !== "undefined") {
+    const { origin, pathname } = window.location;
+    // Remove trailing slash if it exists in the pathname
+    trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
+  }
+  const date = new Date()
+  const day = date.toISOString().split('T')[0];
+
+
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // If the element is in view
+          if (!hasViewed) {
+            console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + '.myshopify.com', trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            setHasViewed(true);
+          } else {
+            console.log("Element is in the viewport again (re-entered)");
+          }
+        } else {
+          // If the element is out of view
+          console.log("Element is not in the viewport");
+        }
+      },
+      {
+        threshold: 0.2, // Trigger when 20% of the element is visible
+      }
+    );
+
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+
+    // Cleanup observer on unmount
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, [hasViewed]);
+
+  // window.sessionStorage.setItem("siiooonn:",JSON.stringify(crypto.randomUUID()));
+
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver(
+  //     ([entry]) => {
+  //       if (entry.isIntersecting) {
+  //         // timeoutId.current = setTimeout(() => {
+  //         //   setImpCount((prev) => hasSentRequest ? 0 : prev + 1);
+  //         //   console.log("Element stayed in the viewport for 5s: cmp::" + id);
+  //         // }, 5000);
+
+  //         // setTimeout(() => {
+  //         //   if (hasSentRequest) return
+  //         //   storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + '.myshopify.com', trafficSource, componentId: id, day, isIncImpression: true, impressionIncVal: impCount, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+  //         //   setImpCount(0);
+  //         //   setHasSentRequest(true);
+  //         // }, 15000);
+
+  //         console.log("entry:::ID:",id,entry.intersectionRatio);
+
+  //       } else {
+  //         // If the element is not in view, clear the timeout to avoid unnecessary action
+  //         if (timeoutId.current) {
+  //           clearTimeout(timeoutId.current);
+  //           timeoutId.current = null; // Reset the timeout ID
+  //         }
+  //         console.log("Element not showing");
+  //       }
+  //     },
+  //     {
+  //       threshold: 0.1, // Trigger when 10% of the element is visible
+  //     }
+  //   );
+
+  //   if (divRef.current) {
+  //     observer.observe(divRef.current);
+  //   } else {
+  //     observer.unobserve(divRef.current);
+  //   }
+
+  //   // Cleanup observer and timeout on unmount
+  //   return () => {
+  //     if (divRef.current) {
+  //       observer.unobserve(divRef.current);
+  //     }
+  //     if (timeoutId.current) {
+  //       clearTimeout(timeoutId.current);
+  //     }
+  //   };
+  // }, [id, impCount, shop?.shopifyDomain, store, trafficSource, day]);
+
+  //console.log("count:", id, impCount);
 
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
@@ -32,20 +135,20 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
   useEffect(() => {
     setSelectecTedProducts(shop?.plan?.planName === PLAN_NAME.free ? addToCartType?.products?.slice(0, 3) : addToCartType?.products);
-    if(shop?.plan?.planName === PLAN_NAME.pro){
+    if (shop?.plan?.planName === PLAN_NAME.pro) {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
 
   }, [addToCartType.products, shop?.plan?.planName]);
 
-  
+
 
   //console.log("customTrackings:",customTrackings);
 
 
 
 
-  const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView) => {
+  const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView, componentId) => {
     const target = event.target;
 
     const variantId = getSelectedVariantId(target, appliesTo, fullView);
@@ -59,6 +162,8 @@ const IndividualProduct = ({ componentData, token, store }) => {
         quantity: 1
       }
     ];
+
+
 
     if (isExistCart) {
       try {
@@ -95,19 +200,19 @@ const IndividualProduct = ({ componentData, token, store }) => {
         cartModal?.current?.showModal();
       }
     }
-
+    storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId:Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: true, addTocartClickIncVal: 1, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
 
     //console.log("selectedVariant:", selectedVariant);
   };
 
-  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView,customTrackings) => {
+  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView, customTrackings, componentId) => {
     event.preventDefault();
 
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo, fullView);
     showLoading(target, true);
 
-    console.log("variantId:", variantId);
+    //console.log("variantId:", variantId);
 
     try {
       const variantIdNum = variantId.replace('gid://shopify/ProductVariant/', '');
@@ -124,6 +229,8 @@ const IndividualProduct = ({ componentData, token, store }) => {
     } finally {
       showLoading(target, false);
     }
+
+    storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId:Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
   }
 
 
@@ -181,7 +288,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
       <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country="US" language="en"></shopify-store>
 
 
-      <div className="shopcomponent_pd_container">
+      <div className="shopcomponent_pd_container" ref={divRef}>
 
 
 
@@ -209,6 +316,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
                 appliesTo={appliesTo}
                 layout={layout}
                 customTrackings={customTrackings}
+                componentId={id}
               />
             )}
 
@@ -224,6 +332,9 @@ const IndividualProduct = ({ componentData, token, store }) => {
           token={token}
           shoppingCartSettings={componentData?.shoppingCartSettings}
           customTrackings={customTrackings}
+          componentId={id}
+          day={day}
+          trafficSource={trafficSource}
         />
 
 

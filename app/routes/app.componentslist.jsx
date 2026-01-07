@@ -140,9 +140,9 @@ export default function ComponentList() {
   const [isLoading, setIsLoading] = useState(false);
   const tableRef = useRef(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     setComponents(componentsList);
-  },[componentsList]);
+  }, [componentsList]);
 
   // const nextPageFnc = () => {
   //   console.log("Next page click");
@@ -250,9 +250,9 @@ export default function ComponentList() {
                 <s-table
                   ref={tableRef}
                   loading={fetcher.state !== 'idle'}
-                  // hasPreviousPage
-                  // hasNextPage
-                  // paginate
+                // hasPreviousPage
+                // hasNextPage
+                // paginate
                 >
                   <s-table-header-row>
                     <s-table-header listSlot="primary">Component Name</s-table-header>
@@ -281,8 +281,8 @@ export default function ComponentList() {
                         </s-table-cell>
                         <s-table-cell>{totalOrderCount}</s-table-cell>
                         <s-table-cell>
-                          {getSymbolFromCurrency(shopData?.currencyCode)+(totalOrderValue || 0).toFixed(2)}
-                          
+                          {getSymbolFromCurrency(shopData?.currencyCode) + (totalOrderValue || 0).toFixed(2)}
+
                         </s-table-cell>
                         <s-table-cell>
                           {status === 'activate' ? <s-badge tone="success">{t("activate")}</s-badge> : <s-badge tone="critical-strong">{t("deactivate")}</s-badge>}
@@ -294,13 +294,19 @@ export default function ComponentList() {
                           />
                           <s-popover id={`component-popover_` + id} inlineSize="8">
                             <s-stack slots="children" direction="block" padding="small small">
-                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details" icon="edit" variant="tertiary"
+                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details"  variant="tertiary"
                               >
-                                View/Edit
+                                 <s-stack
+                                  direction="inline"
+                                  gap="small-300"
+                                  alignItems="center"
+                                >
+                                  <s-icon type={'edit'} />
+                                  <s-text>View/Edit</s-text>
+                                </s-stack>
                               </s-button>
 
                               <s-button
-                                icon={status === 'activate' ? 'disabled' : 'check-circle'}
                                 variant="tertiary"
                                 accessibilityLabel="Status Change"
                                 onClick={() => {
@@ -308,10 +314,18 @@ export default function ComponentList() {
                                 }}
                                 commandFor={`component-popover_` + id}
                                 command='--hide'
-                              >{status === 'activate' ? 'Deactivate' : 'Activate'}</s-button>
+                              >
+                                <s-stack
+                                  direction="inline"
+                                  gap="small-300"
+                                  alignItems="center"
+                                >
+                                  <s-icon type={status === 'activate' ? 'disabled' : 'check-circle'} />
+                                  <s-text>{status === 'activate' ? 'Deactivate' : 'Activate'}</s-text>
+                                </s-stack>
+                              </s-button>
 
                               <s-button
-                                icon={'duplicate'}
                                 variant="tertiary"
                                 accessibilityLabel="Duplicate"
                                 disabled={shopData?.plan?.planName === PLAN_NAME.free && components?.length > 0 ? true : false}
@@ -320,16 +334,34 @@ export default function ComponentList() {
                                 onClick={() => {
                                   handleDuplicateComponent(id);
                                 }}
-                              >{'Duplicate'}</s-button>
+                              >
+                                
+                                <s-stack
+                                  direction="inline"
+                                  gap="small-300"
+                                  alignItems="center"
+                                >
+                                  <s-icon type={'duplicate'} />
+                                  <s-text>{'Duplicate'}</s-text>
+                                </s-stack>
+                                </s-button>
 
                               <s-button
-                                icon="delete"
                                 tone="critical"
                                 variant="tertiary"
                                 accessibilityLabel="Delete"
                                 commandFor={`component_delete_modal_` + id}
                                 command='--show'
-                              >Delete</s-button>
+                              >
+                                <s-stack
+                                  direction="inline"
+                                  gap="small-300"
+                                  alignItems="center"
+                                >
+                                  <s-icon type={'delete'} tone="critical" />
+                                  <s-text tone="critical">{'Delete'}</s-text>
+                                </s-stack>
+                                </s-button>
                             </s-stack>
                           </s-popover>
 

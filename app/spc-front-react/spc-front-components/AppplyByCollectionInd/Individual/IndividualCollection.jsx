@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import ProductCardInd from "../../ApplyByProductInd/Individual/ProductCardInd/ProductCardInd";
 import PoweredBy from "../../PoweredBy/PoweredBy";
 import GlobalStyle from "../../Styles/GlobalStyle/GlobalStyle";
@@ -9,13 +9,64 @@ import { ContextComponent } from "../../../entryPoints/ContextWrapper/ContextWra
 import ShoppingCart from "../../ShoppingCart/ShoppingCart";
 import { PLAN_NAME } from "../../../../constants/constants";
 import { buildUtmParams } from "../../../../utilis/generalUtils";
+import { storeAnalyticsDataToServer } from "../../../../utilis/storeAnalyticsDataToServer";
 
 const IndividualCollection = ({ componentData, token, store }) => {
-  const { title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo,utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign } = componentData;
   const [customTrackings, setCustomTrackings] = useState("");
 
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
+  const divRef = useRef(null);
+  const [hasViewed, setHasViewed] = useState(false);
+
+
+
+
+  let trafficSource = '';
+  if (typeof window !== "undefined") {
+    const { origin, pathname } = window.location;
+    // Remove trailing slash if it exists in the pathname
+    trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
+  }
+  const date = new Date()
+  const day = date.toISOString().split('T')[0];
+
+
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // If the element is in view
+          if (!hasViewed) {
+            console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + '.myshopify.com', trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            setHasViewed(true);
+          } else {
+            console.log("Element is in the viewport again (re-entered)");
+          }
+        } else {
+          // If the element is out of view
+          console.log("Element is not in the viewport");
+        }
+      },
+      {
+        threshold: 0.2, // Trigger when 20% of the element is visible
+      }
+    );
+
+    if (divRef.current) {
+      observer.observe(divRef.current);
+    }
+
+    // Cleanup observer on unmount
+    return () => {
+      if (divRef.current) {
+        observer.unobserve(divRef.current);
+      }
+    };
+  }, [hasViewed]);
 
   const moveSliderPrevNext = (btnType) => {
     const slider = document.querySelector(".shopcomponent_product_layout_gridSlider");
@@ -23,14 +74,14 @@ const IndividualCollection = ({ componentData, token, store }) => {
     slider.scrollBy({ left: btnType === 'next' ? slideWidth : -slideWidth, behavior: "smooth" });
   }
 
- useEffect(() => {
-    if(shop?.plan?.planName === PLAN_NAME.pro){
+  useEffect(() => {
+    if (shop?.plan?.planName === PLAN_NAME.pro) {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
 
   }, [shop?.plan?.planName]);
 
-  const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView) => {
+  const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView, componentId) => {
     const target = event.target;
 
     const variantId = getSelectedVariantId(target, appliesTo, fullView);
@@ -81,11 +132,12 @@ const IndividualCollection = ({ componentData, token, store }) => {
       }
     }
 
+    storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: true, addTocartClickIncVal: 1, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
 
     //console.log("selectedVariant:", selectedVariant);
   };
 
-  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView,customTrackings) => {
+  const handleAddToCheckout = async (event, token, store, tracking, customerTracking, appliesTo, fullView, customTrackings, componentId) => {
     event.preventDefault();
 
     const target = event.target;
@@ -108,6 +160,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
     } finally {
       showLoading(target, false);
     }
+    storeAnalyticsDataToServer({ shopifyDomain: store, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
   }
 
 
@@ -125,7 +178,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
 
 
   return (
-    <div>
+    <div ref={divRef}>
       <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country="US" language="en"></shopify-store>
       <GlobalStyle
         buttonStyleSettings={buttonStyleSettings}
@@ -163,6 +216,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
               appliesTo={appliesTo}
               layout={layout}
               customTrackings={customTrackings}
+              componentId={id}
             />
           )}
 
@@ -177,6 +231,9 @@ const IndividualCollection = ({ componentData, token, store }) => {
           token={token}
           shoppingCartSettings={componentData?.shoppingCartSettings}
           customTrackings={customTrackings}
+          componentId={id}
+          day={day}
+          trafficSource={trafficSource}
         />
 
       </div>

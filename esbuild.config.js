@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 const isDev = process.env.NODE_ENV !== "production";
 const envObj = {
   VITE_SHOPIFY_APP_URL: process.env.SHOPIFY_APP_URL || "",
+  VITE_DATA_API : process.env.DATA_API || "",
 };
 
 const config = {

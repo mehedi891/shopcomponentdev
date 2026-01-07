@@ -147,6 +147,7 @@ const Affiliatedetails = () => {
     value: Number(order.currentTotalPriceSet?.shopMoney?.amount),
   })).sort((a, b) => a.key - b.key);
 
+
   const currencySymbol = getSymbolFromCurrency(shopCurrency || "USD") || "$";
 
   //console.log(data2);
@@ -161,6 +162,8 @@ const Affiliatedetails = () => {
       color: "green",
     },
   ];
+
+  //console.log(data);
 
  
 
@@ -468,12 +471,7 @@ const Affiliatedetails = () => {
 
                       </s-table-row>
                     ))
-
-
-
                     }
-
-
 
                   </s-table-body>
                 </s-table>
