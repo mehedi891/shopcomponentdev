@@ -6,6 +6,7 @@ import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
+import redis from "../utilis/redis.init";
 
 
 export const loader = async ({ request }) => {
@@ -320,7 +321,6 @@ const Plans = () => {
     }
 
     //console.log('data:', data);
-
     fetcher.submit(data, { method: 'post' });
 
   }
@@ -561,7 +561,7 @@ const Plans = () => {
 
                   <s-stack justifyContent="center" alignItems="center" minInlineSize="100%"><s-text
                     type="strong"
-                    
+
                   >{shopData?.plan?.planName === PLAN_NAME.growth && shopData?.plan?.planType === PLAN_TYPE.monthly && shopData?.isAppliedCoupon ? 'Current' : remainTrialDays > 0 ? `Start ${remainTrialDays}-days Free Trial` : 'Get Started'}</s-text></s-stack>
                 </s-clickable>
               </s-stack>
@@ -906,7 +906,15 @@ export const action = async ({ request }) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
-
+  // redis invalided the cache if exist start
+  const pattern = `analytics:${session.shop}:*`;
+  let cursor = "0";
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, "MATCH", pattern, "COUNT", 100);
+    cursor = nextCursor;
+    if (keys.length) await redis.del(...keys);
+  } while (cursor !== "0");
+  // redis invalided the cache if exist end
 
   if (data.planName === PLAN_NAME.growth || data.planName === PLAN_NAME.pro) {
 
