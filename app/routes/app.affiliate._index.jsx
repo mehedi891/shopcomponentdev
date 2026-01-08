@@ -49,7 +49,7 @@ export const loader = async ({ request }) => {
       shop: {
         shopifyDomain: session.shop,
       },
-      isDefault: false
+      //isDefault: false
     },
     include: {
       shop: {

@@ -13,7 +13,7 @@ import { PLAN_NAME } from "../constants/constants";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const days = 0;
+  const days = 7;
   const componentId = null;
   const dateRange =
     new Date(Date.now() - days * 24 * 60 * 60 * 1000)
@@ -165,8 +165,8 @@ export const loader = async ({ request }) => {
 
 const Analytics = () => {
   const [showOrderDataRange, setShowOrderDataRange] = useState({
-    title: "Today",
-    value: 0
+    title: "Last 7 days",
+    value: 7
   });
   const [selectComponent, setSelectComponent] = useState({
     title: "All Components",

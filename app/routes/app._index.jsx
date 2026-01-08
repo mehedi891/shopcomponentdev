@@ -12,6 +12,7 @@ import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric
 import ProductAvailibilityStatus from "../components/ProductAvailibilityStatus/ProductAvailibilityStatus";
 import TermsAndConditions from "../components/TermsAndConditions/TermsAndConditions";
 import getSymbolFromCurrency from "currency-symbol-map";
+import redis from "../utilis/redis.init";
 
 
 export const loader = async ({ request }) => {
@@ -36,13 +37,41 @@ export const loader = async ({ request }) => {
     where: {
       shopifyDomain: session.shop
     },
-    include: {
+    select: {
+      id: true,
+      scAccessToken: true,
+      shopifyDomain: true,
+      currencyCode: true,
+      publicationId: true,
+      plan: {
+        select: {
+          id: true,
+          planName: true
+        }
+      },
       components: {
+        where: {
+          shop: {
+            shopifyDomain: session.shop
+          },
+          softDelete: false,
+        },
         orderBy: {
           id: 'desc',
         },
-      },
-      plan: true
+        select: {
+          id: true,
+          title: true,
+          addToCartType: true,
+          status: true,
+          appliesTo: true,
+          componentSettings: true,
+          totalOrderCount: true,
+          totalOrderValue: true,
+
+        },
+        take: 5,
+      }
     }
   });
 
@@ -95,13 +124,41 @@ export const loader = async ({ request }) => {
         installationCount: 1,
         shopifyShopGid: scToken?.data?.storefrontAccessTokenCreate?.shop?.id,
       },
-      include: {
+      select: {
+        id: true,
+        scAccessToken: true,
+        shopifyDomain: true,
+        currencyCode: true,
+        publicationId: true,
+        plan: {
+          select: {
+            id: true,
+            planName: true
+          }
+        },
         components: {
+          where: {
+            shop: {
+              shopifyDomain: session.shop
+            },
+            softDelete: false,
+          },
           orderBy: {
             id: 'desc',
           },
-        },
-        plan: true
+          select: {
+            id: true,
+            title: true,
+            addToCartType: true,
+            status: true,
+            appliesTo: true,
+            componentSettings: true,
+            totalOrderCount: true,
+            totalOrderValue: true,
+
+          },
+          take: 5,
+        }
       }
     });
   }
@@ -146,44 +203,68 @@ export const loader = async ({ request }) => {
           },
         },
       },
-      include: {
-        plan: true
+      select: {
+        id: true,
+        scAccessToken: true,
+        shopifyDomain: true,
+        currencyCode: true,
+        publicationId: true,
+        plan: {
+          select: {
+            id: true,
+            planName: true
+          }
+        },
+        components: {
+          where: {
+            shop: {
+              shopifyDomain: session.shop
+            },
+            softDelete: false,
+          },
+          orderBy: {
+            id: 'desc',
+          },
+          select: {
+            id: true,
+            title: true,
+            addToCartType: true,
+            status: true,
+            appliesTo: true,
+            componentSettings: true,
+            totalOrderCount: true,
+            totalOrderValue: true,
+
+          },
+          take: 5,
+        }
       }
     });
   }
 
 
-  const components = await db.component.findMany({
-    where: {
-      shopId: shopData.id,
-      softDelete: false,
-    },
-    orderBy: {
-      id: 'desc',
-    },
-    take: 5,
-  });
-
-  // const cmpCount = await db.component.count({
-  //   where: {
-  //     shopId: shopData.id,
-  //     softDelete: false,
-  //   }
-  // });
-
-  // console.log("cmpCount:",cmpCount);
 
 
-  const totalPdJson = await admin.graphql(
-    `#graphql
+
+  let totalPd = 0;
+  const isExistTotalPd = await redis.get(`totalPd:${session.shop}`);
+
+  if (isExistTotalPd) {
+    totalPd = JSON.parse(isExistTotalPd);
+  } else {
+    const totalPdJson = await admin.graphql(
+      `#graphql
             query {
                 productsCount(query:null) {
                 count
                 }
             }`,
-  );
-  const totalproduct = await totalPdJson.json();
+    );
+    const totalproduct = await totalPdJson.json();
 
+    totalPd = totalproduct?.data?.productsCount?.count ?? 0;
+    await redis.set(`totalPd:${session.shop}`, JSON.stringify(totalPd), 'EX', 60 * 2);
+  }
 
   if (!shopData?.publicationId) {
     const appResponse = await admin.graphql(
@@ -242,20 +323,56 @@ export const loader = async ({ request }) => {
         appCatalogId: publicationjson?.data?.publication?.catalog?.id,
         isInstalled: false,
       },
-      include: {
+      select: {
+        id: true,
+        scAccessToken: true,
+        shopifyDomain: true,
+        currencyCode: true,
+        publicationId: true,
+        plan: {
+          select: {
+            id: true,
+            planName: true
+          }
+        },
         components: {
+          where: {
+            shop: {
+              shopifyDomain: session.shop
+            },
+            softDelete: false,
+          },
           orderBy: {
             id: 'desc',
           },
-        },
-        plan: true
+          select: {
+            id: true,
+            title: true,
+            addToCartType: true,
+            status: true,
+            appliesTo: true,
+            componentSettings: true,
+            totalOrderCount: true,
+            totalOrderValue: true,
+
+          },
+          take: 5,
+        }
       }
     });
 
   }
 
-  const totalPublishSpc = await admin.graphql(
-    `#graphql
+  let totalPublishProduct = 0;
+
+  const isExistTotalPublishProduct = await redis.get(`totalPublishProduct:${session.shop}`);
+
+  if (isExistTotalPublishProduct) {
+    totalPublishProduct = JSON.parse(isExistTotalPublishProduct);
+  } else {
+
+    const totalPublishSpc = await admin.graphql(
+      `#graphql
   query PublishedProductCount($publicationId: ID!) {
     publishedProductsCount(publicationId: $publicationId) {
       count
@@ -263,15 +380,18 @@ export const loader = async ({ request }) => {
     }
   }`,
 
-    {
-      variables: {
-        "publicationId": shopData?.publicationId
+      {
+        variables: {
+          "publicationId": shopData?.publicationId
+        },
       },
-    },
-  );
-  const totalPublishSpcJson = await totalPublishSpc.json();
+    );
+    const totalPublishSpcJson = await totalPublishSpc.json();
 
-
+    totalPublishProduct = totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0;
+    await redis.set(`totalPublishProduct:${session.shop}`, JSON.stringify(totalPublishProduct), 'EX', 60 * 2);
+  }
+  const components = shopData?.components || [];
 
   if (!shopData?.plan) {
     throw redirect('/app/plans');
@@ -284,8 +404,8 @@ export const loader = async ({ request }) => {
     shopData: shopData,
     components: components || [],
     hasActivePayment,
-    totalPd: totalproduct?.data?.productsCount?.count ?? 0,
-    totalPublishProduct: totalPublishSpcJson?.data?.publishedProductsCount?.count ?? 0,
+    totalPd: totalPd,
+    totalPublishProduct: totalPublishProduct,
     cataglogId: shopData?.appCatalogId ? shopData?.appCatalogId.replace('gid://shopify/AppCatalog/', '') : '',
     success: true,
     appSubscriptions: appSubscriptions[0]
