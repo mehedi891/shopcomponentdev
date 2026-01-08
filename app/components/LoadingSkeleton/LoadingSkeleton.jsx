@@ -67,6 +67,23 @@ const LoadingSkeleton = () => {
                 </Layout.Section>
             </Layout>
         </SkeletonPage>
+
+        // <s-page
+        //     inlinesize="base"
+        // >
+        //     <div
+        //         style={{width:'100%',height:'100vh',background:'#f4f4f4',display:'flex',justifyContent:'center',alignItems:'center'}}
+        //     >
+        //     <s-stack
+                
+        //         justifyContent="center"
+        //         alignItems="center"
+             
+        //     >
+        //         <s-spinner accessibilityLabel="Loading" size="large-100" />
+        //     </s-stack>
+        //     </div>
+        // </s-page>
     )
 }
 

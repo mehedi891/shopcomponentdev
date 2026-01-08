@@ -27,14 +27,16 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
 
   let trafficSource = '';
-  if (typeof window !== "undefined") {
-    const { origin, pathname } = window.location;
+  if (typeof window !== "undefined" || typeof window.parent !== "undefined") {
+    const { origin, pathname } = window.location.origin !== 'null' ? window.location : window.parent.location;
+
     // Remove trailing slash if it exists in the pathname
     trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
   }
   const date = new Date()
   const day = date.toISOString().split('T')[0];
 
+     
 
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
           // If the element is in view
           if (!hasViewed) {
             console.log("Element is entering the viewport for the first time");
-            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + '.myshopify.com', trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
+            //storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + '.myshopify.com', trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
             setHasViewed(true);
           } else {
             console.log("Element is in the viewport again (re-entered)");

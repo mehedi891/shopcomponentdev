@@ -25,7 +25,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
 
   let trafficSource = '';
   if (typeof window !== "undefined") {
-    const { origin, pathname } = window.location;
+    const { origin, pathname } = window.location.origin !== 'null' ? window.location : window.parent.location;
     // Remove trailing slash if it exists in the pathname
     trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
   }

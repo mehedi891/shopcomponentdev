@@ -27060,8 +27060,8 @@ var IndividualProduct = ({ componentData, token, store }) => {
   const divRef = (0, import_react3.useRef)(null);
   const [hasViewed, setHasViewed] = (0, import_react3.useState)(false);
   let trafficSource = "";
-  if (typeof window !== "undefined") {
-    const { origin, pathname } = window.location;
+  if (typeof window !== "undefined" || typeof window.parent !== "undefined") {
+    const { origin, pathname } = window.location.origin !== "null" ? window.location : window.parent.location;
     trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
   }
   const date = /* @__PURE__ */ new Date();
@@ -27072,7 +27072,6 @@ var IndividualProduct = ({ componentData, token, store }) => {
         if (entry.isIntersecting) {
           if (!hasViewed) {
             console.log("Element is entering the viewport for the first time");
-            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + ".myshopify.com", trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
             setHasViewed(true);
           } else {
             console.log("Element is in the viewport again (re-entered)");
@@ -27294,7 +27293,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
   const [hasViewed, setHasViewed] = (0, import_react4.useState)(false);
   let trafficSource = "";
   if (typeof window !== "undefined") {
-    const { origin, pathname } = window.location;
+    const { origin, pathname } = window.location.origin !== "null" ? window.location : window.parent.location;
     trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
   }
   const date = /* @__PURE__ */ new Date();
@@ -27585,7 +27584,7 @@ var BulkProduct = ({ componentData, token, store }) => {
   const [hasViewed, setHasViewed] = (0, import_react7.useState)(false);
   let trafficSource = "";
   if (typeof window !== "undefined") {
-    const { origin, pathname } = window.location;
+    const { origin, pathname } = window.location.origin !== "null" ? window.location : window.parent.location;
     trafficSource = `${origin}${pathname.replace(/\/$/, "")}`;
   }
   const date = /* @__PURE__ */ new Date();

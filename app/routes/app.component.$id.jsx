@@ -1947,6 +1947,40 @@ const UpdateComponent = () => {
   <!-------------- EmbedUp app code end -------------->
     `;
 
+// const copyCode = `
+//   <!-------------- EmbedUp [https://embedup.com/] ------------>
+
+//   <iframe id="embedup-${watchedValues.tracking}" 
+//           src="about:blank" 
+//           width="100%" height="600" frameborder="0" scrolling="no">
+//   </iframe>
+
+//   <script type="module">
+//     window.addEventListener('DOMContentLoaded', () => {
+//       var iframe = document.getElementById('embedup-${watchedValues.tracking}');
+//       var iframeDoc = iframe.contentWindow.document;
+      
+//       // Embed the div inside the iframe
+//       var div = iframeDoc.createElement('div');
+//       div.id = "embedup-${watchedValues.tracking}";
+//       div.className = "spc_rootElement";
+      
+//       div.setAttribute("data-props", {"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com", '')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"});
+
+//       iframeDoc.body.appendChild(div);
+
+//       // Create and append the script that links to the React minified JS
+//       var script = iframeDoc.createElement("script");
+//       script.type = "module";
+//       script.src = "${appUrl}/api/spceflmainjs?v=1";
+//       iframeDoc.head.appendChild(script);
+//     });
+//   </script>
+
+//   <!-------------- EmbedUp app code end -------------->
+// `;
+
+
   const handleCopyHtmlCode = () => {
     navigator.clipboard.writeText(copyCode);
     shopify.toast.show('Copied SuccessFully', {

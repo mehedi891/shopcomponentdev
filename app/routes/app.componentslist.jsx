@@ -25,16 +25,62 @@ export const loader = async ({ request }) => {
     where: {
       shopifyDomain: session.shop
     },
-    include: {
-      // components: {
-      //   orderBy: {
-      //     id: 'desc',
-      //   },
-      // },
-      plan: true
+    select: {
+      id: true,
+      shopifyDomain: true,
+      currencyCode: true,
+      plan: {
+        select: {
+          id: true,
+          planName: true
+        }
+      },
+      scAccessToken: true,
+      components: {
+        where: {
+          shop: {
+            shopifyDomain: session.shop
+          },
+          softDelete: false,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        select: {
+          id: true,
+          title: true,
+          addToCartType: true,
+          status: true,
+          appliesTo: true,
+          componentSettings: true,
+          totalOrderCount: true,
+          totalOrderValue: true,
+
+        }
+      }
     }
   });
 
+  //  const components = await db.component.findMany({
+  //   where: {
+  //     shopId: shopData.id,
+  //     softDelete: false,
+  //   },
+  //   orderBy: {
+  //     id: 'desc',
+  //   },
+  //   select: {
+  //     id: true,
+  //     title: true,
+  //     addToCartType: true,
+  //     status: true,
+  //     appliesTo: true,
+  //     componentSettings: true,
+  //     totalOrderCount: true,
+  //     totalOrderValue: true,
+
+  //   }
+  // });
 
 
   if (!shopData?.scAccessToken) {
@@ -84,33 +130,42 @@ export const loader = async ({ request }) => {
         installationCount: 1,
         shopifyShopGid: scToken?.data?.storefrontAccessTokenCreate?.shop?.id,
       },
-      include: {
+      select: {
+        id: true,
+        shopifyDomain: true,
+        currencyCode: true,
+        plan: {
+          select: {
+            id: true,
+            planName: true
+          }
+        },
+        scAccessToken: true,
         components: {
+          where: {
+            shop: {
+              shopifyDomain: session.shop
+            },
+            softDelete: false,
+          },
           orderBy: {
             id: 'desc',
           },
-        },
-        plan: true
+          select: {
+            id: true,
+            title: true,
+            addToCartType: true,
+            status: true,
+            appliesTo: true,
+            componentSettings: true,
+            totalOrderCount: true,
+            totalOrderValue: true,
+
+          }
+        }
       }
     });
   }
-
-
-
-  const components = await db.component.findMany({
-    where: {
-      shopId: shopData.id,
-      softDelete: false,
-    },
-    orderBy: {
-      id: 'desc',
-    }
-  });
-
-
-
-
-
 
   if (!shopData?.plan) {
     throw redirect('/app/plans');
@@ -121,8 +176,6 @@ export const loader = async ({ request }) => {
 
   return {
     shopData: shopData,
-    componentsList: components || [],
-    hasActivePayment,
     success: true,
     appSubscriptions: appSubscriptions[0]
   };
@@ -130,9 +183,9 @@ export const loader = async ({ request }) => {
 
 export default function ComponentList() {
   const shopify = useAppBridge();
-  const { shopData, componentsList } = useLoaderData();
-  //console.log('components:', components);
-  const [components, setComponents] = useState(componentsList);
+  const { shopData } = useLoaderData();
+  
+  const [components, setComponents] = useState(shopData.components || []);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -141,8 +194,8 @@ export default function ComponentList() {
   const tableRef = useRef(null);
 
   useEffect(() => {
-    setComponents(componentsList);
-  }, [componentsList]);
+    setComponents(shopData.components);
+  }, [shopData.components]);
 
   // const nextPageFnc = () => {
   //   console.log("Next page click");
@@ -294,9 +347,9 @@ export default function ComponentList() {
                           />
                           <s-popover id={`component-popover_` + id} inlineSize="8">
                             <s-stack slots="children" direction="block" padding="small small">
-                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details"  variant="tertiary"
+                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details" variant="tertiary"
                               >
-                                 <s-stack
+                                <s-stack
                                   direction="inline"
                                   gap="small-300"
                                   alignItems="center"
@@ -335,7 +388,7 @@ export default function ComponentList() {
                                   handleDuplicateComponent(id);
                                 }}
                               >
-                                
+
                                 <s-stack
                                   direction="inline"
                                   gap="small-300"
@@ -344,7 +397,7 @@ export default function ComponentList() {
                                   <s-icon type={'duplicate'} />
                                   <s-text>{'Duplicate'}</s-text>
                                 </s-stack>
-                                </s-button>
+                              </s-button>
 
                               <s-button
                                 tone="critical"
@@ -361,7 +414,7 @@ export default function ComponentList() {
                                   <s-icon type={'delete'} tone="critical" />
                                   <s-text tone="critical">{'Delete'}</s-text>
                                 </s-stack>
-                                </s-button>
+                              </s-button>
                             </s-stack>
                           </s-popover>
 
