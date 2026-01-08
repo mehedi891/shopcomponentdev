@@ -495,14 +495,7 @@ export default function Index() {
   }, [fetcher?.data]);
 
 
-  // useEffect(() => {
-  //   shopify.webVitals.onReport((metric) => {
-  //     console.log("Web Vitals Index:", metric);
-  //   });
-
-  // }, []);
-
-  console.log("f State:", fetcher.state);
+ 
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -516,7 +509,7 @@ export default function Index() {
             paddingBlockEnd="base"
             paddingBlockStart="large"
           >
-            <s-text type="strong">Bring your products to where your audience already is</s-text>
+            <s-heading type="strong">Bring your products to where your audience already is</s-heading>
             <s-text>Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront.</s-text>
           </s-stack>
 
@@ -545,7 +538,7 @@ export default function Index() {
                   alignItems="center"
                   padding="small small"
                 >
-                  <s-text type="strong">Componets</s-text>
+                  <s-heading>Componets</s-heading>
                   <s-stack
                     direction="inline"
                     gap="small"

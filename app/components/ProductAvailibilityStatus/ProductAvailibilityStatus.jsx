@@ -9,7 +9,7 @@ const ProductAvailibilityStatus = ({manageUrl="",totalPublishProductCount=0,publ
         justifyContent="space-between"
         paddingBlockEnd="small"
       >
-        <s-text type="strong">Product Availibility Status</s-text>
+        <s-heading>Product Availibility Status</s-heading>
         <s-link href={manageUrl} target="_blank">Manage availability</s-link>
       </s-stack>
 
@@ -21,7 +21,7 @@ const ProductAvailibilityStatus = ({manageUrl="",totalPublishProductCount=0,publ
         paddingBlockStart="small-300"
         gap="small-100"
       >
-        <s-text><s-text type="strong">{totalPublishProductCount} </s-text>products are available to EmbedUp</s-text>
+        <s-text>{totalPublishProductCount} products are available to EmbedUp</s-text>
         <s-stack
           direction="inline"
           gap="base"

@@ -10,7 +10,7 @@ const TermsAndConditions = () => {
 
           gap="small-300"
         >
-          <s-text type="strong">Terms and Conditions</s-text>
+          <s-heading>Terms and Conditions</s-heading>
           <s-text>View EmbedUp terms and conditions here at anytime</s-text>
           <s-stack
             direction="inline"

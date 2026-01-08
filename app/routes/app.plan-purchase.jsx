@@ -1,11 +1,9 @@
 import { useLoaderData, useNavigate, useNavigation, useSearchParams } from '@remix-run/react';
 import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 import { useTranslation } from 'react-i18next';
-import { BlockStack, Box, Button, Card, InlineStack, Layout, Page, Text } from '@shopify/polaris';
 import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
-import PageTitle from '../components/PageTitle/PageTitle';
 import { MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_STATUS } from '../constants/constants';
 
 export const loader = async ({ request }) => {
@@ -135,7 +133,7 @@ export const loader = async ({ request }) => {
       }
 
 
-    }else if(planName === PLAN_NAME.pro){
+    } else if (planName === PLAN_NAME.pro) {
       const cmpIdsArr = components.map(c => c.id);
       const allowedIds = cmpIdsArr.slice(0, MAX_ALLOWED_COMPONENTS.pro);
       const notAllowedIds = cmpIdsArr.slice(MAX_ALLOWED_COMPONENTS.pro, cmpIdsArr.length);
@@ -195,44 +193,41 @@ const PlanPurchase = () => {
 
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
-    <Page>
-      <PageTitle
 
-        title='EmbedUp - Subscription Confirmed'
-
-      />
-      <Layout>
-        <Layout.Section>
-          <Card>
-            <Box paddingBlock={1200} width="100%">
-              <BlockStack inlineAlign="center">
-                <img width={'250px'} height={'250px'} src="/images/subscription_success.svg" alt='Subscribed Successful' />
-                <Box paddingBlockEnd={800} paddingInline={{ sm: 200, lg: 1600, xl: 2400 }}>
-                  <BlockStack inlineAlign="center">
-                    <Box paddingBlockEnd={150}>
-                      {/* <Text variant="headingMd" as="h6" alignment="center">{t('Thanks', { plan: 'Free' })}</Text> */}
-                      <Text variant="headingLg" as="h2" alignment="center">{"Congratulations! Your EmbedUp subscription is now activated."}</Text>
-                    </Box>
-                    {/* <Box maxWidth="24rem">
-                      <Text variant="bodySm" as="p" alignment="center">{t("enjoy_app_message")}</Text>
-                      
-                    </Box> */}
-
-                    <BlockStack gap={'100'}>
-                      <Text alignment='center' variant='bodyLg'>Start selling beyond your store.</Text>
-                      <Text alignment='center' variant='bodyLg'>Create component &gt; Copy & embed anywhere &gt; Boost sales.</Text>
-                    </BlockStack>
-                  </BlockStack>
-                </Box>
-                <InlineStack gap={200} align="center">
-                  <Button variant="primary" onClick={() => navigate('/app')}>{t("continue")}</Button>
-                </InlineStack>
-              </BlockStack>
-            </Box>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+    <s-page>
+      <s-query-container>
+        <s-stack
+          padding="large-100 none large none"
+          direction="inline"
+          gap="small"
+          justifyContent="start"
+          alignItems="center"
+        >
+          <s-button onClick={() => navigate("/app")} accessibilityLabel="Back to affiliate" icon="arrow-left" variant="tertiary"></s-button>
+          <s-heading>Subscription Confirmed</s-heading>
+        </s-stack>
+        <s-section>
+          <s-stack
+            gap="large"
+            alignItems="center"
+            justifyContent="center"
+            paddingBlockEnd="large"
+          >
+            <s-image aspectRatio="1/0.3" src="/images/subscription_success.svg" alt='Subscribed Successful' />
+            <s-stack
+              gap="small-300"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <s-heading>Congratulations! Your EmbedUp subscription is now activated.</s-heading>
+              <s-text>Start selling beyond your store.</s-text>
+              <s-text>Create component &#62; Copy & embed anywhere &#62; Boost sales.</s-text>
+            </s-stack>
+            <s-button onClick={() => navigate("/app")} variant="primary">Continue</s-button>
+          </s-stack>
+        </s-section>
+      </s-query-container>
+    </s-page>
 
   )
 }

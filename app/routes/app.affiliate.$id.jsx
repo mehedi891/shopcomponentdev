@@ -7,6 +7,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { SaveBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useEffect, useState } from "react";
+import redis from "../utilis/redis.init";
 
 export const loader = async ({ request, params }) => {
   const { session } = await authenticate.admin(request);
@@ -69,7 +70,7 @@ const Updateaffiliate = () => {
   const watchedValues = watch();
 
 
-  
+
 
 
 
@@ -97,38 +98,38 @@ const Updateaffiliate = () => {
   }, [searchParams]);
 
   useEffect(() => {
-  if (actionData?.success) {
-    shopify.toast.show(actionData.message, { duration: 1000 });
+    if (actionData?.success) {
+      shopify.toast.show(actionData.message, { duration: 1000 });
 
-    const current = getValues();
-    reset(current);
+      const current = getValues();
+      reset(current);
 
-  } else if (actionData?.success === false) {
-    shopify.toast.show(actionData.message, { duration: 1000 });
-  }
-}, [actionData, getValues, reset, shopify]);
+    } else if (actionData?.success === false) {
+      shopify.toast.show(actionData.message, { duration: 1000 });
+    }
+  }, [actionData, getValues, reset, shopify]);
 
 
   useEffect(() => {
     if (isDirty) {
       shopify.saveBar.show('spc-save-bar_affiliate');
-     
+
     } else {
       reset(getValues());
-      
+
     }
   }, [isDirty]);
 
 
-    useEffect(() => {
-      if (window) {
-        window.addEventListener('popstate', function (event) {
-          reset(getValues());
-        });
-      }
-    }, []);
+  useEffect(() => {
+    if (window) {
+      window.addEventListener('popstate', function (event) {
+        reset(getValues());
+      });
+    }
+  }, []);
 
-   
+
 
   return (navigation.state === "loading" ? <LoadingSkeleton /> :
 
@@ -637,7 +638,7 @@ export default Updateaffiliate
 
 
 export const action = async ({ request, params }) => {
-  await authenticate.admin(request);
+  const { session } = await authenticate.admin(request);
 
   const { id } = params;
   const formData = await request.formData();
@@ -679,6 +680,15 @@ export const action = async ({ request, params }) => {
       }
     }
   } else if (request.method === 'DELETE') {
+    // redis invalided the cache if exist start
+    const pattern = `analytics:${session.shop}:*`;
+    let cursor = "0";
+    do {
+      const [nextCursor, keys] = await redis.scan(cursor, "MATCH", pattern, "COUNT", 100);
+      cursor = nextCursor;
+      if (keys.length) await redis.del(...keys);
+    } while (cursor !== "0");
+    // redis invalided the cache if exist end
     try {
       const affData = await db.affiliate.delete({
         where: {
@@ -686,7 +696,7 @@ export const action = async ({ request, params }) => {
         }
       });
 
-     
+
       if (affData?.id) {
         return {
           success: true,
@@ -694,11 +704,11 @@ export const action = async ({ request, params }) => {
         }
       }
     } catch (error) {
-      console.log("Error DeletingAff:::>>>",error);
+      console.log("Error DeletingAff:::>>>", error);
       return {
-          success: false,
-          message: "Something went wrong. Please try again."
-        }
+        success: false,
+        message: "Something went wrong. Please try again."
+      }
     }
 
   } else {
