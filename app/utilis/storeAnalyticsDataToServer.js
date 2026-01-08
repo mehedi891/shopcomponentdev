@@ -28,7 +28,7 @@ const storeAnalyticsDataToServer = async ({
   };
   //console.log("data:", data);
 
-  console.log("apiUri:", import.meta.env.VITE_DATA_API);
+  //console.log("apiUri:", import.meta.env.VITE_DATA_API);
 
   try {
     const res = await fetch(`${import.meta.env.VITE_DATA_API}/queue/add`, {
@@ -39,7 +39,7 @@ const storeAnalyticsDataToServer = async ({
       body: JSON.stringify(data),
     });
     const result = await res.json();
-    console.log("result:", result);
+    //console.log("result:", result);
   } catch (error) {
     console.log("Something wen't wrong", error);
   }
