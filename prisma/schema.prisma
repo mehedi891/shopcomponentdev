@@ -84,6 +84,7 @@ model Component {
   utmMedium             String?
   utmCampaign           String?
   customerTracking      String?
+  market                String?    @default("US")
   compHtml              String?    @default("empty")
   shopId                Int
   softDelete            Boolean    @default(false)
@@ -224,7 +225,7 @@ model Affiliate {
 model AffiliateTransaction {
   id                 Int       @id @default(autoincrement())
   affiliateId        Int
-  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  affiliate          Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
   commissionPaid     Float     @default(0.00)
   transactionDetails String?
   createdAt          DateTime  @default(now())

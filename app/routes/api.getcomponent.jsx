@@ -35,6 +35,7 @@ export const loader = async ({ request }) => {
         utmMedium: true,
         utmCampaign: true,
         customerTracking: true,
+        market: true,
         shop: {
           select: {
             appDisabled: true,

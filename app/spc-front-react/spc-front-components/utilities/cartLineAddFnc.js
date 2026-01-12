@@ -1,6 +1,6 @@
 import { CART_FIELDS } from "./fragments/cartPlayLoad";
 
-const cartLineAddFnc = async (isExistCart, selectedVariant, store, token) => {
+const cartLineAddFnc = async (isExistCart, selectedVariant, store, token,market) => {
   //console.log({ isExistCart, selectedVariant, store, token });
   const mutation = `#graphql
    mutation cartLinesAdd(
@@ -20,7 +20,7 @@ ${CART_FIELDS}
   const variables = {
     cartId: isExistCart,
     lines: selectedVariant,
-    country: 'US',
+    country: market || 'US',
     language: 'EN',
   };
 

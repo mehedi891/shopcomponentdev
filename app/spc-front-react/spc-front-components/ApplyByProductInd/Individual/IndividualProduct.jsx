@@ -14,7 +14,7 @@ import { storeAnalyticsDataToServer } from "../../../../utilis/storeAnalyticsDat
 
 
 const IndividualProduct = ({ componentData, token, store }) => {
-  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign,market } = componentData;
   //console.log("componentData222:",componentData);
   const [selectecTedProducts, setSelectecTedProducts] = useState([]);
   const [customTrackings, setCustomTrackings] = useState("");
@@ -150,7 +150,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
 
 
-  const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView, componentId) => {
+  const handleAddToCart = async (event, token, store, tracking, customerTracking, appliesTo, fullView, componentId,market) => {
     const target = event.target;
 
     const variantId = getSelectedVariantId(target, appliesTo, fullView);
@@ -169,13 +169,13 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
     if (isExistCart) {
       try {
-        const cartAdd = await cartLineAddFnc(isExistCart, selectedVariant, store, token);
+        const cartAdd = await cartLineAddFnc(isExistCart, selectedVariant, store, token,market);
         if (cartAdd?.success) {
           setCartData({ ...cartAdd.cartData });
           setCartTotalCount(cartAdd.cartData.totalQuantity);
         } else if (cartAdd?.error) {
           if (cartAdd.error[0]?.field[0] === "cartId") {
-            const createCart = await cartCreateFnc(selectedVariant, store, token, tracking, customerTracking);
+            const createCart = await cartCreateFnc(selectedVariant, store, token, tracking, customerTracking,market);
             if (createCart?.success) {
               setCartData({ ...createCart.cartData });
               setCartTotalCount(createCart.cartData.totalQuantity);
@@ -190,7 +190,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
       }
     } else {
       try {
-        const createCart = await cartCreateFnc(selectedVariant, store, token, tracking, customerTracking);
+        const createCart = await cartCreateFnc(selectedVariant, store, token, tracking, customerTracking,market);
         if (createCart?.success) {
           setCartData({ ...createCart.cartData });
           setCartTotalCount(createCart.cartData.totalQuantity);
@@ -287,7 +287,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
 
   return (
     <div>
-      <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country="US" language="en"></shopify-store>
+      <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country={market || 'US'} language="en"></shopify-store>
 
 
       <div className="shopcomponent_pd_container" ref={divRef}>
@@ -319,6 +319,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
                 layout={layout}
                 customTrackings={customTrackings}
                 componentId={id}
+                market={market}
               />
             )}
 
@@ -337,6 +338,7 @@ const IndividualProduct = ({ componentData, token, store }) => {
           componentId={id}
           day={day}
           trafficSource={trafficSource}
+          market={market}
         />
 
 

@@ -1,6 +1,6 @@
 import { CART_FIELDS } from "./fragments/cartPlayLoad";
 
-const cartCreateFnc = async (selectedVariant, store, token, tracking, customerTracking) => {
+const cartCreateFnc = async (selectedVariant, store, token, tracking, customerTracking,market) => {
   const mutation = `#graphql
       mutation cartCreate(
          $input: CartInput
@@ -33,7 +33,7 @@ const cartCreateFnc = async (selectedVariant, store, token, tracking, customerTr
         }
       ]
     },
-    country: 'US',
+    country: market || 'US',
     language: 'EN',
   };
   try {

@@ -25353,11 +25353,11 @@ var GlobalStyle_default = GlobalStyle;
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/ProductCardInd/ProductCardInd.jsx
 init_define_import_meta_env();
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-var ProductCardInd = ({ componentId, product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout, customTrackings }) => {
+var ProductCardInd = ({ componentId, product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout, customTrackings, market }) => {
   const pdAddToCartBtnHtml = `
                 <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}')"
+                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}','${market}')"
                
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
@@ -26045,7 +26045,6 @@ var storeAnalyticsDataToServer = async ({
     isIncCheckoutClick,
     checkoutClickIncVal
   };
-  console.log("apiUri:", define_import_meta_env_default.VITE_DATA_API);
   try {
     const res = await fetch(`${define_import_meta_env_default.VITE_DATA_API}/queue/add`, {
       method: "POST",
@@ -26055,7 +26054,6 @@ var storeAnalyticsDataToServer = async ({
       body: JSON.stringify(data)
     });
     const result = await res.json();
-    console.log("result:", result);
   } catch (error) {
     console.log("Something wen't wrong", error);
   }
@@ -26901,7 +26899,7 @@ var ShoppingCart_default = ShoppingCart;
 
 // app/spc-front-react/spc-front-components/utilities/cartLineAddFnc.js
 init_define_import_meta_env();
-var cartLineAddFnc = async (isExistCart, selectedVariant, store, token) => {
+var cartLineAddFnc = async (isExistCart, selectedVariant, store, token, market) => {
   const mutation = `#graphql
    mutation cartLinesAdd(
   $cartId: ID!
@@ -26919,7 +26917,7 @@ ${CART_FIELDS}
   const variables = {
     cartId: isExistCart,
     lines: selectedVariant,
-    country: "US",
+    country: market || "US",
     language: "EN"
   };
   try {
@@ -26965,7 +26963,7 @@ var cartLineAddFnc_default = cartLineAddFnc;
 
 // app/spc-front-react/spc-front-components/utilities/cartCreateFnc.js
 init_define_import_meta_env();
-var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTracking) => {
+var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTracking, market) => {
   const mutation = `#graphql
       mutation cartCreate(
          $input: CartInput
@@ -26998,7 +26996,7 @@ var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTrac
         }
       ]
     },
-    country: "US",
+    country: market || "US",
     language: "EN"
   };
   try {
@@ -27052,7 +27050,7 @@ function buildUtmParams({ source, medium, campaign }) {
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/IndividualProduct.jsx
 var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 var IndividualProduct = ({ componentData, token, store }) => {
-  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, addToCartType, utmSource, utmMedium, utmCampaign, market } = componentData;
   const [selectecTedProducts, setSelectecTedProducts] = (0, import_react3.useState)([]);
   const [customTrackings, setCustomTrackings] = (0, import_react3.useState)("");
   const { cartModal, cartRef } = (0, import_react3.useContext)(ContextComponent);
@@ -27072,6 +27070,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
         if (entry.isIntersecting) {
           if (!hasViewed) {
             console.log("Element is entering the viewport for the first time");
+            storeAnalyticsDataToServer({ shopifyDomain: shop?.shopifyDomain || store + ".myshopify.com", trafficSource, componentId: id, day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: true, uniqueVisitorIncVal: 1, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: false, checkoutClickIncVal: 0 });
             setHasViewed(true);
           } else {
             console.log("Element is in the viewport again (re-entered)");
@@ -27105,7 +27104,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
   }, [addToCartType.products, shop?.plan?.planName]);
-  const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, componentId) => {
+  const handleAddToCart = async (event, token2, store2, tracking2, customerTracking, appliesTo2, fullView, componentId, market2) => {
     const target = event.target;
     const variantId = getSelectedVariantId(target, appliesTo2, fullView);
     const isExistCart = localStorage.getItem("shopcomponent_cartId") ? localStorage.getItem("shopcomponent_cartId") : null;
@@ -27118,13 +27117,13 @@ var IndividualProduct = ({ componentData, token, store }) => {
     ];
     if (isExistCart) {
       try {
-        const cartAdd = await cartLineAddFnc_default(isExistCart, selectedVariant, store2, token2);
+        const cartAdd = await cartLineAddFnc_default(isExistCart, selectedVariant, store2, token2, market2);
         if (cartAdd?.success) {
           setCartData({ ...cartAdd.cartData });
           setCartTotalCount(cartAdd.cartData.totalQuantity);
         } else if (cartAdd?.error) {
           if (cartAdd.error[0]?.field[0] === "cartId") {
-            const createCart = await cartCreateFnc_default(selectedVariant, store2, token2, tracking2, customerTracking);
+            const createCart = await cartCreateFnc_default(selectedVariant, store2, token2, tracking2, customerTracking, market2);
             if (createCart?.success) {
               setCartData({ ...createCart.cartData });
               setCartTotalCount(createCart.cartData.totalQuantity);
@@ -27139,7 +27138,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
       }
     } else {
       try {
-        const createCart = await cartCreateFnc_default(selectedVariant, store2, token2, tracking2, customerTracking);
+        const createCart = await cartCreateFnc_default(selectedVariant, store2, token2, tracking2, customerTracking, market2);
         if (createCart?.success) {
           setCartData({ ...createCart.cartData });
           setCartTotalCount(createCart.cartData.totalQuantity);
@@ -27212,7 +27211,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
     };
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: market || "US", language: "en" }),
     /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_pd_container", ref: divRef, children: [
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "shopcomponent_title_N_description", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "shopcomponent_title", children: title }),
@@ -27237,7 +27236,8 @@ var IndividualProduct = ({ componentData, token, store }) => {
               appliesTo,
               layout,
               customTrackings,
-              componentId: id
+              componentId: id,
+              market
             },
             index
           )
@@ -27255,7 +27255,8 @@ var IndividualProduct = ({ componentData, token, store }) => {
           customTrackings,
           componentId: id,
           day,
-          trafficSource
+          trafficSource,
+          market
         }
       )
     ] }),
@@ -27285,7 +27286,7 @@ init_define_import_meta_env();
 var import_react4 = __toESM(require_react(), 1);
 var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
 var IndividualCollection = ({ componentData, token, store }) => {
-  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign, market } = componentData;
   const [customTrackings, setCustomTrackings] = (0, import_react4.useState)("");
   const { cartModal, cartRef } = (0, import_react4.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -27413,7 +27414,7 @@ var IndividualCollection = ({ componentData, token, store }) => {
     }
   }, []);
   return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { ref: divRef, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: market || "US", language: "en" }),
     /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       GlobalStyle_default,
       {
@@ -27449,7 +27450,8 @@ var IndividualCollection = ({ componentData, token, store }) => {
               appliesTo,
               layout,
               customTrackings,
-              componentId: id
+              componentId: id,
+              market
             },
             index
           )
@@ -27467,7 +27469,8 @@ var IndividualCollection = ({ componentData, token, store }) => {
           customTrackings,
           componentId: id,
           day,
-          trafficSource
+          trafficSource,
+          market
         }
       )
     ] }),
@@ -27576,7 +27579,7 @@ var CartCountBuble_default = CartCountBuble;
 var import_react7 = __toESM(require_react(), 1);
 var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
 var BulkProduct = ({ componentData, token, store }) => {
-  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign, market } = componentData;
   const [customTrackings, setCustomTrackings] = (0, import_react7.useState)("");
   const { cartModal, cartRef } = (0, import_react7.useContext)(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -27628,7 +27631,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       setCustomTrackings(buildUtmParams({ source: utmSource, medium: utmMedium, campaign: utmCampaign }));
     }
   }, [shop?.plan?.planName]);
-  const handleAddToCartBulk = async (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, componentId) => {
+  const handleAddToCartBulk = async (event, token2, store2, tracking2, customerTracking2, enableQtyField2, products, componentId, market2) => {
     event.preventDefault();
     const target = event.target;
     const mostParentContainer = target.closest(".shopcomponent_pd_container");
@@ -27654,14 +27657,14 @@ var BulkProduct = ({ componentData, token, store }) => {
     showLoading(target, true);
     if (isExistCart) {
       try {
-        const cartAdd = await cartLineAddFnc_default(isExistCart, selectedVariants, store2, token2);
+        const cartAdd = await cartLineAddFnc_default(isExistCart, selectedVariants, store2, token2, market2);
         if (cartAdd?.success) {
           setCartData({ ...cartAdd.cartData });
           setCartTotalCount(cartAdd.cartData.totalQuantity);
           if (enableQtyField2) resetSelectedQuantity(mostParentContainer);
         } else if (cartAdd?.error) {
           if (cartAdd.error[0]?.field[0] === "cartId") {
-            const createCart = await cartCreateFnc_default(selectedVariants, store2, token2, tracking2, customerTracking2);
+            const createCart = await cartCreateFnc_default(selectedVariants, store2, token2, tracking2, customerTracking2, market2);
             if (createCart?.success) {
               setCartData({ ...createCart.cartData });
               setCartTotalCount(createCart.cartData.totalQuantity);
@@ -27677,7 +27680,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       }
     } else {
       try {
-        const createCart = await cartCreateFnc_default(selectedVariants, store2, token2, tracking2, customerTracking2);
+        const createCart = await cartCreateFnc_default(selectedVariants, store2, token2, tracking2, customerTracking2, market2);
         if (createCart?.success) {
           setCartData({ ...createCart.cartData });
           setCartTotalCount(createCart.cartData.totalQuantity);
@@ -27724,7 +27727,7 @@ var BulkProduct = ({ componentData, token, store }) => {
     storeAnalyticsDataToServer({ shopifyDomain: store2, trafficSource, componentId: Number(componentId), day, isIncImpression: false, impressionIncVal: 0, isIncUniqueVisitor: false, uniqueVisitorIncVal: 0, isIncAddToCartClick: false, addTocartClickIncVal: 0, isIncCheckoutClick: true, checkoutClickIncVal: 1 });
   };
   return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "shopcomponent_pd_container", ref: divRef, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: "US", language: "en" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("shopify-store", { "store-domain": shop?.shopifyDomain || `${store}.myshopify.com`, "public-access-token": shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token, country: market || "US", language: "en" }),
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       GlobalStyle_default,
       {
@@ -27768,7 +27771,8 @@ var BulkProduct = ({ componentData, token, store }) => {
           customTrackings,
           componentId: id,
           day,
-          trafficSource
+          trafficSource,
+          market
         }
       )
     ] }),
@@ -27777,7 +27781,7 @@ var BulkProduct = ({ componentData, token, store }) => {
       {
         className: `product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}`,
         onClick: (event) => {
-          handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, id);
+          handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products, id, market);
         },
         "shopify-attr--disabled": "!product.selectedOrFirstAvailableVariant.availableForSale",
         children: [

@@ -421,7 +421,7 @@ export default function Index() {
   const { t } = useTranslation();
   const fetcher = useFetcher();
   const [isLoading, setIsLoading] = useState(false);
-  const [showInstructionBanner, setShowInstructionBanner] = useState(false);
+  const [showInstructionBanner, setShowInstructionBanner] = useState(true);
   const bannerRef = useRef(null);
 
   const [searchParams] = useSearchParams();
@@ -438,7 +438,6 @@ export default function Index() {
     const isShowBanner = localStorage.getItem('showInstructionBanner');
     if (isShowBanner === 'false') {
       setShowInstructionBanner(false);
-
     } else {
       setShowInstructionBanner(true);
     }
@@ -452,18 +451,12 @@ export default function Index() {
     };
     el.addEventListener("dismiss", onDismiss);
 
-
-
     return () => {
       el.removeEventListener("dismiss", onDismiss);
     };
   }, []);
 
-  useEffect(() => {
 
-
-
-  }, []);
 
   const handleDisableStatus = async (id, status) => {
     setIsLoading(true);

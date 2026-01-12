@@ -65,7 +65,7 @@ export default function App() {
         </div>
         <div style={{ flexFlow: 1 }}>
           <SpcFooter plan={shopData?.plan || ''} />
-          { isDev !== 'development' &&
+          {isDev !== 'development' &&
             <TwakTo />
           }
 
@@ -80,7 +80,40 @@ export default function App() {
 
 // Shopify needs Remix to catch some thrown responses, so that their headers are included in the response.
 export function ErrorBoundary() {
-  return boundary.error(useRouteError());
+  const error = useRouteError();
+  console.error("error", error);
+  return (
+    <AppProvider isEmbeddedApp>
+      <s-page>
+        <s-query-container>
+          <s-box
+            paddingBlockStart="large-200"
+          >
+            <s-section>
+              <s-stack
+                gap="large"
+                alignItems="center"
+                justifyContent="center"
+                paddingBlockEnd="large"
+              >
+                <s-image aspectRatio="1/0.3" src="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png" alt='Error' />
+                <s-stack
+                  gap="small-300"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <s-heading>Unexpected error</s-heading>
+                  <s-text>We have encountered an unexpected technical issue.</s-text>
+                </s-stack>
+                <s-button href="/app" variant="primary">Refresh window</s-button>
+              </s-stack>
+            </s-section>
+          </s-box>
+        </s-query-container>
+      </s-page>
+    </AppProvider>
+  )
+
 }
 
 export const headers = (headersArgs) => {

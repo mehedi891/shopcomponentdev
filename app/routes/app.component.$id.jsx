@@ -27,34 +27,69 @@ import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import { ADD_TO_CART_TYPE, AFFILIATE_STATUS, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS, PLAN_NAME } from "../constants/constants";
+import redis from "../utilis/redis.init";
 
 
 export const loader = async ({ request, params }) => {
   const { id } = params;
-  const { admin } = await authenticate.admin(request);
-  const shopResponse = await admin.graphql(
-    `#graphql
-                 query shopInfo{
-                     shop{
-                     id
-                     myshopifyDomain
-                     plan{
-                     partnerDevelopment
-                     }
-                 }
- 
-                 }`,
-  );
+  const { admin, session } = await authenticate.admin(request);
 
-  const shopData = await shopResponse.json();
+  let marketRegions = [];
+  const isExistMarketRegions = await redis.get(`shop:${session.shop}:marketRegions`);
+
+  if (isExistMarketRegions) {
+    marketRegions = JSON.parse(isExistMarketRegions);
+  } else {
+    const marketResponse = await admin.graphql(`#graphql
+  query MarketsRegionCountryCodes {
+    markets(first: 250) {
+      nodes {
+        name
+        conditions {
+          regionsCondition {
+            regions(first: 250) {
+              nodes {
+                name
+                ... on MarketRegionCountry {
+                  code
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+    const marketData = await marketResponse.json();
+
+    marketRegions = (marketData?.data?.markets?.nodes ?? []).reduce((acc, m) => {
+      const regions = m?.conditions?.regionsCondition?.regions?.nodes ?? [];
+      for (const r of regions) {
+        if (!r?.code) continue;              // keep only country regions
+        if (acc.seen.has(r.code)) continue;  // prevent duplicates
+        acc.seen.add(r.code);
+        acc.items.push(r);
+      }
+      return acc;
+    }, { seen: new Set(), items: [] }).items;
+
+    await redis.set(`shop:${session.shop}:marketRegions`, JSON.stringify(marketRegions), 'EX', 600,); // cache for 10 minutes
+  }
+
+
+
   const component = await db.Component.findUnique({
     where: {
       id: Number(id),
     },
     include: {
       shop: {
-        include: {
+        select: {
           plan: true,
+          shopifyDomain: true,
+          scAccessToken: true,
           affiliates: {
             where: {
               status: AFFILIATE_STATUS.active
@@ -66,14 +101,18 @@ export const loader = async ({ request, params }) => {
   })
 
   return {
-    shopData: shopData.data.shop,
+    shopData: {
+      ...component?.shop,
+      myshopifyDomain: session?.shop || component?.shop?.shopifyDomain,
+    },
     component: component,
     appUrl: process.env.SHOPIFY_APP_URL || '',
+    marketRegions:marketRegions,
   }
 }
 const UpdateComponent = () => {
-  const { component, shopData, appUrl } = useLoaderData();
-  //console.log('component:',component);
+  const { component, shopData, appUrl,marketRegions } = useLoaderData();
+  console.log('component:', component);
   const actionData = useActionData();
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +128,8 @@ const UpdateComponent = () => {
     settingsOpen: false,
     customCssOpen: false,
     tranckingOpen: false,
-    affiliateAssignOpen: true
+    affiliateAssignOpen: true,
+    marketAssignOpen: true,
   });
   const [selectedCollection, setSelectedCollection] = useState([]);
   const [selectedProductsInd, setSelectedProductsInd] = useState([]);
@@ -201,6 +241,7 @@ const UpdateComponent = () => {
       utmCampaign: component.utmCampaign || '',
       customerTracking: component.customerTracking,
       shopId: component.shopId,
+      market: component.market || 'US',
       affiliateId: component.affiliateId || null,
       compHtml: 'EmptyHtml'
     }
@@ -1662,7 +1703,7 @@ const UpdateComponent = () => {
   )).join('\n') : emptyStateHtml;
 
   const productLayoutIndHtml = `
-        <shopify-store public-access-token="${component?.shop?.headlessAccessToken ? component?.shop?.headlessAccessToken : component?.shop?.scAccessToken}" store-domain="${shopData.myshopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${component?.shop?.headlessAccessToken ? component?.shop?.headlessAccessToken : component?.shop?.scAccessToken}" store-domain="${shopData.myshopifyDomain}" country="${watchedValues.market}" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1756,7 +1797,7 @@ const UpdateComponent = () => {
   )).join('\n') : emptyStateHtml;
 
   const productLayoutBulkHtml = `
-        <shopify-store public-access-token="${component?.shop?.headlessAccessToken ? component?.shop?.headlessAccessToken : component?.shop?.scAccessToken}" store-domain="${shopData.myshopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${component?.shop?.headlessAccessToken ? component?.shop?.headlessAccessToken : component?.shop?.scAccessToken}" store-domain="${shopData.myshopifyDomain}" country="${watchedValues.market}" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1869,7 +1910,7 @@ const UpdateComponent = () => {
     : emptyStateHtml;
 
   const collectionLayoutIndHtml = `
-        <shopify-store public-access-token="${component?.shop?.headlessAccessToken ? component?.shop?.headlessAccessToken : component?.shop?.scAccessToken}" store-domain="${shopData.myshopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${component?.shop?.headlessAccessToken ? component?.shop?.headlessAccessToken : component?.shop?.scAccessToken}" store-domain="${shopData.myshopifyDomain}" country="${watchedValues.market}" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1947,38 +1988,38 @@ const UpdateComponent = () => {
   <!-------------- EmbedUp app code end -------------->
     `;
 
-// const copyCode = `
-//   <!-------------- EmbedUp [https://embedup.com/] ------------>
+  // const copyCode = `
+  //   <!-------------- EmbedUp [https://embedup.com/] ------------>
 
-//   <iframe id="embedup-${watchedValues.tracking}" 
-//           src="about:blank" 
-//           width="100%" height="600" frameborder="0" scrolling="no">
-//   </iframe>
+  //   <iframe id="embedup-${watchedValues.tracking}" 
+  //           src="about:blank" 
+  //           width="100%" height="600" frameborder="0" scrolling="no">
+  //   </iframe>
 
-//   <script type="module">
-//     window.addEventListener('DOMContentLoaded', () => {
-//       var iframe = document.getElementById('embedup-${watchedValues.tracking}');
-//       var iframeDoc = iframe.contentWindow.document;
-      
-//       // Embed the div inside the iframe
-//       var div = iframeDoc.createElement('div');
-//       div.id = "embedup-${watchedValues.tracking}";
-//       div.className = "spc_rootElement";
-      
-//       div.setAttribute("data-props", {"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com", '')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"});
+  //   <script type="module">
+  //     window.addEventListener('DOMContentLoaded', () => {
+  //       var iframe = document.getElementById('embedup-${watchedValues.tracking}');
+  //       var iframeDoc = iframe.contentWindow.document;
 
-//       iframeDoc.body.appendChild(div);
+  //       // Embed the div inside the iframe
+  //       var div = iframeDoc.createElement('div');
+  //       div.id = "embedup-${watchedValues.tracking}";
+  //       div.className = "spc_rootElement";
 
-//       // Create and append the script that links to the React minified JS
-//       var script = iframeDoc.createElement("script");
-//       script.type = "module";
-//       script.src = "${appUrl}/api/spceflmainjs?v=1";
-//       iframeDoc.head.appendChild(script);
-//     });
-//   </script>
+  //       div.setAttribute("data-props", {"id":${component?.id},"store":"${component?.shop?.shopifyDomain?.replace(".myshopify.com", '')}","tracking":"${watchedValues.tracking}","token":"${component?.shop?.scAccessToken}"});
 
-//   <!-------------- EmbedUp app code end -------------->
-// `;
+  //       iframeDoc.body.appendChild(div);
+
+  //       // Create and append the script that links to the React minified JS
+  //       var script = iframeDoc.createElement("script");
+  //       script.type = "module";
+  //       script.src = "${appUrl}/api/spceflmainjs?v=1";
+  //       iframeDoc.head.appendChild(script);
+  //     });
+  //   </script>
+
+  //   <!-------------- EmbedUp app code end -------------->
+  // `;
 
 
   const handleCopyHtmlCode = () => {
@@ -3830,6 +3871,76 @@ const UpdateComponent = () => {
                   </s-box>
                 </s-box>
 
+                <s-box paddingBlockEnd={'large'}>
+                  <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+
+                    <s-clickable
+                      padding="small"
+                      background="base"
+                      borderRadius="base"
+                      minBlockSize="50px"
+                      onClick={() => {
+                        setToogleOpen({
+                          ...toogleOpen,
+                          marketAssignOpen: !toogleOpen.marketAssignOpen,
+                        });
+                      }}
+                    >
+                      <s-stack
+                        direction="inline"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <s-stack
+                          direction="inline"
+                          gap="small-300"
+                        >
+                          <s-text type="strong">Markets</s-text>
+                          {disabledContentProPlan &&
+                            <UpgradeTooltip />
+                          }
+
+                        </s-stack>
+                        <s-icon type={toogleOpen.marketAssignOpen ? "caret-up" : "caret-down"}></s-icon>
+                      </s-stack>
+                    </s-clickable>
+
+                    {toogleOpen.marketAssignOpen &&
+
+                      <s-box padding="none small small small">
+                        <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
+                          {marketRegions?.length === 0 ?
+                            <s-text type="auto" tone="critical">Please create a Market first to assign. <s-link href={`https://admin.shopify.com/store/${shopData?.shopifyDomain.replace('.myshopify.com', '')}/markets`}>Create Market</s-link></s-text>
+                            :
+                            <Controller
+                              name="market"
+                              control={control}
+                              defaultValue={'US'}
+                              render={({ field, fieldState }) => (
+                                <s-select label="Assign Market" placeholder="Choose a market"
+                                  onChange={(event) => field.onChange(event.currentTarget.value)}
+                                  value={field.value}
+                                  error={fieldState?.error?.message}
+                                >
+                                  <s-option defaultSelected={watchedValues.market === 'US'} value={'US'}>{"Select a Market"}</s-option>
+                                  {(marketRegions || []).map((item) => {
+                                    return (
+                                      <s-option key={item.code} defaultSelected={watchedValues.market === item.code} value={item.code}>{item.name}</s-option>
+                                    )
+                                  })
+                                  }
+                                </s-select>
+                              )}
+                            />
+                          }
+                        </div>
+                      </s-box>
+
+                    }
+
+                  </s-box>
+                </s-box>
+
 
               </BlockStack>
 
@@ -4071,7 +4182,7 @@ export const action = async ({ request, params }) => {
         },
       });
 
-      console.log("CMPPPP::",cmp);
+      console.log("CMPPPP::", cmp);
       if (cmp?.id) {
         return {
           success: true,
@@ -4116,7 +4227,7 @@ export const action = async ({ request, params }) => {
         ...clonableData,
         title: 'Copy ' + original.title,
         status: STATUS.deactivate,
-        customerTracking: ( csTracking || '') + '_DP',
+        customerTracking: (csTracking || '') + '_DP',
         tracking: (csTracking || '') + '_DP',
         totalOrderCount: 0,
         totalOrderValue: 0,
@@ -4135,7 +4246,7 @@ export const action = async ({ request, params }) => {
           message: "There was an error duplicating the component",
         };
       }
-      
+
       return {
         success: true,
         message: "Component duplicated successfully"

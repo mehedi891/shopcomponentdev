@@ -25,7 +25,7 @@ const Instruction = ({ bannerRef, showInstructionBanner }) => {
             <s-ordered-list>
               <s-list-item>
                 <s-stack>
-                  <s-text type="strong">Create a component</s-text>
+                  <s-heading>Create a component</s-heading>
                   <s-text>Select your desired products,collections,and layout. <s-link
                     href="https://embedup.com/academy/how-to-display-your-store-products-on-other-websites-outside-of-shopify/"
                     target="_blank"
@@ -34,27 +34,27 @@ const Instruction = ({ bannerRef, showInstructionBanner }) => {
               </s-list-item>
               <s-list-item>
                 <s-stack>
-                  <s-text type="strong">Customize settings</s-text>
+                  <s-heading>Customize settings</s-heading>
                   <s-text>Adjust design, and options to match your store’s needs.</s-text>
                 </s-stack>
               </s-list-item>
               <s-list-item>
                 <s-stack>
-                  <s-text type="strong">Save your component</s-text>
+                  <s-heading>Save your component</s-heading>
                   <s-text>Your component is now ready to use.</s-text>
                 </s-stack>
               </s-list-item>
 
               <s-list-item>
                 <s-stack>
-                  <s-text type="strong">Copy the embed code</s-text>
+                  <s-heading>Copy the embed code</s-heading>
                   <s-text>One click to copy your unique code snippet.</s-text>
                 </s-stack>
               </s-list-item>
 
               <s-list-item>
                 <s-stack>
-                  <s-text type="strong">Embed anywhere</s-text>
+                  <s-heading>Embed anywhere</s-heading>
                   <s-text>Paste the code into your external website, blog, or landing page.</s-text>
                 </s-stack>
               </s-list-item>

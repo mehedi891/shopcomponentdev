@@ -1,5 +1,40 @@
 import { useNavigate, useNavigation } from "@remix-run/react";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
+import { authenticate } from "../shopify.server";
+
+
+export const loader = async ({ request }) => {
+
+  const { admin } = await authenticate.admin(request);
+
+//  const response = await admin.graphql(
+//   `#graphql
+//     mutation {
+//       flowTriggerReceive(
+//         handle: "embedup-trigger",
+//         payload: {
+//           email: "mehedi@efoli.com",
+//           component: "min20"
+//         }
+//       ) {
+//         userErrors {
+//           field
+//           message
+//         }
+//       }
+//     }
+//   `
+// );
+
+
+//   const data = await response.json();
+//  console.log("Data::",data.data);
+
+  return {
+    success: true,
+  };
+}
+
 
 const GetSupport = () => {
   const navgate = useNavigate();
@@ -23,15 +58,15 @@ const GetSupport = () => {
       href: "https://calendly.com/efolisupport/45min"
     },
     {
-       title: 'Email Support',
+      title: 'Email Support',
       description: "Need detailed assistance? Reach out via email support@embedup.com, and we'll get back to you promptly.",
       icon: 'email',
       btnText: 'Email us',
       isOnclick: false,
       href: "mailto:support@embedup.com"
     },
-     {
-       title: 'YouTube Tutorials',
+    {
+      title: 'YouTube Tutorials',
       description: "Discover our wide range of video tutorials created to assist you in managing discounts.",
       icon: 'video-list',
       btnText: 'Watch videos',
@@ -39,7 +74,7 @@ const GetSupport = () => {
       href: "https://www.youtube.com/@EmbedUpApp"
     },
     {
-       title: 'Help Docs',
+      title: 'Help Docs',
       description: "Explore our in-depth help documentation for step-by-step guidance and solutions.",
       icon: 'note',
       btnText: 'Browse docs',
@@ -78,8 +113,8 @@ const GetSupport = () => {
           padding="large-100 none large-100 none"
         >
 
-          {supportOptions.map((item,index)=>(
-              <s-grid-item key={index}>
+          {supportOptions.map((item, index) => (
+            <s-grid-item key={index}>
               <s-stack
                 justifyContent="space-between"
                 gap="small"
@@ -106,21 +141,21 @@ const GetSupport = () => {
                   gap="large"
                 >
                   <s-text>{item.description}</s-text>
-                  {item.isOnclick ? 
-                  <s-button
-                    onClick={() => { javascript: void (Tawk_API.toggle()) }}
-                  >{item.btnText}</s-button>
-                  :
-                   <s-button
-                    href={item.href}
-                  >{item.btnText}</s-button>
+                  {item.isOnclick ?
+                    <s-button
+                      onClick={() => { javascript: void (Tawk_API.toggle()) }}
+                    >{item.btnText}</s-button>
+                    :
+                    <s-button
+                      href={item.href}
+                    >{item.btnText}</s-button>
                   }
                 </s-stack>
               </s-stack>
             </s-grid-item>
           ))
 
-            
+
 
           }
 

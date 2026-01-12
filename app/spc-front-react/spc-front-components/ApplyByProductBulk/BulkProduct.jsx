@@ -13,7 +13,7 @@ import { buildUtmParams } from "../../../utilis/generalUtils";
 import { storeAnalyticsDataToServer } from "../../../utilis/storeAnalyticsDataToServer";
 
 const BulkProduct = ({ componentData, token, store }) => {
-  const { id,title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id,title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, enableQtyField, customerTracking, addToCartType, utmSource, utmMedium, utmCampaign,market } = componentData;
   const [customTrackings, setCustomTrackings] = useState("");
   const { cartModal, cartRef } = useContext(ContextComponent);
   const { setCartData, setCartTotalCount } = cartRef.current;
@@ -81,7 +81,7 @@ const BulkProduct = ({ componentData, token, store }) => {
   }, [shop?.plan?.planName]);
 
 
-  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products,componentId) => {
+  const handleAddToCartBulk = async (event, token, store, tracking, customerTracking, enableQtyField, products,componentId,market) => {
     event.preventDefault();
 
     const target = event.target;
@@ -117,7 +117,7 @@ const BulkProduct = ({ componentData, token, store }) => {
 
     if (isExistCart) {
       try {
-        const cartAdd = await cartLineAddFnc(isExistCart, selectedVariants, store, token);
+        const cartAdd = await cartLineAddFnc(isExistCart, selectedVariants, store, token,market);
         if (cartAdd?.success) {
 
           setCartData({ ...cartAdd.cartData });
@@ -127,7 +127,7 @@ const BulkProduct = ({ componentData, token, store }) => {
 
         } else if (cartAdd?.error) {
           if (cartAdd.error[0]?.field[0] === "cartId") {
-            const createCart = await cartCreateFnc(selectedVariants, store, token, tracking, customerTracking);
+            const createCart = await cartCreateFnc(selectedVariants, store, token, tracking, customerTracking,market);
             if (createCart?.success) {
               setCartData({ ...createCart.cartData });
               setCartTotalCount(createCart.cartData.totalQuantity);
@@ -143,7 +143,7 @@ const BulkProduct = ({ componentData, token, store }) => {
       }
     } else {
       try {
-        const createCart = await cartCreateFnc(selectedVariants, store, token, tracking, customerTracking);
+        const createCart = await cartCreateFnc(selectedVariants, store, token, tracking, customerTracking,market);
         if (createCart?.success) {
           setCartData({ ...createCart.cartData });
           setCartTotalCount(createCart.cartData.totalQuantity);
@@ -215,7 +215,7 @@ const BulkProduct = ({ componentData, token, store }) => {
   return (
     <div className="shopcomponent_pd_container" ref={divRef}>
 
-      <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country="US" language="en"></shopify-store>
+      <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country={market || 'US'} language="en"></shopify-store>
       <GlobalStyle
         buttonStyleSettings={buttonStyleSettings}
         componentSettings={componentSettings}
@@ -261,6 +261,7 @@ const BulkProduct = ({ componentData, token, store }) => {
           componentId={id}
           day={day}
           trafficSource={trafficSource}
+          market={market}
         />
       </div>
 
@@ -269,7 +270,7 @@ const BulkProduct = ({ componentData, token, store }) => {
         <div className="product-card__buttons shopcomponent_pd_buttons_bulk">
           <button
             className={`product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}`}
-            onClick={(event) => { handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products,id) }}
+            onClick={(event) => { handleAddToCartBulk(event, shop.scAccessToken, shop.shopifyDomain, tracking, customerTracking, enableQtyField, addToCartType.products,id,market) }}
             shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
           >
             <span className="spcBtn_txt"> {buttonStyleSettings.addToCartBtnTxt}</span>

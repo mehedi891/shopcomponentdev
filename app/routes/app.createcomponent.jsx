@@ -26,27 +26,58 @@ import PageTitle from "../components/PageTitle/PageTitle";
 import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
 import { ADD_TO_CART_TYPE, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, PLAN_NAME, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
+import redis from "../utilis/redis.init";
 
 
 
 
 export const loader = async ({ request }) => {
     const { session, redirect, admin } = await authenticate.admin(request);
-    // const shopResponse = await admin.graphql(
-    //     `#graphql
-    //             query shopInfo{
-    //                 shop{
-    //                 id
-    //                 shopifyDomain
-    //                 plan{
-    //                 partnerDevelopment
-    //                 }
-    //             }
 
-    //             }`,
-    // );
 
-    // const data = await shopResponse.json();
+    let marketRegions = [];
+    const isExistMarketRegions = await redis.get(`shop:${session.shop}:marketRegions`);
+
+    if (isExistMarketRegions) {
+        marketRegions = JSON.parse(isExistMarketRegions);
+    } else {
+        const marketResponse = await admin.graphql(`#graphql
+      query MarketsRegionCountryCodes {
+        markets(first: 250) {
+          nodes {
+            name
+            conditions {
+              regionsCondition {
+                regions(first: 250) {
+                  nodes {
+                    name
+                    ... on MarketRegionCountry {
+                      code
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `);
+
+        const marketData = await marketResponse.json();
+
+        marketRegions = (marketData?.data?.markets?.nodes ?? []).reduce((acc, m) => {
+            const regions = m?.conditions?.regionsCondition?.regions?.nodes ?? [];
+            for (const r of regions) {
+                if (!r?.code) continue;              // keep only country regions
+                if (acc.seen.has(r.code)) continue;  // prevent duplicates
+                acc.seen.add(r.code);
+                acc.items.push(r);
+            }
+            return acc;
+        }, { seen: new Set(), items: [] }).items;
+
+        await redis.set(`shop:${session.shop}:marketRegions`, JSON.stringify(marketRegions), 'EX', 600,); // cache for 10 minutes
+    }
 
     const shop = await db.shop.findUnique({
         where: {
@@ -214,11 +245,12 @@ export const loader = async ({ request }) => {
     return {
         trackingCode: trackingCode,
         shopData: shop,
+        marketRegions
     }
 }
 
 const CreateComponent = () => {
-    const { trackingCode, shopData } = useLoaderData();
+    const { trackingCode, shopData ,marketRegions} = useLoaderData();
     //console.log('shopData:', shopData);
     const navigate = useNavigate();
     const actionData = useActionData();
@@ -233,7 +265,8 @@ const CreateComponent = () => {
         settingsOpen: false,
         customCssOpen: false,
         tranckingOpen: false,
-        affiliateAssignOpen: true
+        affiliateAssignOpen: true,
+        marketAssignOpen: true,
     });
     const [selectedCollection, setSelectedCollection] = useState([]);
     const [selectedProductsInd, setSelectedProductsInd] = useState([]);
@@ -342,7 +375,8 @@ const CreateComponent = () => {
             utmMedium: '',
             utmCampaign: '',
             shopId: shopData?.id,
-            affiliateId:  null,
+            affiliateId: null,
+            market:'US',
             compHtml: 'EmptyHtml'
         }
     });
@@ -1772,7 +1806,7 @@ const CreateComponent = () => {
 
     const productLayoutIndHtml = `
         
-        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="${watchedValues.market}" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1868,7 +1902,7 @@ const CreateComponent = () => {
 
     const productLayoutBulkHtml = `
 
-        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="${watchedValues.market}" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -1985,7 +2019,7 @@ const CreateComponent = () => {
 
     const collectionLayoutIndHtml = `
        
-        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="US" language="en"></shopify-store>
+        <shopify-store public-access-token="${shopData?.headlessAccessToken ? shopData?.headlessAccessToken : shopData?.scAccessToken}" store-domain="${shopData.shopifyDomain}" country="${watchedValues.market}" language="en"></shopify-store>
 
 
         <div class="shopcomponent_pd_container">
@@ -2635,74 +2669,6 @@ const CreateComponent = () => {
                                                     }
 
                                                     <Box paddingBlock={'400'} paddingInline={'300'}>
-
-
-                                                        {/* {selectedProductsBulk?.length > 0 && selectedProductsBulk?.map((product) => (
-                                                                <Box key={product.id}>
-                                                                    <InlineStack align="space-between" blockAlign="center">
-                                                                        <InlineStack gap={'200'} blockAlign="center">
-                                                                            <Thumbnail size="small" source={product?.image ? product?.image : '/images/noImage.png'}
-                                                                                alt={product.handle} />
-                                                                            <Text variant="bodyMd" fontWeight="medium">{product.title}</Text>
-                                                                        </InlineStack>
-                                                                        <Button size="large" variant="monochromePlain" onClick={() => { handleDeleteProductBulk(product.id, 'product') }}>
-                                                                            <Icon tone="subdued" source={DeleteIcon} />
-                                                                        </Button>
-                                                                    </InlineStack>
-
-                                                                    {product?.variants?.length > 0 && product?.variants?.map((variant) => (
-                                                                        <Box key={variant.id} paddingBlockStart={'200'} paddingBlockEnd={'200'} paddingInlineStart={'400'} >
-
-                                                                            <InlineStack align="start" blockAlign="center" gap={'200'}>
-                                                                                <Thumbnail size="small" source={variant?.image ? variant.image : '/images/noImage.png'}
-                                                                                    alt={variant.title} />
-
-                                                                                <BlockStack gap={'100'}>
-
-                                                                                    <Box paddingInline={'100'}>
-                                                                                        <InlineStack gap={'200'} align="space-between" blockAlign="center">
-                                                                                            <Text variant="bodySm">{variant.title}</Text>
-
-                                                                                            <Button size="medium" variant="monochromePlain" onClick={() => { handleDeleteProductBulk(variant.id, 'variant') }} >
-                                                                                                <Icon tone="subdued" source={XIcon} />
-                                                                                            </Button>
-                                                                                        </InlineStack>
-                                                                                    </Box>
-                                                                                    {!watchedValues.enableQtyField &&
-                                                                                        <Box maxWidth="100px">
-                                                                                            <TextField
-                                                                                                label='Quantity'
-                                                                                                labelHidden
-                                                                                                value={variant.quantity || 0}
-                                                                                                onChange={(value) => { handleChangeQuantityDefault(variant.id, value) }}
-                                                                                                align="center"
-                                                                                                size="slim"
-                                                                                                type="number"
-                                                                                                min={1}
-                                                                                                disabled={watchedValues?.enableQtyField === true ? true : false}
-
-                                                                                            />
-                                                                                        </Box>
-
-                                                                                    }
-
-                                                                                </BlockStack>
-
-                                                                            </InlineStack>
-                                                                        </Box>
-                                                                    ))
-
-                                                                    }
-
-                                                                    <Divider />
-                                                                </Box>
-
-
-
-                                                            ))
-
-
-                                                            } */}
 
 
                                                         <DraggableProductBulk
@@ -3881,10 +3847,81 @@ const CreateComponent = () => {
                                                                     error={fieldState?.error?.message}
                                                                 //required
                                                                 >
-                                                                     <s-option defaultSelected={watchedValues.affiliateId === null} value={null}>{"Select a affiliate"}</s-option>
+                                                                    <s-option defaultSelected={watchedValues.affiliateId === null} value={null}>{"Select a affiliate"}</s-option>
                                                                     {shopData?.affiliates?.map((item) => {
                                                                         return (
                                                                             <s-option key={item.id} disabled={item.isDefault === true} value={item.id}>{item.name}</s-option>
+                                                                        )
+                                                                    })
+                                                                    }
+                                                                </s-select>
+                                                            )}
+                                                        />
+                                                    }
+                                                </div>
+                                            </s-box>
+
+                                        }
+
+                                    </s-box>
+                                </s-box>
+
+
+                                <s-box paddingBlockEnd={'large'}>
+                                    <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+
+                                        <s-clickable
+                                            padding="small"
+                                            background="base"
+                                            borderRadius="base"
+                                            minBlockSize="50px"
+                                            onClick={() => {
+                                                setToogleOpen({
+                                                    ...toogleOpen,
+                                                    marketAssignOpen: !toogleOpen.marketAssignOpen,
+                                                });
+                                            }}
+                                        >
+                                            <s-stack
+                                                direction="inline"
+                                                justifyContent="space-between"
+                                                alignItems="center"
+                                            >
+                                                <s-stack
+                                                    direction="inline"
+                                                    gap="small-300"
+                                                >
+                                                    <s-text type="strong">Markets</s-text>
+                                                    {disabledContentProPlan &&
+                                                        <UpgradeTooltip />
+                                                    }
+
+                                                </s-stack>
+                                                <s-icon type={toogleOpen.marketAssignOpen ? "caret-up" : "caret-down"}></s-icon>
+                                            </s-stack>
+                                        </s-clickable>
+
+                                        {toogleOpen.marketAssignOpen &&
+
+                                            <s-box padding="none small small small">
+                                                <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
+                                                    {marketRegions?.length === 0 ?
+                                                        <s-text type="auto" tone="critical">Please create a Market first to assign. <s-link href={`https://admin.shopify.com/store/${shopData?.shopifyDomain.replace('.myshopify.com', '')}/markets`}>Create Market</s-link></s-text>
+                                                        :
+                                                        <Controller
+                                                            name="market"
+                                                            control={control}
+                                                            defaultValue={'US'}
+                                                            render={({ field, fieldState }) => (
+                                                                <s-select label="Assign Market" placeholder="Choose a market"
+                                                                    onChange={(event) => field.onChange(event.currentTarget.value)}
+                                                                    value={field.value}
+                                                                    error={fieldState?.error?.message}
+                                                                >
+                                                                    <s-option defaultSelected={watchedValues.market === 'US'} value={'US'}>{"Select a Market"}</s-option>
+                                                                    {(marketRegions || []).map((item) => {
+                                                                        return (
+                                                                            <s-option key={item.code} value={item.code}>{item.name}</s-option>
                                                                         )
                                                                     })
                                                                     }

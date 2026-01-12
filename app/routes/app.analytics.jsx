@@ -130,7 +130,12 @@ export const loader = async ({ request }) => {
         'Content-Type': 'application/json',
       }
     });
-    analuticsFromServer = await analytics.json();
+    // console.log('analytics::',analytics.ok,analytics);
+    if (analytics?.ok) {
+      analuticsFromServer = await analytics.json();
+    } else {
+      analuticsFromServer = {result: {}};
+    }
 
   } catch (error) {
     console.log("error:::", error);
@@ -488,7 +493,7 @@ const Analytics = () => {
                       padding="small-300 none none small"
 
                     >
-                      {fData?.analyticsData?.trafficSources.map((item, index) => (
+                      {(fData?.analyticsData?.trafficSources || []).map((item, index) => (
                         <s-stack
                           key={index}
                           direction="inline"
@@ -668,7 +673,7 @@ const Analytics = () => {
                       padding="small-300 none none small"
 
                     >
-                      {fData?.affiliateDataFirstFive.map((item, index) => (
+                      {(fData?.affiliateDataFirstFive || []).map((item, index) => (
                         <s-stack
                           key={index}
                           direction="inline"

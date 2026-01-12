@@ -12,7 +12,7 @@ import { buildUtmParams } from "../../../../utilis/generalUtils";
 import { storeAnalyticsDataToServer } from "../../../../utilis/storeAnalyticsDataToServer";
 
 const IndividualCollection = ({ componentData, token, store }) => {
-  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign } = componentData;
+  const { id, title, description, buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, layout, shop, appliesTo, utmSource, utmMedium, utmCampaign ,market } = componentData;
   const [customTrackings, setCustomTrackings] = useState("");
 
   const { cartModal, cartRef } = useContext(ContextComponent);
@@ -179,7 +179,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
 
   return (
     <div ref={divRef}>
-      <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country="US" language="en"></shopify-store>
+      <shopify-store store-domain={shop?.shopifyDomain || `${store}.myshopify.com`} public-access-token={shop?.headlessAccessToken ? shop?.headlessAccessToken : shop?.scAccessToken || token} country={market || 'US'} language="en"></shopify-store>
       <GlobalStyle
         buttonStyleSettings={buttonStyleSettings}
         componentSettings={componentSettings}
@@ -217,6 +217,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
               layout={layout}
               customTrackings={customTrackings}
               componentId={id}
+              market={market}
             />
           )}
 
@@ -234,6 +235,7 @@ const IndividualCollection = ({ componentData, token, store }) => {
           componentId={id}
           day={day}
           trafficSource={trafficSource}
+          market={market}
         />
 
       </div>

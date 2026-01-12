@@ -1,13 +1,13 @@
 
 
-const ProductCardInd = ({ componentId,product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout,customTrackings }) => {
+const ProductCardInd = ({ componentId,product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout,customTrackings,market }) => {
 
 
 
   const pdAddToCartBtnHtml = `
                 <button
                 class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}')"
+                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}','${market}')"
                
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
