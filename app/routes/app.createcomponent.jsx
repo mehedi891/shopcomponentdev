@@ -41,7 +41,8 @@ export const loader = async ({ request }) => {
     if (isExistMarketRegions) {
         marketRegions = JSON.parse(isExistMarketRegions);
     } else {
-        const marketResponse = await admin.graphql(`#graphql
+        try {
+            const marketResponse = await admin.graphql(`#graphql
       query MarketsRegionCountryCodes {
         markets(first: 250) {
           nodes {
@@ -63,20 +64,23 @@ export const loader = async ({ request }) => {
       }
     `);
 
-        const marketData = await marketResponse.json();
+            const marketData = await marketResponse.json();
 
-        marketRegions = (marketData?.data?.markets?.nodes ?? []).reduce((acc, m) => {
-            const regions = m?.conditions?.regionsCondition?.regions?.nodes ?? [];
-            for (const r of regions) {
-                if (!r?.code) continue;              // keep only country regions
-                if (acc.seen.has(r.code)) continue;  // prevent duplicates
-                acc.seen.add(r.code);
-                acc.items.push(r);
-            }
-            return acc;
-        }, { seen: new Set(), items: [] }).items;
+            marketRegions = (marketData?.data?.markets?.nodes ?? []).reduce((acc, m) => {
+                const regions = m?.conditions?.regionsCondition?.regions?.nodes ?? [];
+                for (const r of regions) {
+                    if (!r?.code) continue;              // keep only country regions
+                    if (acc.seen.has(r.code)) continue;  // prevent duplicates
+                    acc.seen.add(r.code);
+                    acc.items.push(r);
+                }
+                return acc;
+            }, { seen: new Set(), items: [] }).items;
 
-        await redis.set(`shop:${session.shop}:marketRegions`, JSON.stringify(marketRegions), 'EX', 600,); // cache for 10 minutes
+            await redis.set(`shop:${session.shop}:marketRegions`, JSON.stringify(marketRegions), 'EX', 600,); // cache for 10 minutes
+        } catch (error) {
+            console.log('error:from market regions', error);
+        }
     }
 
     const shop = await db.shop.findUnique({
@@ -250,7 +254,7 @@ export const loader = async ({ request }) => {
 }
 
 const CreateComponent = () => {
-    const { trackingCode, shopData ,marketRegions} = useLoaderData();
+    const { trackingCode, shopData, marketRegions } = useLoaderData();
     //console.log('shopData:', shopData);
     const navigate = useNavigate();
     const actionData = useActionData();
@@ -376,7 +380,7 @@ const CreateComponent = () => {
             utmCampaign: '',
             shopId: shopData?.id,
             affiliateId: null,
-            market:'US',
+            market: 'US',
             compHtml: 'EmptyHtml'
         }
     });

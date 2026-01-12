@@ -40,42 +40,46 @@ export const loader = async ({ request, params }) => {
   if (isExistMarketRegions) {
     marketRegions = JSON.parse(isExistMarketRegions);
   } else {
-    const marketResponse = await admin.graphql(`#graphql
-  query MarketsRegionCountryCodes {
-    markets(first: 250) {
-      nodes {
-        name
-        conditions {
-          regionsCondition {
-            regions(first: 250) {
-              nodes {
-                name
-                ... on MarketRegionCountry {
-                  code
-                }
-              }
-            }
-          }
+    try {
+      const marketResponse = await admin.graphql(`#graphql
+         query MarketsRegionCountryCodes {
+           markets(first: 250) {
+             nodes {
+               name
+               conditions {
+                 regionsCondition {
+                   regions(first: 250) {
+                     nodes {
+                       name
+                       ... on MarketRegionCountry {
+                         code
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       `);
+
+      const marketData = await marketResponse.json();
+
+      marketRegions = (marketData?.data?.markets?.nodes ?? []).reduce((acc, m) => {
+        const regions = m?.conditions?.regionsCondition?.regions?.nodes ?? [];
+        for (const r of regions) {
+          if (!r?.code) continue;              // keep only country regions
+          if (acc.seen.has(r.code)) continue;  // prevent duplicates
+          acc.seen.add(r.code);
+          acc.items.push(r);
         }
-      }
+        return acc;
+      }, { seen: new Set(), items: [] }).items;
+
+      await redis.set(`shop:${session.shop}:marketRegions`, JSON.stringify(marketRegions), 'EX', 600,); // cache for 10 minutes
+    } catch (error) {
+      console.log('error:from market regions', error);
     }
-  }
-`);
-
-    const marketData = await marketResponse.json();
-
-    marketRegions = (marketData?.data?.markets?.nodes ?? []).reduce((acc, m) => {
-      const regions = m?.conditions?.regionsCondition?.regions?.nodes ?? [];
-      for (const r of regions) {
-        if (!r?.code) continue;              // keep only country regions
-        if (acc.seen.has(r.code)) continue;  // prevent duplicates
-        acc.seen.add(r.code);
-        acc.items.push(r);
-      }
-      return acc;
-    }, { seen: new Set(), items: [] }).items;
-
-    await redis.set(`shop:${session.shop}:marketRegions`, JSON.stringify(marketRegions), 'EX', 600,); // cache for 10 minutes
   }
 
 
@@ -107,11 +111,11 @@ export const loader = async ({ request, params }) => {
     },
     component: component,
     appUrl: process.env.SHOPIFY_APP_URL || '',
-    marketRegions:marketRegions,
+    marketRegions: marketRegions,
   }
 }
 const UpdateComponent = () => {
-  const { component, shopData, appUrl,marketRegions } = useLoaderData();
+  const { component, shopData, appUrl, marketRegions } = useLoaderData();
   console.log('component:', component);
   const actionData = useActionData();
   const navigate = useNavigate();
