@@ -6,6 +6,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 export const loader = async ({ request }) => {
     const { session, redirect } = await authenticate.admin(request);
 
@@ -13,13 +14,25 @@ export const loader = async ({ request }) => {
         where: {
             shopifyDomain: session.shop
         },
-        include: {
+        select: {
+            id: true,
+            shopifyDomain: true,
+            appDisabled: true,
+            createdAt: true,
+            trialDays: true,
             plan: true
         }
     });
-    if (!shop?.plan) {
-        throw redirect('/app/plans')
+
+
+
+     if (shop?.plan?.isTestPlan) {
+    const remaingTrialDays = getRemainingTrialDays(shop?.createdAt, shop?.trialDays);
+
+    if (!shop?.plan || (shop?.plan?.isTestPlan && remaingTrialDays < 1)) {
+      throw redirect('/app/plans');
     }
+  }
 
 
 

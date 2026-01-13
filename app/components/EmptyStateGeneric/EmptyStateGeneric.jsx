@@ -19,7 +19,7 @@ const EmptyStateGeneric = ({
         <s-grid justifyItems="center" maxInlineSize="450px" gap="base">
           <s-stack alignItems="center">
             <s-heading>{title}</s-heading>
-            <s-paragraph>{text}</s-paragraph>
+            <s-paragraph >{text}</s-paragraph>
           </s-stack>
           <s-button-group>
             <s-button slot="primary-action" icon="plus" href={btnHref} aria-label="Create a new">

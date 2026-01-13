@@ -6,6 +6,7 @@ import {
 } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
+import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "./constants/constants";
 export const MONTHLY_PLAN = 'Growth Monthly';
 export const ANNUAL_PLAN = 'Growth Annual';
 export const FREE_PLAN = 'Free';
@@ -200,6 +201,15 @@ const shopify = shopifyApp({
           publicationId:publicationjson?.data?.publication?.id,
           appCatalogId:publicationjson?.data?.publication?.catalog?.id,
           isInstalled: true,
+          isFirstInstall: false, // by default false but as we create the plan automatically so it doesn't need to go to app index page.It will directly go to plan-purchase page
+          maxAllowedComponents: MAX_ALLOWED_COMPONENTS.pro, // Default Pro Plan
+          plan: {
+            create: {
+              planName: PLAN_NAME.pro,
+              planStatus: 'active',
+              isTestPlan: true,
+            }
+          }
         },
       });
 

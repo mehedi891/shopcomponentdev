@@ -27,6 +27,7 @@ import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import DraggableProductBulk from "../components/DragAblePd/DraggableProductBulk";
 import { ADD_TO_CART_TYPE, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, PLAN_NAME, SHOW_COMPONENT_TITLE, STATUS } from "../constants/constants";
 import redis from "../utilis/redis.init";
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
 
@@ -89,14 +90,19 @@ export const loader = async ({ request }) => {
         },
         include: {
             plan: true,
-            components: true,
-            affiliates: true
+            affiliates: true,
+            components:{
+                select:{id:true}
+            }
         }
     });
 
-    if (!shop?.plan) {
-        throw redirect('/app/plans')
+     if (shop?.plan?.isTestPlan) {
+    const remaingTrialDays = getRemainingTrialDays(shop?.createdAt, shop?.trialDays);
+    if (!shop?.plan || (shop?.plan?.isTestPlan && remaingTrialDays < 1)) {
+      throw redirect('/app/plans');
     }
+  }
 
 
 
@@ -392,6 +398,9 @@ const CreateComponent = () => {
         setDisabledContentProPlan(shopData?.plan?.planName === PLAN_NAME.pro ? false : true)
     }, [shopData]);
 
+
+    //console.log('disable content by plan',shopData?.plan?.planName, disabledContentByPlan);
+    // console.log('disable content by plan::',disabledContentByPlan && shopData?.components?.length,shopData?.plan?.planName, disabledContentByPlan);
 
 
     useEffect(() => {
@@ -2186,7 +2195,7 @@ const CreateComponent = () => {
                         // </s-box>
                     } */}
                     <Layout>
-                        {disabledContentByPlan && shopData?.components?.length > 0 &&
+                        {disabledContentByPlan && shopData?.components?.length > 0 === true &&
                             <Layout.Section variant="fullWidth">
                                 <Banner
                                     title={"Upgrade to create another component"}
@@ -2200,7 +2209,7 @@ const CreateComponent = () => {
                             </Layout.Section>
                         }
 
-                        {shopData?.components?.length >= shopData?.maxAllowedComponents &&
+                        {shopData?.components?.length >= shopData?.maxAllowedComponents && !disabledContentByPlan &&
                             <Layout.Section variant="fullWidth">
                                 <Banner
                                     title={`Maximum Component Limit (${shopData?.maxAllowedComponents})`}

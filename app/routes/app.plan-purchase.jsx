@@ -1,6 +1,5 @@
 import { useLoaderData, useNavigate, useNavigation, useSearchParams } from '@remix-run/react';
 import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
-import { useTranslation } from 'react-i18next';
 import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
@@ -65,7 +64,8 @@ export const loader = async ({ request }) => {
               planStatus: appSubscriptions[0].status,
               isTestCharge: appSubscriptions[0].test,
               planType,
-              chargeId
+              chargeId,
+              isTestPlan: false,
             },
             update: {
               planId: appSubscriptions[0].id,
@@ -74,7 +74,8 @@ export const loader = async ({ request }) => {
               planStatus: appSubscriptions[0].status,
               isTestCharge: appSubscriptions[0].test,
               planType,
-              chargeId
+              chargeId,
+              isTestPlan: false,
             },
           },
         },
@@ -179,7 +180,6 @@ export const loader = async ({ request }) => {
 const PlanPurchase = () => {
   const { shopData } = useLoaderData();
 
-  const { t } = useTranslation();
   const navigation = useNavigation();
   const navigate = useNavigate();
 

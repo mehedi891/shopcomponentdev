@@ -9,10 +9,11 @@ import { BarChart, LineChart, StackedAreaChart } from "@shopify/polaris-viz";
 import redis from "../utilis/redis.init";
 import AnalyticsUpgrade from "../components/AnalyticsUpgrade/AnalyticsUpgrade";
 import { PLAN_NAME } from "../constants/constants";
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
+  const { session,redirect } = await authenticate.admin(request);
   const days = 7;
   const componentId = null;
   const dateRange =
@@ -34,9 +35,10 @@ export const loader = async ({ request }) => {
     },
     select: {
       id: true,
-      plan: true,
       shopifyDomain: true,
       currencyCode: true,
+      createdAt: true,
+      trialDays: true,
       orders: {
         where: {
           createdAt: {
@@ -76,9 +78,23 @@ export const loader = async ({ request }) => {
           id: true,
           title: true,
         }
+      },
+      plan:{
+        select: {
+          planName: true,
+          isTestPlan: true
+        }
       }
     }
   });
+
+   if (shopData?.plan?.isTestPlan) {
+    const remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
+
+    if (!shopData?.plan || (shopData?.plan?.isTestPlan && remaingTrialDays < 1)) {
+      throw redirect('/app/plans');
+    }
+  }
 
 
   const summary = (shopData?.orders ?? []).reduce(

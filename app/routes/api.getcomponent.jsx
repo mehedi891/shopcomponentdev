@@ -1,5 +1,6 @@
 import db from "../db.server"
 import { cors } from "remix-utils/cors"
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
 export const loader = async ({ request }) => {
@@ -42,10 +43,13 @@ export const loader = async ({ request }) => {
             shopifyDomain: true,
             scAccessToken: true,
             headlessAccessToken: true,
+            createdAt: true,
+            trialDays: true,
             plan: {
               select: {
                 planName: true,
                 planStatus: true,
+                isTestPlan: true,
               }
             }
           }
@@ -61,6 +65,18 @@ export const loader = async ({ request }) => {
       }));
     }
     if (component?.status === 'activate') {
+      if(component?.shop?.plan?.isTestPlan){
+        const remaingTrialDays = getRemainingTrialDays(component?.shop?.createdAt, component?.shop?.trialDays);
+          if(remaingTrialDays < 1){
+            jsonResponse = new Response(JSON.stringify({
+              data: {},
+              success: false,
+              message: "EmbedUp Plan is not actived",
+              status: 401
+            }));
+            return cors(request, jsonResponse);
+          }
+      }
       jsonResponse = new Response(JSON.stringify({
         data: component,
         success: true,

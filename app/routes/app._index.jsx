@@ -13,6 +13,8 @@ import ProductAvailibilityStatus from "../components/ProductAvailibilityStatus/P
 import TermsAndConditions from "../components/TermsAndConditions/TermsAndConditions";
 import getSymbolFromCurrency from "currency-symbol-map";
 import redis from "../utilis/redis.init";
+import TempPlanBannerShow from "../components/TempPlanBannerShow/TempPlanBannerShow";
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
 export const loader = async ({ request }) => {
@@ -43,10 +45,13 @@ export const loader = async ({ request }) => {
       shopifyDomain: true,
       currencyCode: true,
       publicationId: true,
+      createdAt: true,
+      trialDays: true,
       plan: {
         select: {
           id: true,
-          planName: true
+          planName: true,
+          isTestPlan: true,
         }
       },
       components: {
@@ -75,7 +80,15 @@ export const loader = async ({ request }) => {
     }
   });
 
+  let remaingTrialDays = 0;
 
+     if (shopData?.plan?.isTestPlan) {
+     remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
+
+    if (!shopData?.plan || (shopData?.plan?.isTestPlan && remaingTrialDays < 1)) {
+      throw redirect('/app/plans');
+    }
+  }
 
   if (!shopData?.scAccessToken) {
     const createStorefrontAccessToken = await admin.graphql(
@@ -130,10 +143,13 @@ export const loader = async ({ request }) => {
         shopifyDomain: true,
         currencyCode: true,
         publicationId: true,
+        createdAt: true,
+        trialDays: true,
         plan: {
           select: {
             id: true,
-            planName: true
+            planName: true,
+            isTestPlan: true,
           }
         },
         components: {
@@ -170,77 +186,77 @@ export const loader = async ({ request }) => {
   const planName = url.searchParams.get('planName');
 
 
-  if (isFirstInstall && appSubscriptions?.length > 0) {
-    shopData = await db.shop.update({
-      where: {
-        shopifyDomain: session.shop,
-      },
-      data: {
-        isFirstInstall: isFirstInstall === 'true' ? false : true,
-        maxAllowedComponents: planName === PLAN_NAME.growth ? MAX_ALLOWED_COMPONENTS.growth : MAX_ALLOWED_COMPONENTS.pro,
-        appPlan: appSubscriptions[0].name,
-        trialDays: appSubscriptions[0].trialDays,
-        isAppliedCoupon: true,
-        plan: {
-          upsert: {
-            create: {
-              planId: appSubscriptions[0].id,
-              planName: appSubscriptions[0].name,
-              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
-              planStatus: appSubscriptions[0].status,
-              isTestCharge: appSubscriptions[0].test,
-              planType,
-              chargeId,
-            },
-            update: {
-              planId: appSubscriptions[0].id,
-              planName: appSubscriptions[0].name,
-              price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
-              isTestCharge: appSubscriptions[0].test,
-              planType,
-              chargeId,
-            },
-          },
-        },
-      },
-      select: {
-        id: true,
-        scAccessToken: true,
-        shopifyDomain: true,
-        currencyCode: true,
-        publicationId: true,
-        plan: {
-          select: {
-            id: true,
-            planName: true
-          }
-        },
-        components: {
-          where: {
-            shop: {
-              shopifyDomain: session.shop
-            },
-            softDelete: false,
-          },
-          orderBy: {
-            id: 'desc',
-          },
-          select: {
-            id: true,
-            title: true,
-            addToCartType: true,
-            status: true,
-            appliesTo: true,
-            componentSettings: true,
-            totalOrderCount: true,
-            totalOrderValue: true,
+  // if (isFirstInstall && appSubscriptions?.length > 0) {
+  //   shopData = await db.shop.update({
+  //     where: {
+  //       shopifyDomain: session.shop,
+  //     },
+  //     data: {
+  //       isFirstInstall: isFirstInstall === 'true' ? false : true,
+  //       maxAllowedComponents: planName === PLAN_NAME.growth ? MAX_ALLOWED_COMPONENTS.growth : MAX_ALLOWED_COMPONENTS.pro,
+  //       appPlan: appSubscriptions[0].name,
+  //       trialDays: appSubscriptions[0].trialDays,
+  //       isAppliedCoupon: true,
+  //       plan: {
+  //         upsert: {
+  //           create: {
+  //             planId: appSubscriptions[0].id,
+  //             planName: appSubscriptions[0].name,
+  //             price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+  //             planStatus: appSubscriptions[0].status,
+  //             isTestCharge: appSubscriptions[0].test,
+  //             planType,
+  //             chargeId,
+  //           },
+  //           update: {
+  //             planId: appSubscriptions[0].id,
+  //             planName: appSubscriptions[0].name,
+  //             price: appSubscriptions[0]?.lineItems[0]?.plan?.pricingDetails?.price?.amount || 29,
+  //             isTestCharge: appSubscriptions[0].test,
+  //             planType,
+  //             chargeId,
+  //           },
+  //         },
+  //       },
+  //     },
+  //     select: {
+  //       id: true,
+  //       scAccessToken: true,
+  //       shopifyDomain: true,
+  //       currencyCode: true,
+  //       publicationId: true,
+  //       plan: {
+  //         select: {
+  //           id: true,
+  //           planName: true
+  //         }
+  //       },
+  //       components: {
+  //         where: {
+  //           shop: {
+  //             shopifyDomain: session.shop
+  //           },
+  //           softDelete: false,
+  //         },
+  //         orderBy: {
+  //           id: 'desc',
+  //         },
+  //         select: {
+  //           id: true,
+  //           title: true,
+  //           addToCartType: true,
+  //           status: true,
+  //           appliesTo: true,
+  //           componentSettings: true,
+  //           totalOrderCount: true,
+  //           totalOrderValue: true,
 
-          },
-          take: 5,
-        }
-      }
-    });
-  }
+  //         },
+  //         take: 5,
+  //       }
+  //     }
+  //   });
+  // }
 
 
 
@@ -329,10 +345,13 @@ export const loader = async ({ request }) => {
         shopifyDomain: true,
         currencyCode: true,
         publicationId: true,
+        createdAt: true,
+        trialDays: true,
         plan: {
           select: {
             id: true,
-            planName: true
+            planName: true,
+            isTestPlan: true,
           }
         },
         components: {
@@ -393,9 +412,9 @@ export const loader = async ({ request }) => {
   }
   const components = shopData?.components || [];
 
-  if (!shopData?.plan) {
-    throw redirect('/app/plans');
-  }
+  
+
+ 
 
 
 
@@ -408,14 +427,15 @@ export const loader = async ({ request }) => {
     totalPublishProduct: totalPublishProduct,
     cataglogId: shopData?.appCatalogId ? shopData?.appCatalogId.replace('gid://shopify/AppCatalog/', '') : '',
     success: true,
-    appSubscriptions: appSubscriptions[0]
+    appSubscriptions: appSubscriptions[0],
+    remaingTrialDays,
   };
 };
 
 export default function Index() {
   const shopify = useAppBridge();
-  const { shopData, components, totalPd, totalPublishProduct, cataglogId } = useLoaderData();
-  //console.log('components:', components);
+  const { shopData, components, totalPd, totalPublishProduct, cataglogId ,remaingTrialDays} = useLoaderData();
+  console.log('shopData:', shopData);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -488,7 +508,7 @@ export default function Index() {
   }, [fetcher?.data]);
 
 
- 
+  
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -509,6 +529,12 @@ export default function Index() {
           <s-stack
             paddingBlockEnd="large"
           >
+
+            {shopData?.plan?.isTestPlan &&
+              <TempPlanBannerShow 
+              remaingTrialDays={remaingTrialDays}
+              />
+            }
             {showInstructionBanner &&
               <div
                 style={{ minHeight: '310px' }}

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
 import redis from "../utilis/redis.init";
+import TempPlanBannerShow from "../components/TempPlanBannerShow/TempPlanBannerShow";
 
 
 export const loader = async ({ request }) => {
@@ -216,7 +217,7 @@ export const loader = async ({ request }) => {
     appSubscriptions: appSubscriptions?.length > 0 ? appSubscriptions[0] : {},
     shopInfo: shop?.data?.shop || {},
     paidRedirectInfo: { isFirstInstall, upgrade },
-    trialDaysOffer: shopData?.trialDays ? shopData?.trialDays : parseInt(process.env.TRIAL_DAYS),
+    trialDaysOffer: shopData?.trialDays ? shopData?.trialDays : 0,
     node_env: process.env.NODE_ENV || '',
     couponData,
   }
@@ -422,6 +423,9 @@ const Plans = () => {
           <s-paragraph>Choose the package that best suits your Business Needs</s-paragraph>
           {remainTrialDays > 0 &&
             <s-text>You have {remainTrialDays} Days Free Trial</s-text>
+          }
+          {shopData?.plan?.isTestPlan &&
+            <TempPlanBannerShow remaingTrialDays={remainTrialDays}/>
           }
           {node_env === 'development' &&
             <s-button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</s-button>
@@ -1068,13 +1072,15 @@ export const action = async ({ request }) => {
               planName: data.planName,
               price: 0.0,
               planStatus: PLAN_STATUS.active,
-              planType: PLAN_TYPE.monthly
+              planType: PLAN_TYPE.monthly,
+              isTestPlan: false,
             },
             update: {
               planId: null,
               planName: data.planName,
               price: 0.0,
-              planType: PLAN_TYPE.monthly
+              planType: PLAN_TYPE.monthly,
+              isTestPlan: false,
             },
           },
         },

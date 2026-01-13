@@ -6,6 +6,7 @@ import { AFFILIATE_STATUS, PLAN_NAME } from "../constants/constants";
 import { useEffect, useState } from "react";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
 export const loader = async ({ request }) => {
@@ -30,16 +31,23 @@ export const loader = async ({ request }) => {
       id: true,
       totalOrderCount: true,
       totalOrderValue: true,
+      createdAt: true,
+      trialDays: true,
       plan: {
         select: {
-          planName: true
+          planName: true,
+          isTestPlan: true
         }
       }
     },
   });
 
-  if (!shopData?.plan) {
-    throw redirect('/app/plans')
+  if (shopData?.plan?.isTestPlan) {
+    const remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
+
+    if (!shopData?.plan || (shopData?.plan?.isTestPlan && remaingTrialDays < 1)) {
+      throw redirect('/app/plans');
+    }
   }
 
   let affData = [];

@@ -9,6 +9,7 @@ import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
 import { PLAN_NAME } from "../constants/constants";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 
 
 
@@ -29,10 +30,13 @@ export const loader = async ({ request }) => {
       id: true,
       shopifyDomain: true,
       currencyCode: true,
+      createdAt: true,
+      trialDays: true,
       plan: {
         select: {
           id: true,
-          planName: true
+          planName: true,
+          isTestPlan: true,
         }
       },
       scAccessToken: true,
@@ -134,10 +138,13 @@ export const loader = async ({ request }) => {
         id: true,
         shopifyDomain: true,
         currencyCode: true,
+        createdAt: true,
+        trialDays: true,
         plan: {
           select: {
             id: true,
-            planName: true
+            planName: true,
+            isTestPlan: true,
           }
         },
         scAccessToken: true,
@@ -167,9 +174,15 @@ export const loader = async ({ request }) => {
     });
   }
 
-  if (!shopData?.plan) {
-    throw redirect('/app/plans');
+  if (shopData?.plan?.isTestPlan) {
+    const remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
+
+    if (!shopData?.plan || (shopData?.plan?.isTestPlan && remaingTrialDays < 1)) {
+      throw redirect('/app/plans');
+    }
   }
+
+
 
 
 
@@ -184,7 +197,7 @@ export const loader = async ({ request }) => {
 export default function ComponentList() {
   const shopify = useAppBridge();
   const { shopData } = useLoaderData();
-  
+
   const [components, setComponents] = useState(shopData.components || []);
   const navigate = useNavigate();
   const navigation = useNavigation();

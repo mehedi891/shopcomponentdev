@@ -119,7 +119,7 @@ model Shop {
   billingAddress       String?
   shopifyPlan          String?
   appPlan              String?             @default("Free")
-  trialDays            Int?                @default(5)
+  trialDays            Int?                @default(7)
   planActivatedAt      DateTime?           @default(now())
   shopifyPlus          Boolean?            @default(false)
   myshopifyDomain      String?
@@ -148,6 +148,7 @@ model Plan {
   planType     String?
   chargeId     String?
   isTestCharge Boolean? @default(true)
+  isTestPlan   Boolean? @default(false)
   planStatus   String?  @default("deactived")
   shopId       Int      @unique
   shop         Shop     @relation(fields: [shopId], references: [id])
