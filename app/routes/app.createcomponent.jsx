@@ -91,18 +91,18 @@ export const loader = async ({ request }) => {
         include: {
             plan: true,
             affiliates: true,
-            components:{
-                select:{id:true}
+            components: {
+                select: { id: true }
             }
         }
     });
 
-     if (shop?.plan?.isTestPlan) {
-    const remaingTrialDays = getRemainingTrialDays(shop?.createdAt, shop?.trialDays);
-    if (!shop?.plan || (shop?.plan?.isTestPlan && remaingTrialDays < 1)) {
-      throw redirect('/app/plans');
+    if (shop?.plan?.isTestPlan) {
+        const remaingTrialDays = getRemainingTrialDays(shop?.createdAt, shop?.trialDays);
+        if (!shop?.plan || (shop?.plan?.isTestPlan && remaingTrialDays < 1)) {
+            throw redirect('/app/plans');
+        }
     }
-  }
 
 
 
@@ -322,6 +322,8 @@ const CreateComponent = () => {
 
 
     const { register, setError, getValues, handleSubmit, reset, formState: { errors, isDirty }, control, watch, setValue } = useForm({
+        mode: "onChange",        // validate on change
+        reValidateMode: "onChange",
         defaultValues: {
             title: '',
             description: '',
@@ -2157,6 +2159,8 @@ const CreateComponent = () => {
     }, [embedPHtmlCode]);
 
 
+    //console.log('PD TITLE: ', watchedValues.productLayoutSettings.productTitleColor);
+
     return (
         navigation.state === "loading" ? <LoadingSkeleton /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
@@ -3565,6 +3569,42 @@ const CreateComponent = () => {
                                                                             setProductLayoutSettings({ ...productLayoutSettings, productTitleColor: value });
                                                                         }}
                                                                     />
+
+                                                                    {/* <Controller
+                                                                        name="productLayoutSettings.productTitleColor"
+                                                                        control={control}
+                                                                        defaultValue={productLayoutSettings.productTitleColor || "#303030"}
+                                                                        rules={{
+                                                                            validate: (v) => {
+                                                                                // allow empty if you want (or return "Color is required")
+                                                                                console.log('validating:', v, typeof v);
+                                                                                if (!v || v.trim() === "" ) { 
+                                                                                   setValue("productLayoutSettings.productTitleColor", "#303030", { shouldValidate: true });
+                                                                                    return "Valid color code is required. Ex: #303030";
+                                                                                }
+                                                                                return true;
+                                                                            },
+                                                                        }}
+                                                                        render={({ field, fieldState }) => (
+                                                                            <s-color-field
+                                                                                label="Product title font color"
+                                                                                name={field.name}
+                                                                                value={field.value || ""}
+                                                                                error={fieldState.error?.message}
+                                                                                placeholder="Pick a color or enter a hex value"
+                                                                                details="Choose color in hex format e.g. #303030"
+                                                                                required
+                                                                                onChange={(e) => {
+                                                                                    const val = e?.detail?.value ?? e.currentTarget.value;
+                                                                                    // update RHF
+                                                                                    field.onChange(val);
+                                                                                }}
+                                                                                onBlur={field.onBlur}
+                                                                            />
+                                                                        )}
+                                                                    /> */}
+
+
                                                                 </Box>
 
                                                                 <Box>

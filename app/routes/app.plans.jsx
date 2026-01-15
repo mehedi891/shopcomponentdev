@@ -65,6 +65,7 @@ export const loader = async ({ request }) => {
       coupon: true,
       trialDays: true,
       isAppliedCoupon: true,
+      createdAt: true,
       affiliates: {
         where: {
           shop: {
@@ -209,7 +210,7 @@ export const loader = async ({ request }) => {
     } catch (error) { }
   }
 
-
+  const remainTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
 
 
   return {
@@ -217,14 +218,14 @@ export const loader = async ({ request }) => {
     appSubscriptions: appSubscriptions?.length > 0 ? appSubscriptions[0] : {},
     shopInfo: shop?.data?.shop || {},
     paidRedirectInfo: { isFirstInstall, upgrade },
-    trialDaysOffer: shopData?.trialDays ? shopData?.trialDays : 0,
+    remainTrialDays: remainTrialDays,
     node_env: process.env.NODE_ENV || '',
     couponData,
   }
 }
 
 const Plans = () => {
-  const { shopData, shopInfo, appSubscriptions, trialDaysOffer, couponData, node_env } = useLoaderData();
+  const { shopData, shopInfo, appSubscriptions, couponData, node_env,remainTrialDays } = useLoaderData();
   const fetcher = useFetcher();
   //console.log('shopData:', shopData);
   const navigation = useNavigation();
@@ -259,16 +260,14 @@ const Plans = () => {
       discountDuration: PLAN_PRICE.pro_yearly.discountDuration,
     }
   });
-  const [remainTrialDays, setRemainTrialDays] = useState(0);
+
   const [isLoading, setIsLoading] = useState(null);
   const [isMonthlyPlanShow, setIsMonthlyPlanShow] = useState(true);
   const [showCouponApplySection, setShowCouponApplySection] = useState(false);
   const [couponCodeInpValue, setCouponCodeInpValue] = useState('');
 
 
-  useEffect(() => {
-    setRemainTrialDays(getRemainingTrialDays(shopData?.planActivatedAt, trialDaysOffer))
-  }, [shopData, trialDaysOffer]);
+
 
 
   useEffect(() => {

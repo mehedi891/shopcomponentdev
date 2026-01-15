@@ -44,9 +44,10 @@ export const loader = async ({ request }) => {
       scAccessToken: true,
       shopifyDomain: true,
       currencyCode: true,
-      publicationId: true,
       createdAt: true,
       trialDays: true,
+      appCatalogId: true,
+      publicationId: true,
       plan: {
         select: {
           id: true,
@@ -179,11 +180,11 @@ export const loader = async ({ request }) => {
     });
   }
 
-  const url = new URL(request.url);
-  const isFirstInstall = url.searchParams.get('isFirstInstall');
-  const planType = url.searchParams.get('planType');
-  const chargeId = url.searchParams.get('charge_id');
-  const planName = url.searchParams.get('planName');
+  // const url = new URL(request.url);
+  // const isFirstInstall = url.searchParams.get('isFirstInstall');
+  // const planType = url.searchParams.get('planType');
+  // const chargeId = url.searchParams.get('charge_id');
+  // const planName = url.searchParams.get('planName');
 
 
   // if (isFirstInstall && appSubscriptions?.length > 0) {
@@ -389,7 +390,6 @@ export const loader = async ({ request }) => {
   if (isExistTotalPublishProduct) {
     totalPublishProduct = JSON.parse(isExistTotalPublishProduct);
   } else {
-
     const totalPublishSpc = await admin.graphql(
       `#graphql
   query PublishedProductCount($publicationId: ID!) {
@@ -412,12 +412,6 @@ export const loader = async ({ request }) => {
   }
   const components = shopData?.components || [];
 
-  
-
- 
-
-
-
 
   return {
     shopData: shopData,
@@ -435,7 +429,7 @@ export const loader = async ({ request }) => {
 export default function Index() {
   const shopify = useAppBridge();
   const { shopData, components, totalPd, totalPublishProduct, cataglogId ,remaingTrialDays} = useLoaderData();
-  console.log('shopData:', shopData);
+  //console.log('cataglogId:', {totalPd, totalPublishProduct, cataglogId ,remaingTrialDays});
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { t } = useTranslation();
