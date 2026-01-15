@@ -65,6 +65,11 @@ export const loader = async ({ request }) => {
     }
   });
 
+
+   if(!shopData?.plan){
+    throw redirect('/app/plans');
+  }
+
   //  const components = await db.component.findMany({
   //   where: {
   //     shopId: shopData.id,

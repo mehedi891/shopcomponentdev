@@ -81,6 +81,10 @@ export const loader = async ({ request }) => {
     }
   });
 
+  if(!shopData?.plan){
+    throw redirect('/app/plans');
+  }
+
   let remaingTrialDays = 0;
 
      if (shopData?.plan?.isTestPlan) {

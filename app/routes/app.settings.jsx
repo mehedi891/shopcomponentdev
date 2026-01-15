@@ -24,15 +24,17 @@ export const loader = async ({ request }) => {
         }
     });
 
-
-
-     if (shop?.plan?.isTestPlan) {
-    const remaingTrialDays = getRemainingTrialDays(shop?.createdAt, shop?.trialDays);
-
-    if (!shop?.plan || (shop?.plan?.isTestPlan && remaingTrialDays < 1)) {
-      throw redirect('/app/plans');
+    if (!shop?.plan) {
+        throw redirect('/app/plans');
     }
-  }
+
+    if (shop?.plan?.isTestPlan) {
+        const remaingTrialDays = getRemainingTrialDays(shop?.createdAt, shop?.trialDays);
+
+        if (!shop?.plan || (shop?.plan?.isTestPlan && remaingTrialDays < 1)) {
+            throw redirect('/app/plans');
+        }
+    }
 
 
 
