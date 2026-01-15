@@ -423,11 +423,11 @@ const Plans = () => {
           {remainTrialDays > 0 &&
             <s-text>You have {remainTrialDays} Days Free Trial</s-text>
           }
-          {shopData?.plan?.isTestPlan &&
+          {shopData?.plan?.isTestPlan && remainTrialDays < 1 &&
             <TempPlanBannerShow
               //remaingTrialDays={remainTrialDays}
               title="Your free trial has ended"
-              description="Thanks for trying EmbedUp!To keep your embedded products, bundles, and checkout live, please choose a plan below."
+              description="Thanks for trying EmbedUp! To keep your embedded products, bundles, and checkout live, please choose a plan below."
               subtitle="Your settings and embeds are saved."
               isBtnShow={false}
             />
