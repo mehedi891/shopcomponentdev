@@ -116,7 +116,7 @@ export const loader = async ({ request, params }) => {
 }
 const UpdateComponent = () => {
   const { component, shopData, appUrl, marketRegions } = useLoaderData();
-  console.log('component:', component);
+  //console.log('component:', component);
   const actionData = useActionData();
   const navigate = useNavigate();
   const location = useLocation();
