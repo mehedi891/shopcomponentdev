@@ -88,6 +88,10 @@ export const loader = async ({ request }) => {
     }
   });
 
+   if(!shopData?.plan){
+    throw redirect('/app/plans');
+  }
+
    if (shopData?.plan?.isTestPlan) {
     const remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
 
