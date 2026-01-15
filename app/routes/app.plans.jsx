@@ -394,7 +394,8 @@ const Plans = () => {
       "Affiliate: Create and manage your affiliates",
       "Affiliate Performance",
       "Assign components to affiliate",
-      "Analytics: UTM tracking, campaign performance, visitor to conversion."
+      "Analytics: UTM tracking, campaign performance, visitor to conversion.",
+      "Shopify Markets Pricing"
     ]
   }
 
