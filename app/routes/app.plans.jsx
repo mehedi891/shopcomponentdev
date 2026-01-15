@@ -225,7 +225,7 @@ export const loader = async ({ request }) => {
 }
 
 const Plans = () => {
-  const { shopData, shopInfo, appSubscriptions, couponData, node_env,remainTrialDays } = useLoaderData();
+  const { shopData, shopInfo, appSubscriptions, couponData, node_env, remainTrialDays } = useLoaderData();
   const fetcher = useFetcher();
   //console.log('shopData:', shopData);
   const navigation = useNavigation();
@@ -424,7 +424,13 @@ const Plans = () => {
             <s-text>You have {remainTrialDays} Days Free Trial</s-text>
           }
           {shopData?.plan?.isTestPlan &&
-            <TempPlanBannerShow remaingTrialDays={remainTrialDays}/>
+            <TempPlanBannerShow
+              //remaingTrialDays={remainTrialDays}
+              title="Your free trial has ended"
+              description="Thanks for trying EmbedUp!To keep your embedded products, bundles, and checkout live, please choose a plan below."
+              subtitle="Your settings and embeds are saved."
+              isBtnShow={false}
+            />
           }
           {node_env === 'development' &&
             <s-button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</s-button>

@@ -530,7 +530,11 @@ export default function Index() {
 
             {shopData?.plan?.isTestPlan &&
               <TempPlanBannerShow 
-              remaingTrialDays={remaingTrialDays}
+              btnText="Choose a plan anytime"
+              title="Full access unlocked — free for 7 days"
+              subtitle={`Trial ends in ${remaingTrialDays} days`}
+              description="All premium EmbedUp features are unlocked. Explore embedded products, bundles, and affiliate buy buttons — no payment needed during the trial."
+              //remaingTrialDays={remaingTrialDays}
               />
             }
             {showInstructionBanner &&
