@@ -8,10 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isDev = process.env.NODE_ENV !== "production";
-const envObj = {
-  VITE_SHOPIFY_APP_URL: process.env.SHOPIFY_APP_URL || "",
-  VITE_DATA_API : process.env.DATA_API || "",
-};
+// const envObj = {
+//   VITE_SHOPIFY_APP_URL: process.env.SHOPIFY_APP_URL || "",
+//   VITE_DATA_API : process.env.DATA_API || "",
+// };
 
 const config = {
   entryPoints: ["app/spc-front-react/entryPoints/index.jsx"],
@@ -22,9 +22,14 @@ const config = {
   minify: isDev ? false : true,
   sourcemap: false,
     define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
-    "import.meta.env": JSON.stringify(envObj),
-  },
+  "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
+
+  "import.meta.env.VITE_SHOPIFY_APP_URL": JSON.stringify(process.env.SHOPIFY_APP_URL || ""),
+  "import.meta.env.VITE_DATA_API": JSON.stringify(process.env.DATA_API || ""),
+
+  // optional: prevent "process is not defined" if any dependency checks process.env
+  "process.env": "{}",
+},
   loader: {
     ".js": "jsx",
     // ".svg": "asset",
