@@ -1,0 +1,305 @@
+<main class="affiliate-main" aria-labelledby="affiliate-hero-title">
+  <!-- ====== Inline CSS (scoped to .affiliate-main) ====== -->
+  <style>
+    :root{
+      --bg:#0b0f1a;
+      --card:#111729;
+      --muted:#98a2b3;
+      --text:#e6eaf2;
+      --brand:#6dd3ff;
+      --brand-2:#7b61ff;
+      --accent:#26ffd5;
+      --ring: 0 0 0 4px color-mix(in oklab, var(--brand) 30%, transparent);
+      --radius:18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --shadow-soft: 0 8px 18px rgba(0,0,0,.20);
+      --grid-gap: 1rem;
+      --maxw: 1100px;
+    }
+    .affiliate-main{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji"; color:var(--text); background: radial-gradient(1200px 800px at 10% -10%, #12203a, transparent), radial-gradient(1000px 700px at 110% 10%, #1a133b, transparent), var(--bg); padding: clamp(24px, 3vw, 40px);}
+    .shell{max-width: var(--maxw); margin: 0 auto;}
+
+    /* Hero */
+    .hero{display:grid; gap: 1.2rem; padding: clamp(28px, 4vw, 56px); border:1px solid rgba(255,255,255,.06); background:
+      radial-gradient(600px 300px at 0% 0%, rgba(123,97,255,.15), transparent),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+      border-radius: calc(var(--radius) + 8px);
+      box-shadow: var(--shadow);
+      position: relative; overflow: hidden;}
+    .hero::after{content:""; position:absolute; inset:-2px; background:
+      conic-gradient(from 180deg, rgba(109,211,255,.18), rgba(123,97,255,.18), rgba(38,255,213,.18), rgba(109,211,255,.18));
+      filter: blur(60px); opacity:.35; z-index:0;}
+    .hero > *{position:relative; z-index:1;}
+    .eyebrow{display:inline-flex; align-items:center; gap:.5rem; font-weight:600; color:#c9d3e1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); padding:.35rem .6rem; border-radius:999px; width:max-content}
+    .eyebrow b{color:var(--accent);}
+    .hero h1{font-size: clamp(28px, 5.2vw, 48px); line-height:1.08; margin: .2rem 0;}
+    .hero p{color:#c7cfe0; font-size: clamp(15px, 2.2vw, 18px); max-width: 60ch}
+    .cta-row{display:flex; flex-wrap:wrap; gap:.8rem; margin-top:.6rem}
+    .btn{--bg:linear-gradient(135deg, var(--brand), var(--brand-2)); display:inline-flex; align-items:center; justify-content:center; gap:.6rem; padding:.9rem 1.1rem; border-radius:12px; font-weight:700; text-decoration:none; color:#0d1220; border:0; background:var(--bg); box-shadow: var(--shadow-soft)}
+    .btn.secondary{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.14)}
+    .meta{display:flex; gap:1rem; flex-wrap:wrap; margin-top:.6rem; color:var(--muted); font-size:.95rem}
+    .meta span{display:flex; align-items:center; gap:.45rem; padding:.4rem .65rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:999px}
+    .meta strong{color:#fff}
+
+    /* Section */
+    section{margin-top: clamp(28px, 6vw, 64px);}
+    .section-head{display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; margin-bottom:1rem}
+    .section-head h2{font-size: clamp(22px, 3.8vw, 34px); margin:0;}
+    .section-head p{color:var(--muted); max-width:60ch}
+
+    /* Cards grid */
+    .grid{display:grid; gap: var(--grid-gap);}
+    .grid.cols-3{grid-template-columns: repeat(3, minmax(0, 1fr));}
+    .grid.cols-4{grid-template-columns: repeat(4, minmax(0, 1fr));}
+    @media (max-width: 960px){ .grid.cols-3, .grid.cols-4 {grid-template-columns: 1fr 1fr;} }
+    @media (max-width: 620px){ .grid.cols-3, .grid.cols-4 {grid-template-columns: 1fr;} }
+
+    .card{background: var(--card); border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-soft); display:flex; gap:.8rem; flex-direction:column; min-height: 100%}
+    .card .icon{width: 44px; height:44px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(109,211,255,.25), rgba(123,97,255,.25)); border:1px solid rgba(255,255,255,.12)}
+    .card h3{font-size: 1.05rem; margin:.2rem 0;}
+    .card p{color:#c7cfe0; font-size:.97rem}
+    .card.em{background:
+      radial-gradient(600px 200px at 0% 0%, rgba(123,97,255,.15), transparent),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+      border:1px solid rgba(123,97,255,.25)}
+
+    /* Steps */
+    .steps{counter-reset: step;}
+    .step{display:grid; grid-template-columns: 56px 1fr; gap:1rem; align-items:start; padding:16px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06)}
+    .bullet{width:56px; height:56px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(38,255,213,.22), rgba(109,211,255,.22)); border:1px solid rgba(255,255,255,.16); font-weight:800; color:#0b0f1a}
+    .step h4{margin:.2rem 0; font-size:1.05rem}
+    .step p{margin:0; color:#c7cfe0}
+
+    /* Commission Table */
+    .table{overflow:auto; border-radius:14px; border:1px solid rgba(255,255,255,.08)}
+    table{width:100%; border-collapse:collapse; min-width:640px; background:var(--card)}
+    th, td{padding:14px 16px; text-align:left; border-bottom:1px solid rgba(255,255,255,.06)}
+    th{font-size:.9rem; color:#dfe6f5; background:rgba(255,255,255,.03)}
+    td{color:#c7cfe0}
+    .badge{padding:.35rem .6rem; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.04); font-size:.85rem; color:#eaf6ff}
+
+    /* Testimonials */
+    .tcard{display:grid; gap:.6rem; padding:16px; background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border:1px solid rgba(255,255,255,.08); border-radius:16px}
+    .who{display:flex; align-items:center; gap:.75rem}
+    .avatar{width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg, var(--brand), var(--brand-2)); border:1px solid rgba(255,255,255,.25)}
+    .role{color:var(--muted); font-size:.9rem}
+
+    /* FAQ (native <details>) */
+    details{background: var(--card); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px 16px}
+    details + details{margin-top:.6rem}
+    summary{cursor:pointer; font-weight:700; list-style:none}
+    summary::-webkit-details-marker{display:none}
+    details[open]{box-shadow: var(--shadow-soft)}
+    details p{color:#c7cfe0; margin:.6rem 0 0}
+
+    /* CTA block */
+    .cta{display:grid; gap:1rem; padding:20px; border-radius:18px; border:1px solid rgba(255,255,255,.08); background:
+      radial-gradient(800px 300px at 100% 10%, rgba(38,255,213,.18), transparent),
+      radial-gradient(600px 300px at 0% 100%, rgba(109,211,255,.18), transparent),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00))}
+    .cta h3{font-size: clamp(18px, 3vw, 26px); margin:0}
+    .cta small{color:var(--muted)}
+    .cta .btn{padding:1rem 1.2rem}
+    .cta .btn:focus{outline:none; box-shadow: var(--ring)}
+
+    /* Utility */
+    .kpi{display:flex; gap:1rem; flex-wrap:wrap}
+    .kpi .chip{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); padding:.5rem .7rem; border-radius:10px; font-weight:700}
+    a[href]{color:#beddff}
+  </style>
+
+  <!-- ====== HERO ====== -->
+  <section class="shell hero" aria-describedby="hero-desc">
+    <span class="eyebrow" id="affiliate-hero-title">efoli Affiliate Program <b>— Start Earning Today</b></span>
+    <h1>Earn recurring revenue by recommending efoli</h1>
+    <p id="hero-desc">Share your unique link, help creators discover efoli, and collect commissions every month—while they stay subscribed.</p>
+    <div class="cta-row">
+      <a href="#apply" class="btn" aria-label="Apply to efoli affiliate program">Become an affiliate</a>
+      <a href="#faq" class="btn secondary">Program details</a>
+    </div>
+    <div class="meta" aria-label="Program highlights">
+      <span><strong>50%</strong> first month</span>
+      <span><strong>30%</strong> recurring</span>
+      <span>Cookie window <strong>60 days</strong></span>
+      <span>Payouts via <strong>monthly cycle</strong></span>
+    </div>
+  </section>
+
+  <!-- ====== WHY JOIN ====== -->
+  <section class="shell" id="why">
+    <div class="section-head">
+      <h2>Why join efoli’s affiliate community</h2>
+      <p>Modern tools, fast support, and a commission structure built for consistency—not one-off spikes.</p>
+    </div>
+    <div class="grid cols-3">
+      <article class="card em">
+        <div class="icon" aria-hidden="true">💸</div>
+        <h3>Recurring commissions</h3>
+        <p>Get 50% on the first month and 30% every month after while your referral stays active.</p>
+      </article>
+      <article class="card">
+        <div class="icon" aria-hidden="true">⚡</div>
+        <h3>High-converting product</h3>
+        <p>efoli’s smooth onboarding and polished UX make referrals more likely to convert and stick.</p>
+      </article>
+      <article class="card">
+        <div class="icon" aria-hidden="true">🛟</div>
+        <h3>Dedicated help</h3>
+        <p>Need copy, creatives, or tracking tips? Our team responds quickly with assets that fit your channel.</p>
+      </article>
+    </div>
+    <div class="kpi" style="margin-top: .8rem">
+      <span class="chip">Global audience</span>
+      <span class="chip">Mobile-first</span>
+      <span class="chip">UTM tracking</span>
+      <span class="chip">Fraud protection</span>
+    </div>
+  </section>
+
+  <!-- ====== HOW IT WORKS ====== -->
+  <section class="shell" id="how">
+    <div class="section-head">
+      <h2>How it works</h2>
+      <p>Three simple steps to start earning.</p>
+    </div>
+    <div class="grid">
+      <div class="step">
+        <div class="bullet">1</div>
+        <div>
+          <h4 id="apply">Apply</h4>
+          <p>Tell us about your audience and channels. You’ll receive your unique affiliate link once approved.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="bullet">2</div>
+        <div>
+          <h4>Share</h4>
+          <p>Promote efoli in videos, newsletters, social posts, tutorials, or resource pages—whatever fits your style.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="bullet">3</div>
+        <div>
+          <h4>Earn</h4>
+          <p>Track clicks, trials, and subscriptions. Get paid monthly for every active referral.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== COMMISSIONS ====== -->
+  <section class="shell" id="commissions">
+    <div class="section-head">
+      <h2>Commissions & tiers</h2>
+      <p>Transparent rates with room to grow as you scale your impact.</p>
+    </div>
+    <div class="table" role="region" aria-label="Commission tiers table">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Tier</th>
+            <th scope="col">Monthly Active Referrals</th>
+            <th scope="col">First Month</th>
+            <th scope="col">Recurring (from Month 2)</th>
+            <th scope="col">Perks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge">Starter</span></td>
+            <td>1–9</td>
+            <td>50%</td>
+            <td>30%</td>
+            <td>Standard assets & tracking</td>
+          </tr>
+          <tr>
+            <td><span class="badge">Growth</span></td>
+            <td>10–49</td>
+            <td>50%</td>
+            <td>30%</td>
+            <td>Priority support, quarterly co-promos</td>
+          </tr>
+          <tr>
+            <td><span class="badge">Partner+</span></td>
+            <td>50+</td>
+            <td>50%</td>
+            <td>30%+</td>
+            <td>Custom rates, dedicated manager, early feature access</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--muted); margin-top:.6rem">Have a large audience (e.g., 10k+ subs or email contacts)? <a href="#apply">Contact us</a> for an exclusive arrangement.</p>
+  </section>
+
+  <!-- ====== TESTIMONIALS ====== -->
+  <section class="shell" id="testimonials">
+    <div class="section-head">
+      <h2>What creators say</h2>
+      <p>Real feedback from partners using efoli in their content.</p>
+    </div>
+    <div class="grid cols-3">
+      <figure class="tcard">
+        <div class="who">
+          <div class="avatar" aria-hidden="true"></div>
+          <figcaption>
+            <strong>Sana R.</strong><div class="role">YouTube • Design Tutorials</div>
+          </figcaption>
+        </div>
+        <blockquote>“efoli’s onboarding converts better than any tool I’ve promoted. The recurring payouts add up fast.”</blockquote>
+      </figure>
+      <figure class="tcard">
+        <div class="who">
+          <div class="avatar" aria-hidden="true"></div>
+          <figcaption>
+            <strong>Akash M.</strong><div class="role">Newsletter • Tech & SaaS</div>
+          </figcaption>
+        </div>
+        <blockquote>“Clean tracking and quick support. They even provided custom creatives for a launch week.”</blockquote>
+      </figure>
+      <figure class="tcard">
+        <div class="who">
+          <div class="avatar" aria-hidden="true"></div>
+          <figcaption>
+            <strong>Lina T.</strong><div class="role">Twitter/X • No-Code</div>
+          </figcaption>
+        </div>
+        <blockquote>“The product’s actually useful—my audience sticks with it, which keeps revenue steady.”</blockquote>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ====== FAQ ====== -->
+  <section class="shell" id="faq">
+    <div class="section-head">
+      <h2>Frequently asked questions</h2>
+      <p>Quick answers—no hunting.</p>
+    </div>
+    <details>
+      <summary>How are referrals tracked?</summary>
+      <p>Each affiliate gets a unique link. Cookies and account-level attribution ensure sign-ups are credited to you within the window.</p>
+    </details>
+    <details>
+      <summary>When do I get paid?</summary>
+      <p>Payouts are processed monthly for all eligible, active subscriptions from your referrals.</p>
+    </details>
+    <details>
+      <summary>Is there any cost to join?</summary>
+      <p>No. Joining the efoli affiliate program is free.</p>
+    </details>
+    <details>
+      <summary>Can I request custom creatives?</summary>
+      <p>Yes—send your channel specs and we’ll provide banners, screenshots, and suggested copy.</p>
+    </details>
+  </section>
+
+  <!-- ====== CTA ====== -->
+  <section class="shell cta" aria-labelledby="cta-title">
+    <h3 id="cta-title">Ready to grow with efoli?</h3>
+    <small>Apply in minutes. Get your link. Start earning.</small>
+    <div class="cta-row">
+      <a href="#apply" class="btn">Become an affiliate</a>
+      <a href="#why" class="btn secondary">Explore benefits</a>
+    </div>
+  </section>
+</main>

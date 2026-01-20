@@ -1,0 +1,174 @@
+[
+  {
+    "option": "revenue-and-sub-discount",
+    "value": {
+      "revenueType": "percentage",
+      "revenueValue": 15,
+      "revenueDurationType": "lifetime",
+      "revenueDurationValue": 0,
+      "subDurationType": "recurring",
+      "subDiscount": 25,
+      "subDiscountDuration": 5
+    }
+  },
+  {
+    "option": "revenue-share",
+    "value": {
+      "revenueType": "percentage",
+      "revenueValue": 100,
+      "revenueDurationType": "recurring",
+      "revenueDurationValue": 79879
+    }
+  },
+  {
+    "option": "revenue-and-sub-discount",
+    "value": {
+      "revenueType": "percentage",
+      "revenueValue": 20,
+      "revenueDurationType": "lifetime",
+      "revenueDurationValue": 0,
+      "subDurationType": "lifetime",
+      "subDiscount": 25,
+      "subDiscountDuration": 0
+    }
+  },
+  {
+    "option": "discount-on-app-sub",
+    "value": {
+      "subDurationType": "recurring",
+      "subDiscount": 50,
+      "subDiscountDuration": 3
+    }
+  },
+  {
+    "option": "trial",
+    "value": {
+      "trialType": "trialOnly",
+      "trialDays": 99,
+      "revenueType": "percentage",
+      "revenueValue": 0,
+      "revenueDurationType": "recurring",
+      "revenueDurationValue": 0
+    }
+  },
+  {
+    "option": "trial",
+    "value": {
+      "trialType": "trialOnly",
+      "trialDays": 44,
+      "revenueType": "percentage",
+      "revenueValue": 0,
+      "revenueDurationType": "recurring",
+      "revenueDurationValue": 0
+    }
+  },
+  {
+    "option": "discount-on-app-sub",
+    "value": {
+      "subDurationType": "recurring",
+      "subDiscount": 10,
+      "subDiscountDuration": 12
+    }
+  },
+  {
+    "option": "discount-on-app-sub",
+    "value": {
+      "subDurationType": "lifetime",
+      "subDiscount": 20,
+      "subDiscountDuration": 0
+    }
+  },
+  {
+    "option": "discount-on-app-sub",
+    "value": {
+      "subDurationType": "recurring",
+      "subDiscount": 10,
+      "subDiscountDuration": 12
+    }
+  },
+  {
+    "option": "discount-on-app-sub",
+    "value": {
+      "subDurationType": "lifetime",
+      "subDiscount": 10,
+      "subDiscountDuration": 0
+    }
+  },
+  {
+    "option": "revenue-and-sub-discount",
+    "value": {
+      "revenueType": "percentage",
+      "revenueValue": 10,
+      "revenueDurationType": "lifetime",
+      "revenueDurationValue": 0,
+      "subDurationType": "recurring",
+      "subDiscount": 10,
+      "subDiscountDuration": 12
+    }
+  },
+  {
+    "option": "revenue-and-sub-discount",
+    "value": {
+      "revenueType": "percentage",
+      "revenueValue": 5,
+      "revenueDurationType": "lifetime",
+      "revenueDurationValue": 0,
+      "subDurationType": "lifetime",
+      "subDiscount": 10,
+      "subDiscountDuration": 0
+    }
+  },
+  {
+    "option": "trial",
+    "value": {
+      "trialType": "trialOnly",
+      "trialDays": 3,
+      "revenueType": "percentage",
+      "revenueValue": 0,
+      "revenueDurationType": "recurring",
+      "revenueDurationValue": 0
+    }
+  },
+  {
+    "option": "trial",
+    "value": {
+      "trialType": "trialOnly",
+      "trialDays": 2,
+      "revenueType": "percentage",
+      "revenueValue": 0,
+      "revenueDurationType": "recurring",
+      "revenueDurationValue": 0
+    }
+  },
+  {
+    "option": "discount-on-app-sub",
+    "value": {
+      "subDurationType": "recurring",
+      "subDiscount": 50,
+      "subDiscountDuration": 12
+    }
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+{
+    "offer": {
+        "option": "discount-on-app-sub",
+        "value": {
+            "subDurationType": "recurring",
+            "subDiscount": 30,
+            "subDiscountDuration": 3
+        }
+    }
+}
+
+]

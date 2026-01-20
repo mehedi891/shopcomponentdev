@@ -1,0 +1,244 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum APPLIES_TO {
+  product
+  collection
+}
+
+enum LAYOUT {
+  grid
+  list
+  gridSlider
+}
+
+enum STATUS {
+  actived
+  deactived
+}
+
+enum PLAN_TYPE {
+  monthly
+  yearly
+}
+
+enum PLAN_NAME {
+  Free
+  Growth
+}
+
+enum PLAN_STATUS {
+  ACTIVE
+  CANCELLED
+  DECLINED
+  EXPIRED
+  FROZEN
+  PENDING
+}
+
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model Component {
+  id                    Int        @id @default(autoincrement())
+  title                 String
+  description           String?
+  appliesTo             String     @default("product")
+  addToCartType         Json
+  enableQtyField        Boolean    @default(false)
+  layout                String     @default("grid")
+  status                String     @default("deactived")
+  componentSettings     Json?
+  shoppingCartSettings  Json?
+  productLayoutSettings Json?
+  buttonStyleSettings   Json?
+  tracking              String?    @unique
+  utmSource             String?
+  utmMedium             String?
+  utmCampaign           String?
+  customerTracking      String?
+  market                String?    @default("US")
+  compHtml              String?    @default("empty")
+  shopId                Int
+  softDelete            Boolean    @default(false)
+  shop                  Shop       @relation(fields: [shopId], references: [id])
+  orders                Order[]
+  // ordersByMonth         OrdersByMonth[]
+  totalOrderCount       Int?       @default(0)
+  totalOrderValue       Float?     @default(0.00)
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  affiliateId           Int?
+  affiliate             Affiliate? @relation(fields: [affiliateId], references: [id])
+}
+
+model Shop {
+  id                   Int                 @id @default(autoincrement())
+  shopifyShopGid       String?             @unique
+  shopifyDomain        String?             @unique
+  scAccessToken        String?
+  headlessAccessToken  String?
+  installationCount    Int?
+  maxAllowedComponents Int?                @default(1)
+  name                 String?
+  url                  String?
+  isFirstInstall       Boolean?            @default(true)
+  partnerDevelopment   Boolean?            @default(true)
+  shopOwnerName        String?
+  email                String?
+  shopOwnerPhone       String?
+  currencyCode         String?
+  weightUnit           String?
+  billingAddress       String?
+  shopifyPlan          String?
+  appPlan              String?             @default("Free")
+  trialDays            Int?                @default(7)
+  planActivatedAt      DateTime?           @default(now())
+  shopifyPlus          Boolean?            @default(false)
+  myshopifyDomain      String?
+  appDisabled          Boolean?            @default(false)
+  appCatalogId         String?
+  publicationId        String?
+  isInstalled          Boolean?            @default(false)
+  coupon               String?
+  isAppliedCoupon      Boolean?            @default(true)
+  plan                 Plan?
+  components           Component[]
+  affiliates           Affiliate[]
+  shopOrdersByMonth    ShopOrdersByMonth[]
+  orders               Order[]
+  totalOrderCount      Int?                @default(0)
+  totalOrderValue      Float?              @default(0.00)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+}
+
+model Plan {
+  id           Int      @id @default(autoincrement())
+  planId       String?  @unique
+  planName     String?
+  price        Float?   @default(0.00)
+  planType     String?
+  chargeId     String?
+  isTestCharge Boolean? @default(true)
+  isTestPlan   Boolean? @default(false)
+  planStatus   String?  @default("deactived")
+  shopId       Int      @unique
+  shop         Shop     @relation(fields: [shopId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Order {
+  id                 Int        @id @default(autoincrement())
+  orderId            String     @unique
+  orderObj           String?    @db.Text
+  totalValue         Float?     @default(0)
+  subTotalValue      Float?     @default(0)
+  refundValue        Float?     @default(0)
+  fulFilledValue     Float?     @default(0)
+  commissionalValue  Float?     @default(0)
+  commission         Float?     @default(0)
+  isCancelled        Boolean?   @default(false)
+  isDeleted          Boolean?   @default(false)
+  currency           String?
+  shopifyOrderNumber Int?
+  shopId             Int
+  shop               Shop       @relation(fields: [shopId], references: [id])
+  componentId        Int?
+  component          Component? @relation(fields: [componentId], references: [id])
+  affiliateId        Int?
+  affiliate          Affiliate? @relation(fields: [affiliateId], references: [id])
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+model ShopOrdersByMonth {
+  id          Int      @id @default(autoincrement())
+  monthYear   String
+  totalOrders Int      @default(0)
+  totalValue  Float    @default(0.00)
+  shopId      Int
+  shop        Shop     @relation(fields: [shopId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([monthYear, shopId])
+}
+
+model Affiliate {
+  id                    Int                    @id @default(autoincrement())
+  affTrackingCode       String?                @unique @default("SPC_affiliate_tracking")
+  name                  String?                @default("SPC_affiliate")
+  email                 String?
+  website               String?
+  phone                 String?
+  address               String?
+  notes                 String?
+  commissionCiteria     String?
+  payoutMethods         Json?
+  fixedCommission       Json?
+  tieredCommission      Json?
+  tieredCommissionType  String?
+  status                String?
+  isDefault             Boolean?               @default(false)
+  shopId                Int
+  components            Component[]
+  orders                Order[]
+  shop                  Shop                   @relation(fields: [shopId], references: [id])
+  totalOrderCount       Int?                   @default(0)
+  totalOrderValue       Float?                 @default(0.00)
+  totalSubTotalValue    Float?                 @default(0.00)
+  totalCommission       Float?                 @default(0.00)
+  totalCommissionPaid   Float?                 @default(0.00)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  affiliateTransactions AffiliateTransaction[]
+}
+
+model AffiliateTransaction {
+  id                 Int       @id @default(autoincrement())
+  affiliateId        Int
+  affiliate          Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  commissionPaid     Float     @default(0.00)
+  transactionDetails String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model App {
+  id              Int      @id @default(autoincrement())
+  totalOrderCount Int?     @default(0)
+  totalOrderValue Float?   @default(0.00)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

@@ -1,0 +1,86 @@
+.collapsibleButtonDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collapsibleButtonDiv>button {
+    height: 60px;
+}
+
+.previewSectionSticky {
+    position: sticky;
+    top: 0;
+    transition: all 0.5s ease-in-out;
+    scroll-behavior: smooth;
+   
+}
+
+.sc-addToCartType {
+    padding: 14px 0 !important;
+}
+
+.btncollapsibleHidden[aria-disabled="true"],
+#product-layout-disabled {
+    pointer-events: none;
+    opacity: 0.6 ;
+    user-select: none;
+}
+
+.btncollapsibleHidden[aria-hidden="true"] {
+    display: none;
+}
+
+.supportIcon>span {
+    display: unset !important;
+}
+
+.supportIcon>span>svg {
+    width: 20% !important;
+}
+
+#supportEmailDescription {
+    cursor: pointer;
+}
+
+.Polaris-Box.howToEmbedBox {
+    min-width: 49%;
+}
+
+@media screen and (min-width: 1300px) {
+    .Polaris-Box.howToEmbedBox {
+        min-width: 35%;
+    }
+}
+
+.spc-footer-img {
+    max-height: 25px;
+}
+
+.spc_iframe {
+    box-shadow:
+        rgba(0, 0, 0, 0.1) 0px 1px 2px 0px,
+        rgba(0, 0, 0, 0.1) 0px -1px 2px 0px;
+    margin: 0 auto;
+    display: flex;
+    margin-top: 10px;
+    transition: all 0.5s ease-in-out;
+    scrollbar-width: none; /* Firefox */
+    -webkit-scrollbar-width: none; /* Safari and Chrome */
+}
+
+.spc-iframeModal {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+}
+
+.spc_iframe_view_desktop {
+    max-width: 100%;
+}
+
+.spc_iframe_view_mobile {
+    max-width: 450px;
+}
+
+.Polaris-Box.hideSection {
+    display: none !important;
+}
