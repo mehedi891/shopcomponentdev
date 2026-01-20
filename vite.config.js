@@ -36,6 +36,16 @@ if (host === "localhost") {
 }
 
 export default defineConfig({
+  ssr: {
+    noExternal: [
+      "@shopify/polaris-viz",
+      "@shopify/polaris-viz-core",
+      "d3-scale",
+      "d3-array",
+      "d3-interpolate",
+      "d3-color"
+    ],
+  },
   server: {
     allowedHosts: [host],
     cors: {
@@ -51,6 +61,13 @@ export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths()],
   build: {
     assetsInlineLimit: 0,
+    target: "esnext",
+    ssr: true,
+    rollupOptions: {
+      output: {
+        format: "esm",
+      },
+    },
   },
   optimizeDeps: {
     include: ["@shopify/app-bridge-react"],
