@@ -24,10 +24,10 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                 <s-box paddingBlockStart="large">
                     <s-section>
                         <s-stack gap="base">
-                            <s-box borderRadius="base" background="subdued" blockSize="40px" inlineSize="150px"></s-box>
-                            <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                            <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                            <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
+                            <s-box borderRadius="base" background="strong" blockSize="40px" inlineSize="150px"></s-box>
+                            <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                            <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                            <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
                         </s-stack>
                     </s-section>
                 </s-box>
@@ -40,10 +40,10 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                     <s-grid-item gridColumn="span 8">
                         <s-section>
                             <s-stack gap="base">
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
                             </s-stack>
                         </s-section>
 
@@ -51,10 +51,10 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                         <s-box paddingBlockStart="large">
                             <s-section>
                                 <s-stack gap="base">
-                                    <s-box borderRadius="base" background="subdued" blockSize="40px" inlineSize="150px"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
+                                    <s-box borderRadius="base" background="strong" blockSize="40px" inlineSize="150px"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
                                 </s-stack>
                             </s-section>
                         </s-box>
@@ -63,10 +63,10 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                         <s-box paddingBlockStart="large">
                             <s-section>
                                 <s-stack gap="base">
-                                    <s-box borderRadius="base" background="subdued" blockSize="40px" inlineSize="150px"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
+                                    <s-box borderRadius="base" background="strong" blockSize="40px" inlineSize="150px"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
                                 </s-stack>
                             </s-section>
                         </s-box>
@@ -76,21 +76,21 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                     <s-grid-item gridColumn="span 4">
                         <s-section>
                             <s-stack gap="base">
-                                <s-box borderRadius="base" background="subdued" blockSize="40px" inlineSize="150px"></s-box>
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
-                                <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
+                                <s-box borderRadius="base" background="strong" blockSize="40px" inlineSize="150px"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
+                                <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
                             </s-stack>
 
                         </s-section>
                         <s-box paddingBlockStart="large">
                             <s-section>
                                 <s-stack gap="base">
-                                    <s-box borderRadius="base" background="subdued" blockSize="40px" inlineSize="150px"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="100%"></s-box>
-                                    <s-box borderRadius="small" background="subdued" blockSize="15px" inlineSize="80%"></s-box>
+                                    <s-box borderRadius="base" background="strong" blockSize="40px" inlineSize="150px"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="100%"></s-box>
+                                    <s-box borderRadius="small" background="strong" blockSize="15px" inlineSize="80%"></s-box>
                                 </s-stack>
                             </s-section>
                         </s-box>

@@ -524,6 +524,7 @@ export default function Index() {
               //remaingTrialDays={remaingTrialDays}
               />
             }
+            
             {showInstructionBanner &&
             
                 <div
