@@ -556,7 +556,7 @@ export default function Index() {
                     {isLoading &&
                       <s-spinner accessibilityLabel="Loading" size="base" />
                     }
-                    <s-button accessibilityLabel="Show all components" href={`/app/componentslist`} variant="secondary">Show all components</s-button>
+                    <s-button accessibilityLabel="Show all components" href={`/app/component`} variant="secondary">Show all components</s-button>
                     {shopData?.plan.planName === PLAN_NAME.free && components?.length > 0 &&
                       <UpgradeTooltip />
                     }
