@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 const ClientOnlyCmp = ({children}) => {
   const [isClient, setIsClient] = useState(false);
@@ -13,5 +14,9 @@ const ClientOnlyCmp = ({children}) => {
     </>
   )
 }
+
+ClientOnlyCmp.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default ClientOnlyCmp

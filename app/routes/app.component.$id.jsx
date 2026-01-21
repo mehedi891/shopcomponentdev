@@ -84,6 +84,7 @@ export const loader = async ({ request, params }) => {
           plan: true,
           shopifyDomain: true,
           scAccessToken: true,
+          maxAllowedComponents: true,
           affiliates: {
             where: {
               status: AFFILIATE_STATUS.active
@@ -301,7 +302,7 @@ const UpdateComponent = () => {
   const handleChooseProductsInd = async (query) => {
     const selected = await shopify.resourcePicker({
       type: 'product',
-      multiple: disabledContentByPlan ? 3 : 10,
+      multiple: disabledContentByPlan ? 3 : shopData?.maxAllowedComponents || 3,
       selectionIds: selectedProductsInd.length > 0 ? selectedProductsInd?.map(product => {
         return {
           id: product.id
@@ -325,7 +326,7 @@ const UpdateComponent = () => {
   const handleChooseProductsBulk = async (query) => {
     const selected = await shopify.resourcePicker({
       type: 'product',
-      multiple: 10,
+      multiple: shopData?.maxAllowedComponents || 3,
       query: '',
       selectionIds: selectedProductsBulk?.length > 0 && selectedProductsBulk?.map(item => {
         return {
@@ -382,7 +383,7 @@ const UpdateComponent = () => {
       const totalVariants = selectedProductsBulk.reduce((sum, product) => {
         return sum + (product.variants?.length || 0);
       }, 0);
-      setCheckMaxSelectedVariants(totalVariants >= 10);
+      setCheckMaxSelectedVariants(totalVariants >= Number(shopData?.maxAllowedComponents || 0));
       //console.log('selectedProductsBulk', selectedProductsBulk);
     }
   }, [selectedProductsBulk]);

@@ -196,7 +196,7 @@ export const loader = async ({ request }) => {
   };
 };
 
-export default function ComponentList() {
+export default function Component() {
   const shopify = useAppBridge();
   const { shopData } = useLoaderData();
 

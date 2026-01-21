@@ -2,7 +2,7 @@
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
@@ -438,8 +438,7 @@ export default function Index() {
   const navigation = useNavigation();
   const fetcher = useFetcher();
   const [isLoading, setIsLoading] = useState(false);
-  const [showInstructionBanner, setShowInstructionBanner] = useState(true);
-  const bannerRef = useRef(null);
+  const [showInstructionBanner, setShowInstructionBanner] = useState(false);
 
   const [searchParams] = useSearchParams();
 
@@ -458,20 +457,9 @@ export default function Index() {
     } else {
       setShowInstructionBanner(true);
     }
-
-    const el = bannerRef.current;
-    if (!el) return;
-
-    const onDismiss = () => {
-      localStorage.setItem('showInstructionBanner', false);
-      setShowInstructionBanner(false);
-    };
-    el.addEventListener("dismiss", onDismiss);
-
-    return () => {
-      el.removeEventListener("dismiss", onDismiss);
-    };
   }, []);
+
+
 
 
 
@@ -537,14 +525,15 @@ export default function Index() {
               />
             }
             {showInstructionBanner &&
-              <div
-                style={{ minHeight: '310px' }}
-              >
-                <Instruction
-                  bannerRef={bannerRef}
-                  showInstructionBanner={showInstructionBanner}
-                />
-              </div>
+            
+                <div
+                  style={{ minHeight: '310px' }}
+                >
+                  <Instruction
+                    setShowInstructionBanner={setShowInstructionBanner}
+                  />
+                </div>
+            
             }
 
           </s-stack>
