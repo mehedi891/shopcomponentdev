@@ -27,11 +27,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// <define:import.meta.env>
-var define_import_meta_env_default;
-var init_define_import_meta_env = __esm({
-  "<define:import.meta.env>"() {
-    define_import_meta_env_default = { VITE_SHOPIFY_APP_URL: "http://localhost:3000", VITE_DATA_API: "http://localhost:4001/api/v1" };
+// <define:process.env>
+var init_define_process_env = __esm({
+  "<define:process.env>"() {
   }
 });
 
@@ -39,7 +37,7 @@ var init_define_import_meta_env = __esm({
 var require_react_development = __commonJS({
   "node_modules/react/cjs/react.development.js"(exports, module) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (true) {
       (function() {
         "use strict";
@@ -47,19 +45,19 @@ var require_react_development = __commonJS({
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
         var ReactVersion = "18.3.1";
-        var REACT_ELEMENT_TYPE = Symbol.for("react.element");
-        var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-        var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-        var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-        var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-        var REACT_PROVIDER_TYPE = Symbol.for("react.provider");
-        var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-        var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-        var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-        var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-        var REACT_MEMO_TYPE = Symbol.for("react.memo");
-        var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-        var REACT_OFFSCREEN_TYPE = Symbol.for("react.offscreen");
+        var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element");
+        var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+        var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+        var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+        var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+        var REACT_PROVIDER_TYPE = /* @__PURE__ */ Symbol.for("react.provider");
+        var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+        var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+        var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+        var REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list");
+        var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+        var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+        var REACT_OFFSCREEN_TYPE = /* @__PURE__ */ Symbol.for("react.offscreen");
         var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
         var FAUX_ITERATOR_SYMBOL = "@@iterator";
         function getIteratorFn(maybeIterable) {
@@ -1023,7 +1021,7 @@ var require_react_development = __commonJS({
         }
         var REACT_MODULE_REFERENCE;
         {
-          REACT_MODULE_REFERENCE = Symbol.for("react.module.reference");
+          REACT_MODULE_REFERENCE = /* @__PURE__ */ Symbol.for("react.module.reference");
         }
         function isValidElementType(type) {
           if (typeof type === "string" || typeof type === "function") {
@@ -1914,7 +1912,7 @@ var require_react_development = __commonJS({
 var require_react = __commonJS({
   "node_modules/react/index.js"(exports, module) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (false) {
       module.exports = null;
     } else {
@@ -1927,7 +1925,7 @@ var require_react = __commonJS({
 var require_scheduler_development = __commonJS({
   "node_modules/scheduler/cjs/scheduler.development.js"(exports) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (true) {
       (function() {
         "use strict";
@@ -2378,7 +2376,7 @@ var require_scheduler_development = __commonJS({
 var require_scheduler = __commonJS({
   "node_modules/scheduler/index.js"(exports, module) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (false) {
       module.exports = null;
     } else {
@@ -2391,7 +2389,7 @@ var require_scheduler = __commonJS({
 var require_react_dom_development = __commonJS({
   "node_modules/react-dom/cjs/react-dom.development.js"(exports) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (true) {
       (function() {
         "use strict";
@@ -3193,24 +3191,24 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        var REACT_ELEMENT_TYPE = Symbol.for("react.element");
-        var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-        var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-        var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-        var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-        var REACT_PROVIDER_TYPE = Symbol.for("react.provider");
-        var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-        var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-        var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-        var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-        var REACT_MEMO_TYPE = Symbol.for("react.memo");
-        var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-        var REACT_SCOPE_TYPE = Symbol.for("react.scope");
-        var REACT_DEBUG_TRACING_MODE_TYPE = Symbol.for("react.debug_trace_mode");
-        var REACT_OFFSCREEN_TYPE = Symbol.for("react.offscreen");
-        var REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden");
-        var REACT_CACHE_TYPE = Symbol.for("react.cache");
-        var REACT_TRACING_MARKER_TYPE = Symbol.for("react.tracing_marker");
+        var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element");
+        var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+        var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+        var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+        var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+        var REACT_PROVIDER_TYPE = /* @__PURE__ */ Symbol.for("react.provider");
+        var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+        var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+        var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+        var REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list");
+        var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+        var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+        var REACT_SCOPE_TYPE = /* @__PURE__ */ Symbol.for("react.scope");
+        var REACT_DEBUG_TRACING_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.debug_trace_mode");
+        var REACT_OFFSCREEN_TYPE = /* @__PURE__ */ Symbol.for("react.offscreen");
+        var REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden");
+        var REACT_CACHE_TYPE = /* @__PURE__ */ Symbol.for("react.cache");
+        var REACT_TRACING_MARKER_TYPE = /* @__PURE__ */ Symbol.for("react.tracing_marker");
         var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
         var FAUX_ITERATOR_SYMBOL = "@@iterator";
         function getIteratorFn(maybeIterable) {
@@ -23556,7 +23554,7 @@ var require_react_dom_development = __commonJS({
 var require_react_dom = __commonJS({
   "node_modules/react-dom/index.js"(exports, module) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (false) {
       checkDCE();
       module.exports = null;
@@ -23570,7 +23568,7 @@ var require_react_dom = __commonJS({
 var require_client = __commonJS({
   "node_modules/react-dom/client.js"(exports) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     var m = require_react_dom();
     if (false) {
       exports.createRoot = m.createRoot;
@@ -23602,24 +23600,24 @@ var require_client = __commonJS({
 var require_react_jsx_runtime_development = __commonJS({
   "node_modules/react/cjs/react-jsx-runtime.development.js"(exports) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (true) {
       (function() {
         "use strict";
         var React = require_react();
-        var REACT_ELEMENT_TYPE = Symbol.for("react.element");
-        var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-        var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-        var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-        var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-        var REACT_PROVIDER_TYPE = Symbol.for("react.provider");
-        var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-        var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-        var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-        var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-        var REACT_MEMO_TYPE = Symbol.for("react.memo");
-        var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-        var REACT_OFFSCREEN_TYPE = Symbol.for("react.offscreen");
+        var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element");
+        var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+        var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+        var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+        var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+        var REACT_PROVIDER_TYPE = /* @__PURE__ */ Symbol.for("react.provider");
+        var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+        var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+        var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+        var REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list");
+        var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+        var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+        var REACT_OFFSCREEN_TYPE = /* @__PURE__ */ Symbol.for("react.offscreen");
         var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
         var FAUX_ITERATOR_SYMBOL = "@@iterator";
         function getIteratorFn(maybeIterable) {
@@ -23665,7 +23663,7 @@ var require_react_jsx_runtime_development = __commonJS({
         var enableDebugTracing = false;
         var REACT_MODULE_REFERENCE;
         {
-          REACT_MODULE_REFERENCE = Symbol.for("react.module.reference");
+          REACT_MODULE_REFERENCE = /* @__PURE__ */ Symbol.for("react.module.reference");
         }
         function isValidElementType(type) {
           if (typeof type === "string" || typeof type === "function") {
@@ -24496,7 +24494,7 @@ var require_react_jsx_runtime_development = __commonJS({
 var require_jsx_runtime = __commonJS({
   "node_modules/react/jsx-runtime.js"(exports, module) {
     "use strict";
-    init_define_import_meta_env();
+    init_define_process_env();
     if (false) {
       module.exports = null;
     } else {
@@ -24508,7 +24506,7 @@ var require_jsx_runtime = __commonJS({
 // node_modules/currency-symbol-map/map.js
 var require_map = __commonJS({
   "node_modules/currency-symbol-map/map.js"(exports, module) {
-    init_define_import_meta_env();
+    init_define_process_env();
     module.exports = {
       AED: "\u062F.\u0625",
       AFN: "\u060B",
@@ -24704,7 +24702,7 @@ var require_map = __commonJS({
 // node_modules/currency-symbol-map/currency-symbol-map.js
 var require_currency_symbol_map = __commonJS({
   "node_modules/currency-symbol-map/currency-symbol-map.js"(exports, module) {
-    init_define_import_meta_env();
+    init_define_process_env();
     var currencySymbolMap = require_map();
     module.exports = function getSymbolFromCurrency2(currencyCode) {
       if (typeof currencyCode !== "string") {
@@ -24721,24 +24719,24 @@ var require_currency_symbol_map = __commonJS({
 });
 
 // app/spc-front-react/entryPoints/index.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_client = __toESM(require_client(), 1);
 
 // app/spc-front-react/spc-front-components/Main/Main.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react10 = __toESM(require_react(), 1);
 var import_react_dom2 = __toESM(require_react_dom(), 1);
 
 // app/spc-front-react/spc-front-components/Container/Container.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react9 = __toESM(require_react(), 1);
 
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/IndividualProduct.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react3 = __toESM(require_react(), 1);
 
 // app/spc-front-react/spc-front-components/PoweredBy/PoweredBy.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
 var PoweredBy = ({ shop }) => {
   const host = typeof window !== "undefined" ? window.location.host : "unknown-host";
@@ -24777,7 +24775,7 @@ var PoweredBy = ({ shop }) => {
 var PoweredBy_default = PoweredBy;
 
 // app/spc-front-react/spc-front-components/Styles/GlobalStyle/GlobalStyle.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 var GlobalStyle = ({ buttonStyleSettings, componentSettings, productLayoutSettings, shoppingCartSettings, tracking, customCss }) => {
   const globalStyles = `
@@ -25351,7 +25349,7 @@ var GlobalStyle = ({ buttonStyleSettings, componentSettings, productLayoutSettin
 var GlobalStyle_default = GlobalStyle;
 
 // app/spc-front-react/spc-front-components/ApplyByProductInd/Individual/ProductCardInd/ProductCardInd.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 var ProductCardInd = ({ componentId, product, tracking, componentSettings, viewBtnTxt, token, store, customerTracking, addToCartBtnTxt, checkoutBtnTxt, shop, appliesTo, layout, customTrackings, market }) => {
   const pdAddToCartBtnHtml = `
@@ -25537,18 +25535,18 @@ var ProductCardInd = ({ componentId, product, tracking, componentSettings, viewB
 var ProductCardInd_default = ProductCardInd;
 
 // app/spc-front-react/spc-front-components/ShoppingCart/ShoppingCart.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react2 = __toESM(require_react(), 1);
 
 // app/spc-front-react/entryPoints/ContextWrapper/ContextWrapper.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react = __toESM(require_react(), 1);
 
 // app/spc-front-react/spc-front-components/utilities/getExistCart.js
-init_define_import_meta_env();
+init_define_process_env();
 
 // app/spc-front-react/spc-front-components/utilities/fragments/cartPlayLoad.js
-init_define_import_meta_env();
+init_define_process_env();
 var CART_FIELDS = `#graphql
   fragment CartFields on Cart {
     id
@@ -25712,7 +25710,7 @@ var ContextWrapper_default = ContextWrapper;
 var import_currency_symbol_map = __toESM(require_currency_symbol_map(), 1);
 
 // app/spc-front-react/spc-front-components/utilities/cartLineRemoveFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var cartLineRemoveFnc = async (cartId, lineIdsArr, token, store) => {
   const mutation = `#graphql
 mutation cartLinesRemove(
@@ -25773,7 +25771,7 @@ mutation cartLinesRemove(
 var cartLineRemoveFnc_default = cartLineRemoveFnc;
 
 // app/spc-front-react/spc-front-components/utilities/cartLinesUpdateFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var cartLinesUpdateFnc = async (cartId, linesArr, token, store) => {
   const mutation = `#graphql
 mutation cartLinesRemove(
@@ -25834,7 +25832,7 @@ mutation cartLinesRemove(
 var cartLinesUpdateFnc_default = cartLinesUpdateFnc;
 
 // app/spc-front-react/spc-front-components/utilities/cartApplyDiscountCodeFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var cartApplyDiscountCodeFnc = async (cartId, discountCodesArr, token, store) => {
   const mutation = `#graphql
 mutation cartDiscountCodesUpdate(
@@ -25898,7 +25896,7 @@ mutation cartDiscountCodesUpdate(
 var cartApplyDiscountCodeFnc_default = cartApplyDiscountCodeFnc;
 
 // app/spc-front-react/spc-front-components/utilities/cartNoteUpdateFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var cartNoteUpdateFnc = async (cartId, note, token, store) => {
   const mutation = `#graphql
 mutation cartNoteUpdate(
@@ -25960,7 +25958,7 @@ mutation cartNoteUpdate(
 var cartNoteUpdateFnc_default = cartNoteUpdateFnc;
 
 // app/spc-front-react/spc-front-components/utilities/utilisFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var getSelectedVariantId = (targetElement, appliesTo, fullView) => {
   let variantId = "";
   if (fullView === "true") {
@@ -26004,7 +26002,7 @@ var resetSelectedQuantity = (container) => {
 };
 
 // app/constants/constants.js
-init_define_import_meta_env();
+init_define_process_env();
 var PLAN_NAME = {
   free: "Free",
   growth: "Growth",
@@ -26016,7 +26014,7 @@ var BoleanOptions = {
 };
 
 // app/utilis/storeAnalyticsDataToServer.js
-init_define_import_meta_env();
+init_define_process_env();
 var storeAnalyticsDataToServer = async ({
   shopifyDomain,
   trafficSource,
@@ -26046,7 +26044,7 @@ var storeAnalyticsDataToServer = async ({
     checkoutClickIncVal
   };
   try {
-    const res = await fetch(`${define_import_meta_env_default.VITE_DATA_API}/queue/add`, {
+    const res = await fetch(`${"http://localhost:4001/api/v1"}/queue/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -26898,7 +26896,7 @@ var ShoppingCart = ({ cartModal, cartRef, token, store, shoppingCartSettings, cu
 var ShoppingCart_default = ShoppingCart;
 
 // app/spc-front-react/spc-front-components/utilities/cartLineAddFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var cartLineAddFnc = async (isExistCart, selectedVariant, store, token, market) => {
   const mutation = `#graphql
    mutation cartLinesAdd(
@@ -26962,7 +26960,7 @@ ${CART_FIELDS}
 var cartLineAddFnc_default = cartLineAddFnc;
 
 // app/spc-front-react/spc-front-components/utilities/cartCreateFnc.js
-init_define_import_meta_env();
+init_define_process_env();
 var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTracking, market) => {
   const mutation = `#graphql
       mutation cartCreate(
@@ -27038,7 +27036,7 @@ var cartCreateFnc = async (selectedVariant, store, token, tracking, customerTrac
 var cartCreateFnc_default = cartCreateFnc;
 
 // app/utilis/generalUtils.js
-init_define_import_meta_env();
+init_define_process_env();
 function buildUtmParams({ source, medium, campaign }) {
   return Object.entries({
     utm_source: source,
@@ -27282,7 +27280,7 @@ var IndividualProduct = ({ componentData, token, store }) => {
 var IndividualProduct_default = IndividualProduct;
 
 // app/spc-front-react/spc-front-components/AppplyByCollectionInd/Individual/IndividualCollection.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react4 = __toESM(require_react(), 1);
 var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
 var IndividualCollection = ({ componentData, token, store }) => {
@@ -27485,10 +27483,10 @@ var IndividualCollection = ({ componentData, token, store }) => {
 var IndividualCollection_default = IndividualCollection;
 
 // app/spc-front-react/spc-front-components/ApplyByProductBulk/BulkProduct.jsx
-init_define_import_meta_env();
+init_define_process_env();
 
 // app/spc-front-react/spc-front-components/ApplyByProductBulk/BulkProductCard/BulkProductCard.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react5 = __toESM(require_react(), 1);
 var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
 var BulkProductCard = ({ tracking, product, enableQtyField }) => {
@@ -27559,7 +27557,7 @@ var BulkProductCard = ({ tracking, product, enableQtyField }) => {
 var BulkProductCard_default = BulkProductCard;
 
 // app/spc-front-react/spc-front-components/ShoppingCart/CartCountBuble/CartCountBuble.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react6 = __toESM(require_react(), 1);
 var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
 var CartCountBuble = () => {
@@ -27821,7 +27819,7 @@ var BulkProduct = ({ componentData, token, store }) => {
 var BulkProduct_default = BulkProduct;
 
 // app/spc-front-react/spc-front-components/ShoppingCart/CartCountBuble/CartBubleWrapper.jsx
-init_define_import_meta_env();
+init_define_process_env();
 var import_react8 = __toESM(require_react(), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
 var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
@@ -27860,7 +27858,7 @@ var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
 var Container = ({ id, token, store }) => {
   const [componentData, setComponentData] = (0, import_react9.useState)({});
   const [loading, setLoading] = (0, import_react9.useState)(false);
-  const baseApiUrl = define_import_meta_env_default.VITE_SHOPIFY_APP_URL;
+  const baseApiUrl = "http://localhost:3000";
   (0, import_react9.useEffect)(() => {
     setLoading(true);
     const fetchData = async () => {

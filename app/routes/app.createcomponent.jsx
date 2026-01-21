@@ -556,7 +556,7 @@ const CreateComponent = () => {
 
     const handleDiscard = () => {
         setSelectedProductsBulk([]);
-        selectedProductsInd([]);
+        setSelectedProductsInd([]);
         setSelectedCollection([]);
         reset();
     }
@@ -2066,7 +2066,7 @@ const CreateComponent = () => {
 
     //console.log('Errors:',errors);
     return (
-        navigation.state === "loading" ? <LoadingSkeleton /> :
+        navigation.state === "loading" ? <LoadingSkeleton pageSize="large" /> :
             <form method="post" onSubmit={handleSubmit(formHandleSubmit)} >
                 <SaveBar id="spc-save-bar">
                     <button type="submit" variant="primary"

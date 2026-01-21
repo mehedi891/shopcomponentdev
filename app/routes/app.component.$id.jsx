@@ -100,6 +100,7 @@ export const loader = async ({ request, params }) => {
       myshopifyDomain: session?.shop || component?.shop?.shopifyDomain,
     },
     component: component,
+    // eslint-disable-next-line no-undef
     appUrl: process.env.SHOPIFY_APP_URL || '',
     marketRegions: marketRegions,
   }
@@ -451,8 +452,9 @@ const UpdateComponent = () => {
 
 
   const handleDiscard = () => {
-    reset();
     watchedValues.appliesTo === APPLIES_TO.bycollection ? setSelectedCollection(component?.addToCartType?.products) : watchedValues.addToCartType?.type === ADD_TO_CART_TYPE.individual ? setSelectedProductsInd(component?.addToCartType?.products) : setSelectedProductsBulk(component?.addToCartType?.products);
+    reset();
+    //console.log('reset');
   }
 
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import esbuild from "esbuild";
 import path from "path";
 import { fileURLToPath } from "url";
