@@ -373,7 +373,7 @@ const CreateComponent = () => {
     }, [shopData]);
 
 
-console.log('disable content by plan',shopData?.plan?.planName, disabledContentByPlan);
+    //console.log('disable content by plan',shopData?.plan?.planName, disabledContentByPlan);
     // console.log('disable content by plan::',disabledContentByPlan && shopData?.components?.length,shopData?.plan?.planName, disabledContentByPlan);
 
 

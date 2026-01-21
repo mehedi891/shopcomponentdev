@@ -42,7 +42,7 @@ export const loader = async ({ request }) => {
     },
   });
 
-   if(!shopData?.plan){
+  if (!shopData?.plan) {
     throw redirect('/app/plans');
   }
 
@@ -289,63 +289,40 @@ const Affiliate = () => {
                       </s-table-cell>
                       <s-table-cell>
                         <s-button accessibilityLabel="More" command="--show" commandFor={`affliate-popover_` + item.id} variant="secondary" icon="menu-horizontal" />
-                        <s-popover id={`affliate-popover_` + item.id} inlineSize="8">
-                          <s-stack slots="children" direction="block" padding="small small">
-                            <s-button disabled={disabledContentProPlan} href={`/app/affiliate/details/${item.id}`} accessibilityLabel="See details" variant="tertiary"
-                            >
+                        <s-menu id={`affliate-popover_` + item.id} accessibilityLabel="Affiliate actions">
+                          <s-button
+                            disabled={disabledContentProPlan}
+                            href={`/app/affiliate/details/${item.id}`}
+                            accessibilityLabel="See details"
+                            icon="info"
+                          >View details</s-button>
 
-                              <s-stack
-                                direction="inline"
-                                gap="small-300"
-                                alignItems="center"
-                              >
-                                <s-icon type="info" />
-                                <s-text>{'View details'}</s-text>
-                              </s-stack>
-                            </s-button>
-                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Edit" variant="tertiary"
-                              onClick={() => { navigate(`/app/affiliate/${item.id}`) }}
-                            >
+                          <s-button
+                            disabled={disabledContentProPlan}
+                            onClick={() => { navigate(`/app/affiliate/${item.id}`) }}
+                            accessibilityLabel="Edit Affiliate"
+                            icon="edit"
+                          >Edit Affiliate</s-button>
 
-                              <s-stack
-                                direction="inline"
-                                gap="small-300"
-                                alignItems="center"
-                              >
-                                <s-icon type="edit" />
-                                <s-text>{'Edit Affiliate'}</s-text>
-                              </s-stack>
-                            </s-button>
+                          <s-button
+                            disabled={disabledContentProPlan}
+                            onClick={() => handleStatusChange(item.id, item.status === AFFILIATE_STATUS.active ? AFFILIATE_STATUS.inactive : AFFILIATE_STATUS.active)}
+                            accessibilityLabel="Status change"
+                            icon={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'}
+                          >{item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'}</s-button>
 
-                            <s-button command="--hide" commandFor={`affliate-popover_` + item.id} disabled={disabledContentProPlan} accessibilityLabel={item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'} variant="tertiary"
-                              onClick={() => handleStatusChange(item.id, item.status === AFFILIATE_STATUS.active ? AFFILIATE_STATUS.inactive : AFFILIATE_STATUS.active)}
-                            >
-                              <s-stack
-                                direction="inline"
-                                gap="small-300"
-                                alignItems="center"
-                              >
-                                <s-icon type={item.status === AFFILIATE_STATUS.active ? 'disabled' : 'check-circle'} />
-                                <s-text>{item.status === AFFILIATE_STATUS.active ? 'Deactivate' : 'Activate'}</s-text>
-                              </s-stack>
-                            </s-button>
+                          <s-button
+                            disabled={disabledContentProPlan}
+                            commandFor={`delete_modal_` + item.id}
+                            command="--show"
+                            accessibilityLabel="Delete Affiliate"
+                            icon="delete"
+                            tone="critical"
 
+                          >Delete</s-button>
+                        </s-menu>
 
-                            <s-button disabled={disabledContentProPlan} accessibilityLabel="Delete" tone="critical"  variant="tertiary" commad="--show" commandFor={`delete_modal_` + item.id}>
-                              <s-stack
-                                direction="inline"
-                                gap="small-300"
-                                alignItems="center"
-                              >
-                                <s-icon tone="critical" type={'delete'} />
-                                <s-text tone="critical" >{'Delete'}</s-text>
-                              </s-stack>
-                            </s-button>
-
-                          </s-stack>
-                        </s-popover>
-
-                        <s-modal id={`delete_modal_` + item.id} heading="Delete Affiliate — This action cannot be undone" accessibilityLabel="Delete Affiliate">
+                        <s-modal id={`delete_modal_` + item.id} heading={`Delete Affiliate — This action cannot be undone (${item?.name})`} accessibilityLabel="Delete Affiliate">
 
                           <s-paragraph>If you delete this affiliate, it will be permanently removed and cannot be restored. All associated performance data will also be permanently deleted.</s-paragraph>
 

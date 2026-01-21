@@ -81,14 +81,14 @@ export const loader = async ({ request }) => {
     }
   });
 
-  if(!shopData?.plan){
+  if (!shopData?.plan) {
     throw redirect('/app/plans');
   }
 
   let remaingTrialDays = 0;
 
-     if (shopData?.plan?.isTestPlan) {
-     remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
+  if (shopData?.plan?.isTestPlan) {
+    remaingTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
 
     if (!shopData?.plan || (shopData?.plan?.isTestPlan && remaingTrialDays < 1)) {
       throw redirect('/app/plans');
@@ -432,7 +432,7 @@ export const loader = async ({ request }) => {
 
 export default function Index() {
   const shopify = useAppBridge();
-  const { shopData, components, totalPd, totalPublishProduct, cataglogId ,remaingTrialDays} = useLoaderData();
+  const { shopData, components, totalPd, totalPublishProduct, cataglogId, remaingTrialDays } = useLoaderData();
   //console.log('cataglogId:', {totalPd, totalPublishProduct, cataglogId ,remaingTrialDays});
   const navigate = useNavigate();
   const navigation = useNavigation();
@@ -505,7 +505,7 @@ export default function Index() {
   }, [fetcher?.data]);
 
 
-  
+
 
   return (
     navigation.state === "loading" ? <LoadingSkeleton /> :
@@ -528,11 +528,11 @@ export default function Index() {
           >
 
             {shopData?.plan?.isTestPlan &&
-              <TempPlanBannerShow 
-              btnText="Choose a plan anytime"
-              title="Full access unlocked — free for 7 days"
-              subtitle={`Trial ends in ${remaingTrialDays} days`}
-              description="All premium EmbedUp features are unlocked. Explore embedded products, bundles, and affiliate buy buttons — no payment needed during the trial."
+              <TempPlanBannerShow
+                btnText="Choose a plan anytime"
+                title="Full access unlocked — free for 7 days"
+                subtitle={`Trial ends in ${remaingTrialDays} days`}
+                description="All premium EmbedUp features are unlocked. Explore embedded products, bundles, and affiliate buy buttons — no payment needed during the trial."
               //remaingTrialDays={remaingTrialDays}
               />
             }
@@ -615,80 +615,31 @@ export default function Index() {
                             commandFor={`component-popover_` + id}
                             command='--show'
                           />
-                          <s-popover id={`component-popover_` + id} inlineSize="8">
-                            <s-stack slots="children" direction="block" padding="small small">
-                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details" variant="tertiary"
-                              >
+                          <s-menu id={`component-popover_` + id} inlineSize="8">
+                            <s-button accessibilityLabel="View component" icon="edit" href={`/app/component/${id}`}>View/Edit</s-button>
+                            <s-button
+                              icon={status === 'activate' ? 'disabled' : 'check-circle'}
+                              accessibilityLabel="Component Status change"
+                              onClick={() => {
+                                handleDisableStatus(id, status);
+                              }}>{status === 'activate' ? 'Deactivate' : 'Activate'}</s-button>
+                            <s-button
+                              icon="duplicate"
+                              accessibilityLabel="Duplicate component"
+                              disabled={shopData?.plan?.planName === PLAN_NAME.free && components?.length > 0 ? true : false}
+                              onClick={() => {
+                                handleDuplicateComponent(id);
+                              }}
+                            >Duplicate</s-button>
 
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type="edit" />
-                                  <s-text>{'View/Edit'}</s-text>
-                                </s-stack>
-
-                              </s-button>
-
-                              <s-button
-
-                                variant="tertiary"
-                                accessibilityLabel="Status Change"
-                                onClick={() => {
-                                  handleDisableStatus(id, status);
-                                }}
-                                commandFor={`component-popover_` + id}
-                                command='--hide'
-                              >
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type={status === 'activate' ? 'disabled' : 'check-circle'} />
-                                  <s-text>{status === 'activate' ? 'Deactivate' : 'Activate'}</s-text>
-                                </s-stack>
-                              </s-button>
-
-                              <s-button
-                                variant="tertiary"
-                                accessibilityLabel="Duplicate"
-                                disabled={shopData?.plan?.planName === PLAN_NAME.free && components?.length > 0 ? true : false}
-                                commandFor={`component-popover_` + id}
-                                command='--hide'
-                                onClick={() => {
-                                  handleDuplicateComponent(id);
-                                }}
-                              >
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type={'duplicate'} />
-                                  <s-text>{'Duplicate'}</s-text>
-                                </s-stack>
-                              </s-button>
-
-                              <s-button
-                                tone="critical"
-                                variant="tertiary"
-                                accessibilityLabel="Delete"
-                                commandFor={`component_delete_modal_` + id}
-                                command='--show'
-                              >
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon tone="critical" type={'delete'} />
-                                  <s-text tone="critical" >{'Delete'}</s-text>
-                                </s-stack>
-                              </s-button>
-                            </s-stack>
-                          </s-popover>
+                            <s-button
+                              icon="delete"
+                              tone="critical"
+                              accessibilityLabel="Delete component"
+                              commandFor={`component_delete_modal_` + id}
+                              command='--show'
+                            >Delete</s-button>
+                          </s-menu>
 
                           <s-modal id={`component_delete_modal_` + id} heading="Delete component — This action cannot be undone" accessibilityLabel="Delete Component">
                             <s-text>If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</s-text>

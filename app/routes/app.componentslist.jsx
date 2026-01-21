@@ -63,7 +63,7 @@ export const loader = async ({ request }) => {
   });
 
 
-   if(!shopData?.plan){
+  if (!shopData?.plan) {
     throw redirect('/app/plans');
   }
 
@@ -344,7 +344,7 @@ export default function ComponentList() {
                           <s-text>{appliesTo === 'product' ? 'Product' : 'Collection'}</s-text>
                         </s-table-cell>
                         <s-table-cell>
-                          <s-text>{addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? 'Individual add to cart' : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? 'Bulk add to cart': addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</s-text>
+                          <s-text>{addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'cart' ? 'Individual add to cart' : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'bulk' ? 'Bulk add to cart' : addToCartType?.type === 'individual' && componentSettings?.cartBehavior === 'checkout' ? 'Individual checkout' : 'Bulk checkout'}</s-text>
                         </s-table-cell>
                         <s-table-cell>{totalOrderCount}</s-table-cell>
                         <s-table-cell>
@@ -359,78 +359,32 @@ export default function ComponentList() {
                             commandFor={`component-popover_` + id}
                             command='--show'
                           />
-                          <s-popover id={`component-popover_` + id} inlineSize="8">
-                            <s-stack slots="children" direction="block" padding="small small">
-                              <s-button href={`/app/component/${id}`} accessibilityLabel="See details" variant="tertiary"
-                              >
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type={'edit'} />
-                                  <s-text>View/Edit</s-text>
-                                </s-stack>
-                              </s-button>
+                          <s-menu id={`component-popover_` + id} inlineSize="8">
+                            <s-button icon="edit" accessibilityLabel="Edit Component" href={`/app/component/${id}`}>View/Edit</s-button>
+                            <s-button
+                              icon={status === 'activate' ? 'disabled' : 'check-circle'} accessibilityLabel="Status Change"
+                              onClick={() => {
+                                handleDisableStatus(id, status);
+                              }}
+                            >
+                              {status === 'activate' ? 'Deactivate' : 'Activate'}</s-button>
 
-                              <s-button
-                                variant="tertiary"
-                                accessibilityLabel="Status Change"
-                                onClick={() => {
-                                  handleDisableStatus(id, status);
-                                }}
-                                commandFor={`component-popover_` + id}
-                                command='--hide'
-                              >
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type={status === 'activate' ? 'disabled' : 'check-circle'} />
-                                  <s-text>{status === 'activate' ? 'Deactivate' : 'Activate'}</s-text>
-                                </s-stack>
-                              </s-button>
+                            <s-button
+                              icon="duplicate" accessibilityLabel="Duplicate Component"
+                              onClick={() => {
+                                handleDuplicateComponent(id);
+                              }}
+                            >
+                              Duplicate</s-button>
 
-                              <s-button
-                                variant="tertiary"
-                                accessibilityLabel="Duplicate"
-                                disabled={shopData?.plan?.planName === PLAN_NAME.free && components?.length > 0 ? true : false}
-                                commandFor={`component-popover_` + id}
-                                command='--hide'
-                                onClick={() => {
-                                  handleDuplicateComponent(id);
-                                }}
-                              >
-
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type={'duplicate'} />
-                                  <s-text>{'Duplicate'}</s-text>
-                                </s-stack>
-                              </s-button>
-
-                              <s-button
-                                tone="critical"
-                                variant="tertiary"
-                                accessibilityLabel="Delete"
-                                commandFor={`component_delete_modal_` + id}
-                                command='--show'
-                              >
-                                <s-stack
-                                  direction="inline"
-                                  gap="small-300"
-                                  alignItems="center"
-                                >
-                                  <s-icon type={'delete'} tone="critical" />
-                                  <s-text tone="critical">{'Delete'}</s-text>
-                                </s-stack>
-                              </s-button>
-                            </s-stack>
-                          </s-popover>
+                            <s-button
+                              icon="delete" accessibilityLabel="Delete Component"
+                              commandFor={`component_delete_modal_` + id}
+                              command='--show'
+                              tone="critical"
+                            >
+                              Delete</s-button>
+                          </s-menu>
 
                           <s-modal id={`component_delete_modal_` + id} heading="Delete component — This action cannot be undone" accessibilityLabel="Delete Component">
                             <s-text>If this component is embedded on any website, those embeds will stop working immediately. This action can’t be undone.</s-text>
