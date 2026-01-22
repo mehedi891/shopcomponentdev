@@ -514,6 +514,7 @@ export default function Index() {
           <s-stack
             paddingBlockEnd="large"
           >
+            <s-text>From dev branch</s-text>
 
             {shopData?.plan?.isTestPlan &&
               <TempPlanBannerShow
