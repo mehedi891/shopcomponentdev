@@ -1,5 +1,5 @@
 
-const Bar = ({width='100%', height='15px', color='#dbdbdb', radius='7px'}) => {
+const Bar = ({width='100%', height='13px', color='#dbdbdb', radius='7px'}) => {
   return (
     <div
       style={{

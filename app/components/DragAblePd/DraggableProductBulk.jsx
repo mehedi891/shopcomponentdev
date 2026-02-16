@@ -14,7 +14,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 
-const SortableProduct = ({ product, handleDelete, watchedValues, handleDeleteProductBulk, handleChangeQuantityDefault }) => {
+const SortableProduct = ({ product, watchedValues, handleDeleteProductBulk, handleChangeQuantityDefault }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: product.id });
 
   const style = {
@@ -47,7 +47,7 @@ const SortableProduct = ({ product, handleDelete, watchedValues, handleDeletePro
 
           <s-button
             accessibilityLabel="Delete"
-            onClick={() => handleDelete(product.id)}
+            onClick={() => handleDeleteProductBulk(product.id, 'product')}
             variant="tertiary"
             icon="delete"
           />

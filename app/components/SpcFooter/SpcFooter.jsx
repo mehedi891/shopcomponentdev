@@ -1,5 +1,5 @@
 import { capitalizeFirstCaracter } from "../../utilis/generalUtils"
-
+import Chat from "../Chat/Chat"
 
 const SpcFooter = ({ plan }) => {
   return (
@@ -44,6 +44,7 @@ const SpcFooter = ({ plan }) => {
           </s-link>
         </s-stack>
       </s-stack>
+      <Chat/>
     </s-box>
   )
 }

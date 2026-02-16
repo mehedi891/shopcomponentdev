@@ -25,9 +25,9 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                     <s-section>
                         <s-stack gap="base">
                             <Bar width="150px" height="40px" />
-                            <Bar width="100%" height="15px" />
-                            <Bar width="100%" height="15px" />
-                            <Bar width="80%" height="15px" />
+                            <Bar width="100%" height="13px" />
+                            <Bar width="100%" height="13px" />
+                            <Bar width="80%" height="13px" />
                         </s-stack>
                     </s-section>
                 </s-box>
@@ -40,10 +40,10 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                     <s-grid-item gridColumn="span 8">
                         <s-section>
                             <s-stack gap="base">
-                                <Bar width="100%" height="15px" />
-                                <Bar width="100%" height="15px" />
-                                <Bar width="100%" height="15px" />
-                                <Bar width="80%" height="15px" />
+                                <Bar width="100%" height="13px" />
+                                <Bar width="100%" height="13px" />
+                                <Bar width="100%" height="13px" />
+                                <Bar width="80%" height="13px" />
                             </s-stack>
                         </s-section>
 
@@ -52,9 +52,9 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                             <s-section>
                                 <s-stack gap="base">
                                     <Bar width="150px" height="40px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="80%" height="15px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="80%" height="13px" />
                                 </s-stack>
                             </s-section>
                         </s-box>
@@ -64,9 +64,9 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                             <s-section>
                                 <s-stack gap="base">
                                     <Bar width="150px" height="40px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="80%" height="15px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="80%" height="13px" />
                                 </s-stack>
                             </s-section>
                         </s-box>
@@ -77,9 +77,9 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                         <s-section>
                             <s-stack gap="base">
                                <Bar width="150px" height="40px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="80%" height="15px" />
-                                    <Bar width="100%" height="15px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="80%" height="13px" />
+                                    <Bar width="100%" height="13px" />
                             </s-stack>
 
                         </s-section>
@@ -87,10 +87,10 @@ const LoadingSkeleton = ({ pageSize = 'base' }) => {
                             <s-section>
                                 <s-stack gap="base">
                                     <Bar width="150px" height="40px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="100%" height="15px" />
-                                    <Bar width="80%" height="15px" />
-                                    <Bar width="100%" height="15px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="100%" height="13px" />
+                                    <Bar width="80%" height="13px" />
+                                    <Bar width="100%" height="13px" />
                                 </s-stack>
                             </s-section>
                         </s-box>

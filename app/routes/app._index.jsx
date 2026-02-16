@@ -2,7 +2,7 @@
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { useFetcher, useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import db from "../db.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import UpgradeTooltip from "../components/UpgradeTooltip/UpgradeTooltip";
@@ -21,19 +21,6 @@ export const loader = async ({ request }) => {
 
   const { session, admin, billing, redirect } = await authenticate.admin(request);
   const { hasActivePayment, appSubscriptions } = await billing.check();
-
-  // const shopResponse = await admin.graphql(
-  //   `#graphql
-  //           query shopInfo{
-  //               shop{
-  //                 id
-  //               }
-  //       }`,
-
-  // );
-
-  // const shop = await shopResponse.json();
-
 
   let shopData = await db.shop.findUnique({
     where: {
@@ -450,7 +437,7 @@ export default function Index() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const isShowBanner = localStorage.getItem('showInstructionBanner');
     if (isShowBanner === 'false') {
       setShowInstructionBanner(false);
@@ -514,7 +501,6 @@ export default function Index() {
           <s-stack
             paddingBlockEnd="large"
           >
-            <s-text>From dev branch</s-text>
 
             {shopData?.plan?.isTestPlan &&
               <TempPlanBannerShow
