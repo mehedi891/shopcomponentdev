@@ -507,7 +507,7 @@ export default function Index() {
             paddingBlockEnd="base"
             paddingBlockStart="large"
           >
-            <s-heading type="strong">SBring your products to where your audience already is</s-heading>
+            <s-heading type="strong">Bring your products to where your audience already is</s-heading>
             <s-text>Create a component → Copy & embed it on any site → Sell where people scroll. Turn any page into a storefront.</s-text>
           </s-stack>
 
