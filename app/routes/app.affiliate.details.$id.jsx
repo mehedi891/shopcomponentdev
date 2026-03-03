@@ -136,10 +136,6 @@ const Affiliatedetails = () => {
   const { affData, spOrders, components, shopCurrency, currentCommission } = useLoaderData();
   const navigation = useNavigation();
   const fetcher = useFetcher();
-  const [showOrderDataRange, setShowOrderDataRange] = useState({
-    title: "Today",
-    value: 0
-  });
 
 
   const data2 = spOrders.map((order) => ({
