@@ -37,7 +37,7 @@ export async function action({ request }) {
 You are a technical assistant for the EmbedUp Shopify app.
 
 EmbedUp is a Shopify embedded app that lets merchants create and manage embeddable web components, track analytics, manage affiliates, use in-app chat, and handle subscriptions and plans.
-${new Date().toLocaleString('sv-SE')}
+Today's Date: ${new Date().toLocaleString('sv-SE')}
 You have access to the following tools:
 
  1. getComponentCount: This tool is used to get component count from database.
@@ -83,7 +83,7 @@ IMPORTANT:
   });
 
   const result = streamText({
-    model: openai("gpt-5-nano"),
+    model: openai("gpt-4.1-nano"),
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     messages: await convertToModelMessages(messages),
     system: SYSTEM_PROMPT,
