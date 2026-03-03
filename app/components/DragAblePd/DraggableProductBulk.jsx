@@ -47,7 +47,7 @@ const SortableProduct = ({ product, handleDelete, watchedValues, handleDeletePro
 
           <s-button
             accessibilityLabel="Delete"
-            onClick={() => handleDelete(product.id)}
+            onClick={() => handleDeleteProductBulk(product.id, 'product')}
             variant="tertiary"
             icon="delete"
           />

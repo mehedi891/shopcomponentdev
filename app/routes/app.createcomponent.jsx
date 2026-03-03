@@ -3504,7 +3504,7 @@ const CreateComponent = () => {
                                                                         render={({ field }) => (
                                                                             <s-checkbox
                                                                                 label='Component title show'
-                                                                                checked={watchedValues.showComponentTitle?.fullView === SHOW_COMPONENT_TITLE.yes ? true : false}
+                                                                                checked={watchedValues?.componentSettings?.showComponentTitle === SHOW_COMPONENT_TITLE.yes ? true : false}
                                                                                 onChange={(e) => {
                                                                                     const newValue = e.currentTarget.checked ? SHOW_COMPONENT_TITLE.yes : SHOW_COMPONENT_TITLE.no;
                                                                                     field.onChange(newValue);
@@ -4020,7 +4020,7 @@ const CreateComponent = () => {
                                                                             value={field.value}
                                                                             error={fieldState?.error?.message}
                                                                         >
-                                                                            <s-option defaultSelected={watchedValues.market === 'US'} value={'US'}>{"Select a Market"}</s-option>
+                                                                            {/* <s-option defaultSelected={watchedValues.market === 'US'} value={'US'}>{"Select a Market"}</s-option> */}
                                                                             {(marketRegions || []).map((item) => {
                                                                                 return (
                                                                                     <s-option key={item.code} value={item.code}>{item.name}</s-option>

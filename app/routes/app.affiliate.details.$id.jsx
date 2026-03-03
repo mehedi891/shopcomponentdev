@@ -481,7 +481,7 @@ const Affiliatedetails = () => {
                 title="No Assigned Component found"
                 text="Assign a component to get started"
                 btnText="Assign a component"
-                btnHref="/app/componentslist"
+                btnHref="/app/component"
               />
             }
           </s-box>
