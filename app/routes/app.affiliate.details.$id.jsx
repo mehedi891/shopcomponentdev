@@ -3,7 +3,7 @@ import db from "../db.server";
 import { authenticate } from "../shopify.server";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { AFFILIATE_STATUS, COMISSION_CRITERIA } from "../constants/constants";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric";
 import { capitalizeFirstCaracter } from "../utilis/generalUtils";
 import TransactionModal from "../components/TransactionModal/TransactionModal";
@@ -136,10 +136,6 @@ const Affiliatedetails = () => {
   const { affData, spOrders, components, shopCurrency, currentCommission } = useLoaderData();
   const navigation = useNavigation();
   const fetcher = useFetcher();
-  const [showOrderDataRange, setShowOrderDataRange] = useState({
-    title: "Today",
-    value: 0
-  });
 
 
   const data2 = spOrders.map((order) => ({
@@ -481,7 +477,7 @@ const Affiliatedetails = () => {
                 title="No Assigned Component found"
                 text="Assign a component to get started"
                 btnText="Assign a component"
-                btnHref="/app/componentslist"
+                btnHref="/app/component"
               />
             }
           </s-box>
