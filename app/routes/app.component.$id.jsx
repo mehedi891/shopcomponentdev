@@ -3660,7 +3660,7 @@ const UpdateComponent = () => {
                             gap="small-300"
                           >
                             <s-text type="strong">Custom CSS</s-text>
-                            {disabledContentProPlan &&
+                            {disabledContentByPlan &&
                               <UpgradeTooltip />
                             }
                           </s-stack>
@@ -3671,7 +3671,7 @@ const UpdateComponent = () => {
                       {toogleOpen.customCssOpen &&
                         <s-box padding="none small small small">
 
-                          <div className={disabledContentProPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentProPlan}>
+                          <div className={disabledContentByPlan ? 'btncollapsibleHidden' : ''} aria-disabled={disabledContentByPlan}>
                             <s-stack
                               gap="base"
                             >
