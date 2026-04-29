@@ -225,6 +225,7 @@ const shopify = shopifyApp({
         await appthrive.bootstrap({
         shopDomain: session.shop,
         accessToken: session.accessToken,
+        shopifyClientSecret: process.env.SHOPIFY_API_SECRET,
       })
       } catch (error) {
         console.log("error:",error);
