@@ -6,8 +6,8 @@ import {
 } from "@shopify/shopify-app-react-router/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
-import {MAX_ALLOWED_COMPONENTS, PLAN_NAME} from "./constants/constants"
-
+import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "./constants/constants"
+import { createClient } from '@appthriveio/sdk'
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
@@ -20,7 +20,7 @@ const shopify = shopifyApp({
   future: {
     expiringOfflineAccessTokens: true,
   },
-   hooks: {
+  hooks: {
     afterAuth: async ({ session, admin }) => {
       const shopResponse = await admin.graphql(
         `#graphql
@@ -173,8 +173,8 @@ const shopify = shopifyApp({
           shopifyPlan: shop?.plan?.publicDisplayName,
           shopifyPlus: shop?.plan?.shopifyPlus,
           appDisabled: false,
-          publicationId:publicationjson?.data?.publication?.id,
-          appCatalogId:publicationjson?.data?.publication?.catalog?.id,
+          publicationId: publicationjson?.data?.publication?.id,
+          appCatalogId: publicationjson?.data?.publication?.catalog?.id,
           isInstalled: true,
           isFirstInstall: false,
         },
@@ -196,8 +196,8 @@ const shopify = shopifyApp({
           shopifyPlan: shop?.plan?.publicDisplayName,
           shopifyPlus: shop?.plan?.shopifyPlus,
           appDisabled: false,
-          publicationId:publicationjson?.data?.publication?.id,
-          appCatalogId:publicationjson?.data?.publication?.catalog?.id,
+          publicationId: publicationjson?.data?.publication?.id,
+          appCatalogId: publicationjson?.data?.publication?.catalog?.id,
           isInstalled: true,
           isFirstInstall: false, // by default false but as we create the plan automatically so it doesn't need to go to app index page.It will directly go to plan-purchase page
           maxAllowedComponents: MAX_ALLOWED_COMPONENTS.pro, // Default Pro Plan
@@ -211,7 +211,27 @@ const shopify = shopifyApp({
         },
       });
 
+      const appthrive = createClient({
+        orgId: process.env.APPTHRIVE_ORG_ID,
+        appId: process.env.APPTHRIVE_APP_ID,
+        webhookSecret: process.env.APPTHRIVE_WEBHOOK_SECRET,
+      })
+
+      console.log("BeforeSessionShopFromServer:", session.shop);
+
+      // In your existing Shopify OAuth callback:
+      // await appthrive.bootstrap({ shopDomain: session.shop, accessToken: session.accessToken });
+      try {
+        await appthrive.bootstrap({
+        shopDomain: session.shop,
+        accessToken: session.accessToken,
+      })
+      } catch (error) {
+        console.log("error:",error);
+      }
       
+
+      console.log("AfterSessionShopFromServer:", session.shop);
 
     }
   },

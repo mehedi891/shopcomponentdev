@@ -18,6 +18,28 @@ export const loader = async ({ request }) => {
   const { session, admin, billing, redirect } = await authenticate.admin(request);
   const { hasActivePayment, appSubscriptions } = await billing.check();
 
+//  try {
+//     const data = await fetch('https://api.appthrive.io/v1/validate', {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: 'Bearer ' + process.env.APPTHRIVE_API_KEY,
+//       },
+//       // body: JSON.stringify({
+//       //   shopDomain: session.shop,
+//       //   accessToken: session.accessToken,
+//       // }),
+//     });
+
+//     const result = await data.json();
+//     console.log("AppThrive Validation Result:", result);
+
+//  } catch (error) {
+//   console.log("TriveErrCatch1:",error);
+//  }
+
+
+  
 
   let shopData = await db.shop.findUnique({
     where: {

@@ -9,29 +9,40 @@ import TwakTo from "../components/TwakTo/TwakTo";
 import { useEffect } from "react";
 
 
+
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const shopData = await db.shop.findUnique({
     where: { shopifyDomain: session.shop },
     select: {
+
       id: true,
       plan: true,
     },
   });
 
+  // const orgId = process.env.APPTHRIVE_ORG_ID;
+  // const appId = process.env.APPTHRIVE_APP_ID;
+  // const webhookSecret = process.env.APPTHRIVE_WEBHOOK_SECRET;
 
+
+
+// await appthrive.bootstrap({ shopDomain, accessToken })
 
   return {
     // eslint-disable-next-line no-undef
     apiKey: process.env.SHOPIFY_API_KEY || "",
     shopData: shopData || {},
+    
     // eslint-disable-next-line no-undef
     isDev: process.env.NODE_ENV || "production"
   };
 };
 
 export default function App() {
-    const { apiKey, shopData, isDev } = useLoaderData();
+  const { apiKey, shopData, isDev, } = useLoaderData();
+
+
 
 
 
@@ -56,12 +67,12 @@ export default function App() {
         <s-link href="/app/plans">Subscription Plan</s-link>
         <s-link href="/app/getsupport">Get support</s-link>
       </s-app-nav>
-      
-      <div style={{ height: "100%",minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between", width: "100%" }}>
+
+      <div style={{ height: "100%", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between", width: "100%" }}>
         <div style={{ flexGrow: 1 }}>
           <Outlet />
         </div>
-        <div style={{ flexGrow: 1,display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+        <div style={{ flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
           <SpcFooter plan={shopData?.plan || ''} />
           {isDev !== 'development' &&
             <TwakTo />
@@ -69,7 +80,7 @@ export default function App() {
 
         </div>
       </div>
-     
+
     </AppProvider>
   );
 }
