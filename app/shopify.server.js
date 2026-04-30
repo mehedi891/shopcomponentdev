@@ -7,7 +7,8 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 import { MAX_ALLOWED_COMPONENTS, PLAN_NAME } from "./constants/constants"
-import { createClient } from '@appthriveio/sdk'
+import { appthrive } from './appthrive.server';
+
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
@@ -211,11 +212,6 @@ const shopify = shopifyApp({
         },
       });
 
-      const appthrive = createClient({
-        orgId: process.env.APPTHRIVE_ORG_ID,
-        appId: process.env.APPTHRIVE_APP_ID,
-        webhookSecret: process.env.APPTHRIVE_WEBHOOK_SECRET,
-      })
 
       console.log("BeforeSessionShopFromServer:", session.shop);
 
@@ -225,7 +221,6 @@ const shopify = shopifyApp({
         await appthrive.bootstrap({
         shopDomain: session.shop,
         accessToken: session.accessToken,
-        shopifyClientSecret: process.env.SHOPIFY_API_SECRET,
       })
       } catch (error) {
         console.log("error:",error);
