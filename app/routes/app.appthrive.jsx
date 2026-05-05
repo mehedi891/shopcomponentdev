@@ -35,6 +35,8 @@ export const action = async ({ request }) => {
     .update(body)
     .digest('hex');
 
+    console.log("hmac:", signature);
+
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -51,8 +53,10 @@ export const action = async ({ request }) => {
     let data;
     try {
       data = JSON.parse(responseText);
+      console.log("data:",data);
     } catch {
       data = responseText;
+      console.log("data C:",data);
     }
 
     if (!response.ok) {
