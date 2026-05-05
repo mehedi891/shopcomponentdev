@@ -1,18 +1,37 @@
 import { useActionData, useFetcher } from "react-router";
-import crypto from "crypto";
+import { createHmac } from "node:crypto";
+import { authenticate } from "../shopify.server";
+import db from "../db.server";
 
 const WEBHOOK_URL = 'https://app.appthrive.io/api/workflows/webhook/wh_uBTpKrjX7dL68hfMdB-715_E';
 const HMAC_SECRET = 'uSE27d_MN-HEuCBuMy5H03jLaD6Ojd3NS-4_nlA0JmI';
 
+const ERROR_MESSAGES = {
+  400: 'Body is not JSON; or no merchant identifier was supplied.',
+  401: 'X-AppThrive-Signature missing, or HMAC did not verify.',
+  404: 'webhookId unknown or revoked, or the merchant identifier did not resolve in your org.',
+  409: 'Workflow exists but is not Published.',
+};
+
 export const action = async ({ request }) => {
+  const { session } = await authenticate.admin(request);
   const formData = await request.formData();
   const webhookUrl = formData.get('webhook') || WEBHOOK_URL;
 
-  const payload = { triggered_at: new Date().toISOString() };
-  const body = JSON.stringify(payload);
+  const shop = await db.shop.findUnique({
+    where: { shopifyDomain: session.shop },
+    select: {
+      id: true,
+      shopifyShopGid: true,
+    },
+  });
 
-  const signature = crypto
-    .createHmac('sha256', HMAC_SECRET)
+  const body = JSON.stringify({
+    merchant_id: shop.shopifyShopGid,
+    shop_domain: session.shop,
+  });
+
+  const signature = createHmac('sha256', HMAC_SECRET)
     .update(body)
     .digest('hex');
 
@@ -21,19 +40,27 @@ export const action = async ({ request }) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-appthrive-signature': `sha256=${signature}`,
+        'x-appthrive-signature': signature,
+        'x-appthrive-merchant-id': shop.shopifyShopGid,
+        'x-appthrive-shop-domain': session.shop,
       },
       body,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = responseText;
     }
 
-    const data = await response.json();
-    console.log('Webhook response:', data);
+    if (!response.ok) {
+      const message = ERROR_MESSAGES[response.status] ?? `HTTP error! status: ${response.status}`;
+      return { success: false, status: response.status, message, data };
+    }
 
-    return { success: true, message: 'Workflow triggered successfully', data };
+    return { success: true, status: response.status, message: 'Workflow triggered successfully', data };
   } catch (error) {
     console.error('Error triggering webhook:', error);
     return { success: false, message: error.message };
@@ -43,14 +70,15 @@ export const action = async ({ request }) => {
 const AppThrive = () => {
   const fetcher = useFetcher();
   const actionData = useActionData();
-  console.log("actionData:",actionData);
+
   const handleFormSubmit = (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const inputValue = formData.get('webhook'); // Replace 'inputName' with the actual name attribute of your input
     fetcher.submit(formData, { method: 'post' });
-      console.log('Form submitted with value:', inputValue);
-  }
+  };
+
+  const result = fetcher.data ?? actionData;
+
   return (
     <s-page inlineSize="small">
       <s-query-container>
@@ -60,17 +88,22 @@ const AppThrive = () => {
               name="webhook"
               label="Webhook URL"
               placeholder="Enter your webhook URL here"
-              
-              value="https://app.appthrive.io/api/workflows/webhook/wh_uBTpKrjX7dL68hfMdB-715_E"
-            onChange={(e)=>{}}
+              value={WEBHOOK_URL}
+              onChange={() => {}}
             />
-            <s-button type="submit" variant="primary">Submit</s-button>
+            <s-button type="submit" variant="primary" loading={fetcher.state !== 'idle'}>
+              Submit
+            </s-button>
+            {result && (
+              <s-banner tone={result.success ? 'success' : 'critical'}>
+                {result.message}
+              </s-banner>
+            )}
           </s-stack>
-            
         </form>
       </s-query-container>
     </s-page>
-  )
-}
+  );
+};
 
-export default AppThrive
+export default AppThrive;
