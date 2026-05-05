@@ -3,8 +3,8 @@ import { createHmac } from "node:crypto";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 
-const WEBHOOK_URL = 'https://app.appthrive.io/api/workflows/webhook/wh_uBTpKrjX7dL68hfMdB-715_E';
-const HMAC_SECRET = 'uSE27d_MN-HEuCBuMy5H03jLaD6Ojd3NS-4_nlA0JmI';
+const WEBHOOK_URL = 'https://app.appthrive.io/api/workflows/webhook/wh_3O7V4bnc8rd7bhgeIM4nNYVH';
+const HMAC_SECRET = 'Kb5S9SSexLrga9qkxL0ChEXF4q8pcsPwJj-Kwy01Lns';
 
 const ERROR_MESSAGES = {
   400: 'Body is not JSON; or no merchant identifier was supplied.',
@@ -27,7 +27,7 @@ export const action = async ({ request }) => {
   });
 
   const body = JSON.stringify({
-    merchant_id: shop.shopifyShopGid,
+    //merchant_id: shop.shopifyShopGid,
     shop_domain: session.shop,
   });
 
@@ -41,7 +41,7 @@ export const action = async ({ request }) => {
       headers: {
         'Content-Type': 'application/json',
         'x-appthrive-signature': signature,
-        'x-appthrive-merchant-id': shop.shopifyShopGid,
+       // 'x-appthrive-merchant-id': shop.shopifyShopGid,
         'x-appthrive-shop-domain': session.shop,
       },
       body,
