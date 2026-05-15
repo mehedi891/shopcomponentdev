@@ -27,9 +27,9 @@ function toAppThriveShape(row) {
     shopifyPlan: row.shopifyPlan,
     currency: row.currencyCode,
     address1:row.billingAddress,
-    tags:[`${row?.plan?.planName}_Plan`],
+    tags:[row?.isInstalled ? `${row.plan.isTestPlan ? "Pro_trial" : row?.plan?.planName}_Plan` : "uninstalled"],
     customAttributes: {
-        currentAppPlan: `${row?.plan?.planName}_Plan`
+        currentAppPlan: row?.isInstalled ? `${row.plan.isTestPlan ? "Pro_trial" : row?.plan?.planName}_Plan` : "uninstalled"
       },
       // notes:[
       //   {
