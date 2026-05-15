@@ -21,21 +21,28 @@ function toAppThriveShape(row) {
     shopId: row.shopifyShopGid,
     shopDomain: row.shopifyDomain,
     shopName: row.name,
-    shopOwnerName:row.shopOwnerName,
+    shopOwnerName: row.shopOwnerName,
     shopOwnerEmail: row.email,
     shopOwnerPhone: row.shopOwnerPhone,
     shopifyPlan: row.shopifyPlan,
     currency: row.currencyCode,
-    address1:row.billingAddress,
-    tags:[row?.isInstalled ? `${row.plan.isTestPlan ? "Pro_trial" : row?.plan?.planName}_Plan` : "uninstalled"],
+    address1: row.billingAddress,
+    tags: [
+      row?.isInstalled
+        ? `${row?.plan?.isTestPlan ? "Pro_trial" : (row?.plan?.planName ?? "Free")}_Plan`
+        : "uninstalled"
+    ],
     customAttributes: {
-        currentAppPlan: row?.isInstalled ? `${row.plan.isTestPlan ? "Pro_trial" : row?.plan?.planName}_Plan` : "uninstalled"
-      },
-      // notes:[
-      //   {
-      //     content: 'Enrolled in Free plan on 2026-05-12',
-      //     isPinned: true}
-      // ]
+      currentAppPlan: row?.isInstalled
+        ? `${row?.plan?.isTestPlan ? "Pro_trial" : (row?.plan?.planName ?? "Free")}_Plan`
+        : "uninstalled"
+    },
+
+    // notes:[
+    //   {
+    //     content: 'Enrolled in Free plan on 2026-05-12',
+    //     isPinned: true}
+    // ]
   };
 }
 
