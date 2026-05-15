@@ -30,7 +30,7 @@ export const action = async ({ request }) => {
   });
 
   const body = JSON.stringify({
-    merchantId: shop.shopifyShopGid,
+    merchantId: session.shop,
     initiatedBy: 'embedup',
   });
 
