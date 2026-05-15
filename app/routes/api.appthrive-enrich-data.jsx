@@ -66,6 +66,8 @@ export const action = async ({ request }) => {
       shopOwnerPhone: true,
       shopifyPlan: true,
       currencyCode: true,
+      isInstalled: true,
+      billingAddress: true,
       plan: true,
     },
   });
