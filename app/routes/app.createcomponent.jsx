@@ -18,7 +18,7 @@ import { ADD_TO_CART_TYPE, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, PLA
 import redis from "../utilis/redis.init";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 import ColorFieldController from "../components/ColorFieldController/ColorFieldController";
-import { triggerManualWorkflow } from "../appthrive-api.server.js";
+import { triggerManualWorkflow } from "../appthrive-api.js";
 import {sendShopifyEvent} from "../shopify-events.server";
 
 
