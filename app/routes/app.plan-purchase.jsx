@@ -4,7 +4,7 @@ import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
 import { MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_STATUS } from '../constants/constants';
-import { triggerManualWorkflow } from '../appthrive-api.js';
+import { triggerManualWorkflow } from '../appthrive-api.server.js';
 import { sendShopifyEvent } from '../shopify-events.server.js';
 export const loader = async ({ request }) => {
 

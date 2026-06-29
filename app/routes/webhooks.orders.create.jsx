@@ -2,7 +2,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { COMISSION_CRITERIA } from "../constants/constants";
 import { calculateFixedCommission, calculateTierCommission } from "../utilis/calculateCommission";
-import { triggerManualWorkflow, updateMerchantEnrichment } from '../appthrive-api.js';
+import { triggerManualWorkflow, updateMerchantEnrichment } from '../appthrive-api.server.js';
 import { sendShopifyEvent } from '../shopify-events.server.js';
 
 export const action = async ({ request }) => {
