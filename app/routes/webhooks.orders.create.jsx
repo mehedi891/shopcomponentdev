@@ -2,9 +2,11 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { COMISSION_CRITERIA } from "../constants/constants";
 import { calculateFixedCommission, calculateTierCommission } from "../utilis/calculateCommission";
+import { triggerManualWorkflow, updateMerchantEnrichment } from '../appthrive-api.js';
+import { sendShopifyEvent } from '../shopify-events.server.js';
 
 export const action = async ({ request }) => {
-  const { payload } = await authenticate.webhook(request);
+  const { payload, shop } = await authenticate.webhook(request);
   //console.log('Payload:', payload);
   const isSpcOrder = payload?.note_attributes?.find(
     (item) => item.name === "embedup_tracking"
@@ -145,6 +147,93 @@ export const action = async ({ request }) => {
 
       }
     });
+
+    const shopData = await db.shop.findUnique({
+      where: { shopifyDomain: shop },
+      select: {
+        id: true,
+        shopifyShopGid: true,
+        totalOrderCount: true,
+        totalOrderValue: true,
+        // orders: true
+      }
+    });
+
+    const prevTotal = shopData.totalOrderValue - totalPrice;
+    const newTotal = shopData.totalOrderValue;
+
+    // if (shopData.totalOrderCount === 1) {
+    //   // first sale — fires only once by nature
+    // } else if (prevTotal < 500 && newTotal >= 500) {
+    //   // 500 threshold — first crossing only
+    // } else if (prevTotal < 1000 && newTotal >= 1000) {
+    //   // 1000 threshold
+    // } else if (prevTotal < 5000 && newTotal >= 5000) {
+    //   // 5000 threshold
+    // }
+
+
+    try {
+      if (shopData.totalOrderCount === 1) {
+        //trigger workflow for first sale celebration
+        const payload = {
+          change_type: 'first_sale_celebration',
+          remove_tags: [],
+          add_tags: ['first_sale_celebration'],
+
+        }
+
+        await triggerManualWorkflow(shop, `eu_first_sale`, 'wf_digkKItxJF7d', payload);
+        //update merchat enrichment tag for first sale celebration
+       
+        await sendShopifyEvent({
+          shopId: shopData.shopifyShopGid,
+          eventHandle: 'first_sale_celebration',
+          attributes: { value: `Order Value: ${totalPrice}` },
+        });
+      } else if (prevTotal < 500 && newTotal >= 500) {
+
+         const payload = {
+          change_type: '500_threshold_reached',
+          remove_tags: [],
+          add_tags: [],
+
+        }
+
+        //trigger workflow for 500 sale celebration
+        await triggerManualWorkflow(shop, `500_threshold_reached`, 'wf_digkKItxJF7d',payload);
+
+        await sendShopifyEvent({
+          shopId: shopData.shopifyShopGid,
+          eventHandle: '500_threshold_reached',
+          attributes: { value: `Order Value: ${shopData.totalOrderValue}` },
+        });
+      }else if (prevTotal < 10000 && newTotal >= 10000) {
+
+         const payload = {
+          change_type: '10000_threshold_reached',
+          remove_tags: [],
+          add_tags: [],
+
+        }
+
+        //trigger workflow for 500 sale celebration
+        await triggerManualWorkflow(shop, `10000_threshold_reached`, 'wf_digkKItxJF7d',payload);
+
+        await sendShopifyEvent({
+          shopId: shopData.shopifyShopGid,
+          eventHandle: '10000_threshold_reached',
+          attributes: { value: `Order Value: ${shopData.totalOrderValue}` },
+        });
+      }
+
+    } catch (error) {
+      await sendShopifyEvent({
+        shopId: shopData.shopifyShopGid,
+        eventHandle: 'orders_webhook_workflow_trigger_failed',
+        attributes: { value: error.message },
+      });
+    }
 
     console.log("End transaction");
   } catch (error) {

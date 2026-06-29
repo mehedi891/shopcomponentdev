@@ -76,17 +76,73 @@ export const action = async ({ request }) => {
 
   const payloadSin = {
     shopDomain: session.shop,
-    shopOwnerName: " Mehedi Hasan dev Single",
-     notes: [
-      {
-        content: 'Auto-enrolled in beta cohort 2026-05-12 from single merchant enrichment test',
-        isPinned: true
-      },
-      {
-        content: 'from single merchant enrichment test',
-        isPinned: false
-      }
+    shopOwnerName: " Mehedi Hasan dev Single3",
+    tags: [
+      // "free_plan",
+      // "paid_plan",
+      // "standard_plan",
+      // "growth_plan",
+      // "pro_plan",
+      // "trial_plan",
+      // "trial_expired",
+      // "trial_converted",
+      // "plan_downgraded",
+      // "dev_store",
+      // "uninstalled",
+      // "reinstalled",
+      // "app_disabled",
+      // "finish_onboarding",
+      // "not_finish_onboarding",
+      // "onboarding_day3_incomplete",
+      // "no_sales",
+      // "first_sale_celebration",
+      // "500_threshold_reached",
+      // "1000_threshold_reached",
+      // "5000_threshold_reached",
+      // "10000_threshold_reached",
+      // "dormant_14d",
+      // "dormant_30d",
+      // "high_engagement",
+      // "new_feature_release",
+      // "feature_requested",
+      // "issue_occurred",
+      // "nps_promoter",
+      // "nps_detractor"
+      // "not_activate_embed",
+      // "not_activate_block",
+      // "has_ruleset",
+      // "no_active_ruleset",
+      // "ruleset_published",
+      // "product_option_used",
+      // "min_max_used",
+      // "bundle_not_created",
+      // "bundle_not_activated",
+      // "bundle_published_first",
+      // "component_created",
+      // "not_created_component",
+      // "component_activate",
+      // "component_not_active",
+      // "growth_cmp_limit_reached",
+      // "free_cmp_limit_reached",
+      // "embed_not_activated",
+      // "component_customised",
+      // "component_limit_warning",
+      // "discount_created",
+      // "discount_set_active",
+      // "discount_set_not_active",
+      // "bulk_code_generated",
+      // "discount_expired"
     ],
+    //  notes: [
+    //   {
+    //     content: 'Auto-enrolled in beta cohort 2026-05-12 from single merchant enrichment test',
+    //     isPinned: true
+    //   },
+    //   {
+    //     content: 'from single merchant enrichment test',
+    //     isPinned: false
+    //   }
+    // ],
   }
 
   const payload = [
@@ -96,7 +152,7 @@ export const action = async ({ request }) => {
       //shopName: shopDetails?.name ?? null,
       //shopOwnerEmail: shopDetails?.email ?? null,
       shopOwnerName: " Mehedi Hasan dev bulk2",
-      tags:["isVipC", "isReturningC"],
+      tags: ["isVipC", "isReturningC"],
       // customAttributes: {
       //   mailSent: false,
       // }
@@ -124,16 +180,16 @@ export const action = async ({ request }) => {
       //shopName: shopDetails?.name ?? null,
       //shopOwnerEmail: shopDetails?.email ?? null,
       shopOwnerName: " Mehedi Hasan mart3",
-       notes: [
-      {
-        content: 'Auto-enrolled in beta cohort 2026-05-12 from bulk merchant enrichment test',
-        isPinned: true
-      },
-      {
-        content: 'from bulk merchant enrichment test',
-        isPinned: false
-      }
-    ],
+      notes: [
+        {
+          content: 'Auto-enrolled in beta cohort 2026-05-12 from bulk merchant enrichment test',
+          isPinned: true
+        },
+        {
+          content: 'from bulk merchant enrichment test',
+          isPinned: false
+        }
+      ],
     }
   ];
 
@@ -185,11 +241,11 @@ const SingleEnrich = () => {
   const handleFormSubmit = (event) => {
     event.preventDefault();
 
-     const data = {
+    const data = {
       bulk: bulk === 'bulk' ? 'bulk' : '',
-     }
+    }
 
-    fetcher.submit(data , { method: 'post' });
+    fetcher.submit(data, { method: 'post' });
   };
 
   const result = fetcher.data ?? null;

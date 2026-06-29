@@ -18,8 +18,8 @@ import { ADD_TO_CART_TYPE, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, PLA
 import redis from "../utilis/redis.init";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 import ColorFieldController from "../components/ColorFieldController/ColorFieldController";
-
-
+import { triggerManualWorkflow } from "../appthrive-api";
+import {sendShopifyEvent} from "../shopify-events.server";
 
 
 export const loader = async ({ request }) => {
@@ -4196,6 +4196,7 @@ const CreateComponent = () => {
 export default CreateComponent
 
 export const action = async ({ request }) => {
+    const {session} = await authenticate.admin(request);
     const formData = await request.formData();
     const data = Object.fromEntries(formData);
     const jsonFields = [
@@ -4223,12 +4224,40 @@ export const action = async ({ request }) => {
     }
     const updatedData = { ...data, customerTracking: customerTracking, enableQtyField: enableQtyField, shopId: shopId, affiliateId: Number(data.affiliateId) };
 
+const existingCmp = await db.shop.findUnique({
+  where: { shopifyDomain: session.shop },
+  select: {
+    id: true,
+    shopifyShopGid: true,
+    components: {
+      select: {
+        id: true,
+      },
+    },
+  },
+});
 
     const createComp = await db.component.create({
         data: updatedData,
     });
 
     if (createComp?.id) {
+
+        //appthrive workflow trigger for first create component
+        if(existingCmp?.components?.length === 0){
+        try {
+            await triggerManualWorkflow(session.shop, "eu_first_component_created", "wf_BxVvsNKp4QIe");
+
+      await sendShopifyEvent({
+        shopId: existingCmp.shopifyShopGid,
+        eventHandle: 'first_component_created',
+        attributes: { value : 'created successfully' },
+      });
+        } catch (error) {
+            console.error("Error occurred while triggering workflow:", error);
+        }
+        }
+        
         return {
             success: true,
             createCompData: createComp,

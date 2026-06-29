@@ -317,7 +317,8 @@ const Plans = () => {
       isFirstInstall: `${shopData?.isFirstInstall}`,
       partnerDevelopment: shopInfo?.plan?.partnerDevelopment || false,
       remaingTrialDays: remainTrialDays,
-      planPriceAndDiscount: JSON.stringify(planPriceAndDiscount)
+      planPriceAndDiscount: JSON.stringify(planPriceAndDiscount),
+      currentPlan: shopData?.plan?.planName || null,
     }
 
     //console.log('data:', data);
@@ -881,7 +882,7 @@ const Plans = () => {
                     <s-text-field
                       name="couponCode"
                       defaultValue={couponCodeInpValue}
-                      onChange={(e) => { setCouponCodeInpValue(e.targetvalue) }}
+                      onChange={(e) => { setCouponCodeInpValue(e.target.value) }}
                       label="Coupon Code"
                       labelAccessibilityVisibility="exclusive"
                       placeholder="Enter your coupon code"
@@ -927,6 +928,12 @@ export const action = async ({ request }) => {
   // redis invalided the cache if exist end
 
   if (data.planName === PLAN_NAME.growth || data.planName === PLAN_NAME.pro) {
+    const currentPlan = appSubscriptions[0]?.name ?? data?.currentPlan ?? null;
+    const PLAN_RANK = { [PLAN_NAME.free]: 0, [PLAN_NAME.growth]: 1, [PLAN_NAME.pro]: 2 };
+    const isUpgrade = (PLAN_RANK[data.planName] ?? 0) > (PLAN_RANK[currentPlan] ?? 0);
+
+
+    // console.log('isUpgrade:', isUpgrade, 'currentPlan:', currentPlan, 'data.planName:', data.planName);
 
     if (appSubscriptions?.length > 0) {
       for (let i = 0; i < appSubscriptions.length; i++) {
@@ -957,10 +964,10 @@ export const action = async ({ request }) => {
     }
 
 
-    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}&planName=${data.planName}`;
+    let returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?${isUpgrade ? 'upgrade=true' : 'downgrade=true'}&planType=${data.planType}&planName=${data.planName}`;
 
     if (data?.isFirstInstall === 'false') {
-      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?upgrade=true&planType=${data.planType}&planName=${data.planName}`;
+      returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/plan-purchase/?${isUpgrade ? 'upgrade=true' : 'downgrade=true'}&planType=${data.planType}&planName=${data.planName}`;
     } else if (data?.isFirstInstall === 'true') {
       returnURL = `https://admin.shopify.com/store/${session.shop.replace('.myshopify.com', '')}/apps/${process.env.APP_HANDLE}/app/?isFirstInstall=true&planType=${data.planType}&planName=${data.planName}`;
     }
@@ -985,11 +992,11 @@ export const action = async ({ request }) => {
       }),
     };
 
-    console.log("appRecurringPricingDetails", appRecurringPricingDetails,
-      JSON.stringify(appRecurringPricingDetails)
-    );
+    //console.log("appRecurringPricingDetails", appRecurringPricingDetails,
+    //  JSON.stringify(appRecurringPricingDetails)
+    //);
 
-    console.log("isDiscount:", isDiscount, "discountValue:", discountValue);
+    //console.log("isDiscount:", isDiscount, "discountValue:", discountValue);
 
     const variables = {
       name: data.planName,
@@ -1130,9 +1137,9 @@ export const action = async ({ request }) => {
 
     if (data?.isFirstInstall === 'true' && shopData?.plan?.planName === PLAN_NAME.free) {
       //console.log('from ifBlock');
-      throw redirect('/app');
+      throw redirect(`/app?isFirstInstall=true&planName=${PLAN_NAME.free}`);
     } else if (data?.isFirstInstall === 'false' && shopData?.plan?.planName === PLAN_NAME.free) {
-      throw redirect('/app/plan-purchase?downgrade=true');
+      throw redirect(`/app/plan-purchase?downgrade=true&planName=${PLAN_NAME.free}`);
     }
 
     return {

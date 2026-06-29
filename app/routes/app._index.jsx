@@ -22,6 +22,7 @@ export const loader = async ({ request }) => {
   const { session, admin, billing, redirect } = await authenticate.admin(request);
   const { hasActivePayment, appSubscriptions } = await billing.check();
 
+
   // const shopResponse = await admin.graphql(
   //   `#graphql
   //           query shopInfo{
@@ -45,6 +46,7 @@ export const loader = async ({ request }) => {
       shopifyDomain: true,
       currencyCode: true,
       createdAt: true,
+      shopifyShopGid: true,
       trialDays: true,
       appCatalogId: true,
       publicationId: true,
@@ -148,6 +150,7 @@ export const loader = async ({ request }) => {
         shopifyDomain: true,
         currencyCode: true,
         publicationId: true,
+        shopifyShopGid: true,
         createdAt: true,
         trialDays: true,
         plan: {
@@ -350,6 +353,7 @@ export const loader = async ({ request }) => {
         shopifyDomain: true,
         currencyCode: true,
         publicationId: true,
+        shopifyShopGid: true,
         createdAt: true,
         trialDays: true,
         plan: {
@@ -416,6 +420,7 @@ export const loader = async ({ request }) => {
   }
   const components = shopData?.components || [];
 
+  
 
   return {
     shopData: shopData,

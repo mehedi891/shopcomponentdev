@@ -102,44 +102,44 @@ model Component {
 }
 
 model Shop {
-  id                   Int                 @id @default(autoincrement())
-  shopifyShopGid       String?             @unique
-  shopifyDomain        String?             @unique
-  scAccessToken        String?
-  headlessAccessToken  String?
-  installationCount    Int?
-  maxAllowedComponents Int?                @default(1)
-  name                 String?
-  url                  String?
-  isFirstInstall       Boolean?            @default(true)
-  partnerDevelopment   Boolean?            @default(true)
-  shopOwnerName        String?
-  email                String?
-  shopOwnerPhone       String?
-  currencyCode         String?
-  weightUnit           String?
-  billingAddress       String?
-  shopifyPlan          String?
-  appPlan              String?             @default("Free")
-  trialDays            Int?                @default(7)
-  planActivatedAt      DateTime?           @default(now())
-  shopifyPlus          Boolean?            @default(false)
-  myshopifyDomain      String?
-  appDisabled          Boolean?            @default(false)
-  appCatalogId         String?
-  publicationId        String?
-  isInstalled          Boolean?            @default(false)
-  coupon               String?
-  isAppliedCoupon      Boolean?            @default(true)
-  plan                 Plan?
-  components           Component[]
-  affiliates           Affiliate[]
-  shopOrdersByMonth    ShopOrdersByMonth[]
-  orders               Order[]
-  totalOrderCount      Int?                @default(0)
-  totalOrderValue      Float?              @default(0.00)
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  id                       Int                 @id @default(autoincrement())
+  shopifyShopGid           String?             @unique
+  shopifyDomain            String?             @unique
+  scAccessToken            String?
+  headlessAccessToken      String?
+  installationCount        Int?
+  maxAllowedComponents     Int?                @default(1)
+  name                     String?
+  url                      String?
+  isFirstInstall           Boolean?            @default(true)
+  partnerDevelopment       Boolean?            @default(true)
+  shopOwnerName            String?
+  email                    String?
+  shopOwnerPhone           String?
+  currencyCode             String?
+  weightUnit               String?
+  billingAddress           String?
+  shopifyPlan              String?
+  appPlan                  String?             @default("Free")
+  trialDays                Int?                @default(7)
+  planActivatedAt          DateTime?           @default(now())
+  shopifyPlus              Boolean?            @default(false)
+  myshopifyDomain          String?
+  appDisabled              Boolean?            @default(false)
+  appCatalogId             String?
+  publicationId            String?
+  isInstalled              Boolean?            @default(false)
+  coupon                   String?
+  isAppliedCoupon          Boolean?            @default(true)
+  plan                     Plan?
+  components               Component[]
+  affiliates               Affiliate[]
+  shopOrdersByMonth        ShopOrdersByMonth[]
+  orders                   Order[]
+  totalOrderCount          Int?                @default(0)
+  totalOrderValue          Float?              @default(0.00)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
 }
 
 model Plan {

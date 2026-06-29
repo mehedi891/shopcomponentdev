@@ -4,7 +4,8 @@ import { authenticate } from '../shopify.server';
 import db from "../db.server";
 import { useEffect } from 'react';
 import { MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_STATUS } from '../constants/constants';
-
+import { triggerManualWorkflow } from '../appthrive-api.js';
+import { sendShopifyEvent } from '../shopify-events.server.js';
 export const loader = async ({ request }) => {
 
   const { session, billing, admin } = await authenticate.admin(request);
@@ -167,6 +168,43 @@ export const loader = async ({ request }) => {
 
     }
 
+  }
+
+  
+  try {
+    const plan = planName === PLAN_NAME.free ? 'free_plan' : planName === PLAN_NAME.growth ? 'growth_plan' : 'pro_plan';
+  //  await  updateMerchantEnrichment(
+  //   session.shop, 
+  //   { 
+  //     tags:[plan],
+  //     customAttributes:{euAppPlan: plan}
+  //    },
+  // );
+    await sendShopifyEvent({
+      shopId: shopData.shopifyShopGid,
+      eventHandle: 'plan_purchased_success',
+      attributes: { value: planName },
+    });
+
+    const planTags = ["free_plan", "growth_plan", "pro_plan"];
+    const removeTags = planTags.filter(t => t !== plan);
+    const payload= {
+      change_type: upgrade === 'true' ? 'plan_upgraded' : downgrade === 'true' ? 'plan_downgraded' : 'plan_changed',
+      remove_tags: removeTags,
+      add_tags: [plan],
+      
+    }
+    
+       await triggerManualWorkflow(session.shop, `eu_plan_upgraded_${planName}`, 'wf_9DA65hwdrTlo',payload);
+   
+  
+    
+  } catch (error) {
+     await sendShopifyEvent({
+        shopId: shopData.shopifyShopGid,
+        eventHandle: 'plan_purchase_failed',
+        attributes: { value : error.message },
+      });
   }
 
   return {

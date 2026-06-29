@@ -21,13 +21,13 @@ export const action = async ({ request }) => {
   const formData = await request.formData();
   const webhookUrl = formData.get('webhook') || WEBHOOK_URL;
 
-  const shop = await db.shop.findUnique({
-    where: { shopifyDomain: session.shop },
-    select: {
-      id: true,
-      shopifyShopGid: true,
-    },
-  });
+  // const shop = await db.shop.findUnique({
+  //   where: { shopifyDomain: session.shop },
+  //   select: {
+  //     id: true,
+  //     shopifyShopGid: true,
+  //   },
+  // });
 
   const body = JSON.stringify({
     merchantId: session.shop,

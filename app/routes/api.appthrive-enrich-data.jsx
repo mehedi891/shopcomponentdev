@@ -29,12 +29,12 @@ function toAppThriveShape(row) {
     address1: row.billingAddress,
     tags: [
       row?.isInstalled
-        ? `${row?.plan?.isTestPlan ? "Pro_trial" : (row?.plan?.planName ?? "Free")}_Plan`
+        ? `${row?.plan?.isTestPlan ? "trial_" : (row?.plan?.planName ?? "free_")}plan`
         : "uninstalled"
     ],
     customAttributes: {
       currentAppPlan: row?.isInstalled
-        ? `${row?.plan?.isTestPlan ? "Pro_trial" : (row?.plan?.planName ?? "Free")}_Plan`
+        ? `${row?.plan?.isTestPlan ? "trial_" : (row?.plan?.planName ?? "free_")}plan`
         : "uninstalled"
     },
 

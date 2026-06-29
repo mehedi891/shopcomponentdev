@@ -18,7 +18,7 @@ import DraggableProductInd from "../components/DragAblePd/DraggableProductInd";
 import { ADD_TO_CART_TYPE, AFFILIATE_STATUS, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, SHOW_COMPONENT_TITLE, STATUS, PLAN_NAME } from "../constants/constants";
 import redis from "../utilis/redis.init";
 import ColorFieldController from "../components/ColorFieldController/ColorFieldController";
-//import {sendShopifyEvent} from "../shopify-events.server";
+
 
 export const loader = async ({ request, params }) => {
   const { id } = params;
@@ -4126,6 +4126,7 @@ export default UpdateComponent
 
 
 export const action = async ({ request, params }) => {
+  const {session} = await authenticate.admin(request);
   const { id } = params;
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
@@ -4198,11 +4199,9 @@ export const action = async ({ request, params }) => {
         },
       });
 
-      // await sendShopifyEvent({
-      //   shopId: "gid://shopify/Shop/62651891811",
-      //   eventHandle: 'component_status_changed',
-      //   attributes: { value : data.status },
-      // });
+
+    
+
     } catch (error) {
       return {
         success: false,

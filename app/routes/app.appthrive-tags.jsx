@@ -3,6 +3,36 @@ import { useFetcher } from "react-router";
 const WEBHOOK_URL = `https://app.appthrive.io/api/v1/tags`;
 const APPTHRIVE_PAT = 'at_Oax4NuYU2p9rcreLlaTyNFgnQU0KTjfD';
 
+// export const loader = async ({ request }) => {
+//   const deleteUrl = `${WEBHOOK_URL}/tag_KuTYNX2o`
+//   try {
+//     const response = await fetch(deleteUrl, {
+//       method: 'DELETE',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${APPTHRIVE_PAT}`,
+//       },
+//       // body: JSON.stringify({
+//       //   name: 'mailSent',
+//       //   color: 'emerald',
+//       //   description: ''
+//       // }),
+//     });
+//     const responseText = await response.text();
+//     let data;
+//     try {
+//       data = JSON.parse(responseText);
+//       console.log("data:", data);
+//     } catch {
+//       data = responseText;
+//       console.log("data C:", data);
+//     }
+//   } catch (error) {
+//     console.log("Delete,Error",error);
+//   }
+//   return null;
+// }
+
 export const action = async ({ request }) => {
   const formData = await request.formData();
   const webhookUrl = formData.get('webhook') || WEBHOOK_URL;
