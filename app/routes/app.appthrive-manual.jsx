@@ -1,7 +1,6 @@
 import { useActionData, useFetcher } from "react-router";
 //import { createHmac } from "node:crypto";
 import { authenticate } from "../shopify.server";
-import db from "../db.server";
 const WORKFLOW_ID = "wf_ropcRFYbpWNK"
 const WEBHOOK_URL = `https://app.appthrive.io/api/v1/workflows/${WORKFLOW_ID}/runs`;
 const APPTHRIVE_PAT = 'at_Oax4NuYU2p9rcreLlaTyNFgnQU0KTjfD';
