@@ -193,7 +193,7 @@ export const loader = async ({ request }) => {
 
     const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
 
-    console.log("API URL Plans:", url);
+    console.log("API URL Plans:", url,"appSecret:",appSecret);
 
     try {
       const couponResponse = await fetch(url, {

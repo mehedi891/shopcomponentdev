@@ -41,7 +41,7 @@ export const action = async ({ request }) => {
             }
 
             const resData = await response.json();
-            //console.log("resDataApplyco:", resData);
+            console.log("resDataApplyco:", resData,"appSecret:",appSecret);
             if(resData?.offer?.option && resData?.offer?.option != "") {
                 const updateData = {
                     coupon: code,
