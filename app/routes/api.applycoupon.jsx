@@ -10,19 +10,19 @@ export const action = async ({ request }) => {
   const timestamp = Date.now().toString();
             const code = formData.get("couponCode");
 
-            const canonical = `${timestamp}:${"COUPON_CHECK"}:${code}:${"EmbedUp"}:${session.shop}`;
+            const canonical = `${timestamp}:${"COUPON_CHECK"}:${code}:${"embedup"}:${session.shop}`;
             
             const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
             const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
             const inputFormData = new FormData();
             inputFormData.set("target", "COUPON_CHECK");
             inputFormData.set("code", code);
-            inputFormData.set("app", "EmbedUp");
+            inputFormData.set("app", "embedup");
             inputFormData.set("shop", session.shop);
 
             const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
 
-            console.log("API URL", process.env.COUPON_CODE_API_URL);
+            console.log("API URL:2222", process.env.COUPON_CODE_API_URL);
 
             const response = await fetch(url, {
                 method: "POST",
@@ -41,6 +41,7 @@ export const action = async ({ request }) => {
             }
 
             const resData = await response.json();
+            //console.log("resDataApplyco:", resData);
             if(resData?.offer?.option && resData?.offer?.option != "") {
                 const updateData = {
                     coupon: code,

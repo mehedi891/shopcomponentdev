@@ -1,0 +1,77 @@
+[
+  {
+    "$schema": "https://extensions.shopifycdn.com/shopifycloud/schemas/v1/tool.json",
+    "name": "get_top_components",
+    "description": "Get the top performing affiliate buy button components sorted by total sales revenue or order count. Use this when the merchant asks about best performing, top selling, or most popular buy buttons.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "number",
+          "description": "Number of components to return. Default is 5, maximum is 10."
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": ["revenue", "orders"],
+          "description": "Sort by total revenue (default) or total order count."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "$schema": "https://extensions.shopifycdn.com/shopifycloud/schemas/v1/tool.json",
+    "name": "get_component_stats",
+    "description": "Get detailed sales stats for a specific buy button component by its name or ID. Use this when the merchant asks about a specific buy button by name.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The component name or numeric ID to look up."
+        }
+      },
+      "required": ["query"]
+    }
+  },
+  {
+    "$schema": "https://extensions.shopifycdn.com/shopifycloud/schemas/v1/tool.json",
+    "name": "get_top_affiliates",
+    "description": "Get the top performing affiliates sorted by revenue, order count, or commission earned. Use this when the merchant asks about best affiliates, top partners, or affiliate performance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "number",
+          "description": "Number of affiliates to return. Default is 5, maximum is 10."
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": ["revenue", "orders", "commission"],
+          "description": "Sort by total revenue (default), total orders, or total commission earned."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "$schema": "https://extensions.shopifycdn.com/shopifycloud/schemas/v1/tool.json",
+    "name": "get_app_overview",
+    "description": "Get a summary of the EmbedUp app performance including total orders, total revenue, number of active buy buttons, number of affiliates, and current plan. Use this when the merchant asks for a general overview, summary, or dashboard.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "$schema": "https://extensions.shopifycdn.com/shopifycloud/schemas/v1/tool.json",
+    "name": "how_to_create_component",
+    "description": "Get step-by-step instructions for creating a new affiliate buy button component in EmbedUp. Use this when the merchant asks how to create, set up, or add a new buy button.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  }
+]

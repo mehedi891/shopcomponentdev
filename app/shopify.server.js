@@ -220,11 +220,15 @@ const shopify = shopifyApp({
       try {
         await appthrive.bootstrap({
         shopDomain: session.shop,
+        shopOwnerName:shop?.shopOwnerName || '',
+        shopOwnerEmail:shop?.email || '',
+        shopOwnerPhone: shop?.billingAddress?.phone || '',
+        currency :shop?.currencyCode,
         accessToken: session.accessToken,
         shopifyClientSecret: process.env.SHOPIFY_API_SECRET,
       })
       } catch (error) {
-        console.log("error:",error);
+        console.log("error from appthrive.bootstrap:",error);
       }
       
       console.log("AfterSessionShopFromServer:", session.shop);

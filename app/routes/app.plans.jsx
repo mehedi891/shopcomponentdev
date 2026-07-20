@@ -181,14 +181,14 @@ export const loader = async ({ request }) => {
     // Create canonical string for signing
     const timestamp = Date.now().toString();
 
-    const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"EmbedUp"}:${session.shop}`;
+    const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"embedup"}:${session.shop}`;
     const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
     const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
 
     const inputFormData = new FormData();
     inputFormData.set("target", "GET_COUPON_OFFER");
     inputFormData.set("code", code);
-    inputFormData.set("app", "EmbedUp");
+    inputFormData.set("app", "embedup");
     inputFormData.set("shop", session.shop);
 
     const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
@@ -209,6 +209,8 @@ export const loader = async ({ request }) => {
       }
     } catch (error) { }
   }
+
+  console.log('couponData:', couponData);
 
   const remainTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
 
