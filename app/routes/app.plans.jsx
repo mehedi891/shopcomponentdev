@@ -130,6 +130,7 @@ export const loader = async ({ request }) => {
         coupon: true,
         trialDays: true,
         isAppliedCoupon: true,
+        createdAt: true,
       }
     });
   }
@@ -175,40 +176,70 @@ export const loader = async ({ request }) => {
   // }
 
 
-  let couponData = {};
-  const code = shopData.coupon || "";
-  if (code && code != "") {
-    // Create canonical string for signing
-    const timestamp = Date.now().toString();
+ let couponData = {};
+let code = shopData.coupon || "";
 
-    const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"embedup"}:${session.shop}`;
-    const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
-    const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
+// Only auto-discover within the claim window (matches the panel's 48h TTL).
+const isFresh = Date.now() - new Date(shopData.createdAt).getTime() < 48 * 60 * 60 * 1000;
 
-    const inputFormData = new FormData();
-    inputFormData.set("target", "GET_COUPON_OFFER");
-    inputFormData.set("code", code);
-    inputFormData.set("app", "embedup");
-    inputFormData.set("shop", session.shop);
+// Run when: a code is already stored (fetch its offer for display), OR the shop
+// has no code yet and is a fresh install (ask the panel "any pending referral
+// for this store?" with an empty code).
+if (code || (!shopData.coupon && isFresh)) {
+  const timestamp = Date.now().toString();
+  const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"embedup"}:${session.shop}`;
+  const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
+  const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
 
-    const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
+  const inputFormData = new FormData();
+  inputFormData.set("target", "GET_COUPON_OFFER");
+  inputFormData.set("code", code); // "" on a fresh shop → panel resolves by shop
+  inputFormData.set("app", "embedup");
+  inputFormData.set("shop", session.shop);
 
-    console.log("API URL Plans:", url,"appSecret:",appSecret);
+  const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
 
-    try {
-      const couponResponse = await fetch(url, {
-        method: "POST",
-        headers: {
-          "x-api-signature": signature,
-          "x-api-timestamp": timestamp,
-        },
-        body: inputFormData,
-      });
-      if (couponResponse.ok) {
-        couponData = await couponResponse.json();
+  try {
+    const couponResponse = await fetch(url, {
+      method: "POST",
+      headers: {
+        "x-api-signature": signature,
+        "x-api-timestamp": timestamp,
+      },
+      body: inputFormData,
+    });
+
+    if (couponResponse.ok) {
+      couponData = await couponResponse.json();
+      console.log("Coupon Data:", couponData);
+
+      // Panel discovered a pending referral for this store → save it ONCE, using
+      // the SAME fields your manual apply writes, so both paths end up identical.
+      if (!code && couponData?.code && couponData?.offer) {
+        code = couponData.code;
+
+        const updateData = {
+          coupon: code,
+          isAppliedCoupon: false,
+          planActivatedAt: new Date().toISOString(),
+          trialDays: couponData.offer?.option === "trial"
+            ? parseInt(couponData.offer?.value?.trialDays) || 0
+            : 0,
+        };
+
+        await db.shop.update({
+          where: { shopifyDomain: session.shop },
+          data: updateData,
+        });
+
+        shopData = { ...shopData, coupon: code }; // persist → won't re-discover
       }
-    } catch (error) { }
+    }
+  } catch (error) {
+    console.error("Error fetching coupon data:", error);
   }
+}
+
 
   console.log('couponData:', couponData);
 
