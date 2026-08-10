@@ -176,72 +176,73 @@ export const loader = async ({ request }) => {
   // }
 
 
- let couponData = {};
-let code = shopData.coupon || "";
+  let couponData = {};
+  let code = shopData.coupon || "";
 
-// Only auto-discover within the claim window (matches the panel's 48h TTL).
-const isFresh = Date.now() - new Date(shopData.createdAt).getTime() < 48 * 60 * 60 * 1000;
+  // Only auto-discover within the claim window (matches the panel's 48h TTL).
+  const isFresh = Date.now() - new Date(shopData.createdAt).getTime() < 48 * 60 * 60 * 1000;
 
-// Run when: a code is already stored (fetch its offer for display), OR the shop
-// has no code yet and is a fresh install (ask the panel "any pending referral
-// for this store?" with an empty code).
-if (code || (!shopData.coupon && isFresh)) {
-  const timestamp = Date.now().toString();
-  const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"embedup"}:${session.shop}`;
-  const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
-  const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
+  if (code || (!shopData.coupon && isFresh)) {
+    try {
+      const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
+      const apiUrl = process.env.COUPON_CODE_API_URL;
 
-  const inputFormData = new FormData();
-  inputFormData.set("target", "GET_COUPON_OFFER");
-  inputFormData.set("code", code); // "" on a fresh shop → panel resolves by shop
-  inputFormData.set("app", "embedup");
-  inputFormData.set("shop", session.shop);
+      if (appSecret && apiUrl) {
+        const timestamp = Date.now().toString();
+        const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"embedup"}:${session.shop}`;
+        const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
 
-  const url = `${process.env.COUPON_CODE_API_URL}/check-coupon`;
+        const inputFormData = new FormData();
+        inputFormData.set("target", "GET_COUPON_OFFER");
+        inputFormData.set("code", code);
+        inputFormData.set("app", "embedup");
+        inputFormData.set("shop", session.shop);
 
-  try {
-    const couponResponse = await fetch(url, {
-      method: "POST",
-      headers: {
-        "x-api-signature": signature,
-        "x-api-timestamp": timestamp,
-      },
-      body: inputFormData,
-    });
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000);
+        let couponResponse;
+        try {
+          couponResponse = await fetch(`${apiUrl}/check-coupon`, {
+            method: "POST",
+            headers: { "x-api-signature": signature, "x-api-timestamp": timestamp },
+            body: inputFormData,
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timer);
+        }
 
-    if (couponResponse.ok) {
-      couponData = await couponResponse.json();
-      console.log("Coupon Data:", couponData);
+        if (couponResponse?.ok) {
+          couponData = await couponResponse.json().catch(() => ({}));
 
-      // Panel discovered a pending referral for this store → save it ONCE, using
-      // the SAME fields your manual apply writes, so both paths end up identical.
-      if (!code && couponData?.code && couponData?.offer) {
-        code = couponData.code;
-
-        const updateData = {
-          coupon: code,
-          isAppliedCoupon: false,
-          planActivatedAt: new Date().toISOString(),
-          trialDays: couponData.offer?.option === "trial"
-            ? parseInt(couponData.offer?.value?.trialDays) || 0
-            : 0,
-        };
-
-        await db.shop.update({
-          where: { shopifyDomain: session.shop },
-          data: updateData,
-        });
-
-        shopData = { ...shopData, coupon: code }; // persist → won't re-discover
+          if (!code && couponData?.code && couponData?.offer) {
+            const discovered = couponData.code;
+            try {
+              await db.shop.update({
+                where: { shopifyDomain: session.shop },
+                data: {
+                  coupon: discovered,
+                  isAppliedCoupon: false,
+                  planActivatedAt: new Date().toISOString(),
+                  trialDays:
+                    couponData.offer?.option === "trial"
+                      ? parseInt(couponData.offer?.value?.trialDays) || 0
+                      : 0,
+                },
+              });
+              code = discovered;
+              shopData = { ...shopData, coupon: discovered };
+            } catch (dbErr) {
+              console.error("[efoli] shop coupon persist failed (non-fatal):", dbErr?.message);
+            }
+          }
+        }
       }
+    } catch (error) {
+      console.error("[efoli] coupon lookup failed (non-fatal):", error?.message ?? error);
+      couponData = {};
     }
-  } catch (error) {
-    console.error("Error fetching coupon data:", error);
   }
-}
-
-
-  console.log('couponData:', couponData);
 
   const remainTrialDays = getRemainingTrialDays(shopData?.createdAt, shopData?.trialDays);
 
