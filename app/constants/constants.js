@@ -110,6 +110,9 @@ const TIERED_COMISSION_TYPE = {
   orderAmount: 'orderAmount'
 }
 
+// Coupon offers that discount the app subscription itself
+const SUBSCRIPTION_DISCOUNT_OFFERS = ["discount-on-app-sub", "revenue-and-sub-discount"];
+
 export {
   APPLIES_TO,
   ADD_TO_CART_TYPE,
@@ -127,5 +130,6 @@ export {
   COMISSION_CRITERIA,
   FIXED_COMISSION,
   AFFILIATE_STATUS,
-  TIERED_COMISSION_TYPE
+  TIERED_COMISSION_TYPE,
+  SUBSCRIPTION_DISCOUNT_OFFERS
 }

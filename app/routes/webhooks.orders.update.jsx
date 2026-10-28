@@ -1,5 +1,4 @@
 import { authenticate } from "../shopify.server";
-import { inspect } from 'node:util';
 
 import db from "../db.server";
 //import calculateTotalRefund from "../utilis/calculateTotalRefund";
@@ -7,21 +6,12 @@ import { COMISSION_CRITERIA } from "../constants/constants";
 import { calculateFixedCommission, calculateTierCommission } from "../utilis/calculateCommission";
 
 export const action = async ({ request }) => {
-  const { payload, topic, subTopic } = await authenticate.webhook(request);
+  const { payload, topic } = await authenticate.webhook(request);
 
 
   console.log('from orders update');
   // console.log('from orders update payload', payload);
-  console.log('topic:', topic, 'Subtopic:', subTopic);
-  console.log(
-    inspect(payload, {
-      depth: null,            // no depth limit
-      maxArrayLength: null,   // print all elements
-      colors: true,
-      compact: false,
-      breakLength: 120
-    })
-  );
+  console.log('topic:', topic, 'order:', payload?.admin_graphql_api_id);
 
   const isExistOrder = await db.order.findUnique({
     where: {

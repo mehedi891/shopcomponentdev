@@ -1,7 +1,8 @@
 export const updateMerchantEnrichment = async (shop, enrichmentData) => {
   const { createHmac } = await import('node:crypto');
   const INGEST_URL = 'https://app.appthrive.io/api/ingest/org_XbPoGTQPldjc/app_ayLlm5B_RZN5/merchant';
-  const APPTHRIVE_SECRET = 'whsk_ba4be564cee8aa84961b618909f4df4710224db152f495e2';
+  const APPTHRIVE_SECRET = process.env.APPTHRIVE_WEBHOOK_SECRET;
+  if (!APPTHRIVE_SECRET) return { success: false, message: "APPTHRIVE_WEBHOOK_SECRET is not set" };
 
   const ERROR_MESSAGES = {
     400: 'Body invalid or missing required fields.',
@@ -99,7 +100,8 @@ export const triggerManualWorkflow = async(shop, initiatedBy,workflowId,payload)
   //console.log({shop,initiatedBy});
   //const WORKFLOW_ID = "wf_BxVvsNKp4QIe"
   const WEBHOOK_URL = `https://app.appthrive.io/api/v1/workflows/${workflowId}/runs`;
-  const APPTHRIVE_PAT = "at_Oax4NuYU2p9rcreLlaTyNFgnQU0KTjfD";
+  const APPTHRIVE_PAT = process.env.APPTHRIVE_PAT;
+  if (!APPTHRIVE_PAT) return { success: false, message: "APPTHRIVE_PAT is not set" };
 
   const ERROR_MESSAGES = {
     400: 'Body invalid, workflow not active, or workflow trigger type is not manual-api.',

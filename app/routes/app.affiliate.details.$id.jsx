@@ -14,7 +14,7 @@ import { getCurrentTier } from "../utilis/calculateCommission";
 
 
 export const loader = async ({ request, params }) => {
-  const { admin, } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const { id } = params;
 
   const response = await admin.graphql(
@@ -37,6 +37,7 @@ export const loader = async ({ request, params }) => {
   affData = await db.affiliate.findUnique({
     where: {
       id: Number(id),
+      shop: { shopifyDomain: session.shop },
     },
     include: {
       components: {
@@ -54,6 +55,7 @@ export const loader = async ({ request, params }) => {
   affOrderTotals = await db.order.aggregate({
     where: {
       affiliateId: Number(id),
+      shop: { shopifyDomain: session.shop },
       isCancelled: false
     },
     _sum: {
@@ -70,6 +72,7 @@ export const loader = async ({ request, params }) => {
       by: ['componentId'],
       where: {
         affiliateId: Number(id),
+        shop: { shopifyDomain: session.shop },
         isCancelled: false
       },
       _sum: {

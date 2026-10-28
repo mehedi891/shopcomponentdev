@@ -18,6 +18,7 @@ import { ADD_TO_CART_TYPE, APPLIES_TO, BoleanOptions, CART_BEHAVIOR, LAYOUT, PLA
 import redis from "../utilis/redis.init";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
 import ColorFieldController from "../components/ColorFieldController/ColorFieldController";
+import { escapeHtml, safeStyleText } from "../spc-front-react/spc-front-components/utilities/htmlEscape";
 import { triggerManualWorkflow } from "../appthrive-api.js";
 import {sendShopifyEvent} from "../shopify-events.server";
 
@@ -1730,8 +1731,8 @@ const CreateComponent = () => {
         <div class="shopcomponent_pd_container">
             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
-                <div class="shopcomponent_title">${watchedValues.title}</div>
-                <div class="shopcomponent_description">${watchedValues.description}</div>
+                <div class="shopcomponent_title">${escapeHtml(watchedValues.title)}</div>
+                <div class="shopcomponent_description">${escapeHtml(watchedValues.description)}</div>
             </div>
 
             <div class="shopcomponent_slider_container_${watchedValues.layout}">
@@ -1753,7 +1754,7 @@ const CreateComponent = () => {
         ${stylesPdT1}
         ${globalStyles}
          <style>
-            ${watchedValues.componentSettings.customCss}
+            ${safeStyleText(watchedValues.componentSettings.customCss)}
         </style>
 
     `;
@@ -1826,8 +1827,8 @@ const CreateComponent = () => {
         <div class="shopcomponent_pd_container">
             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
-                <div class="shopcomponent_title">${watchedValues.title}</div>
-                <div class="shopcomponent_description">${watchedValues.description}</div>
+                <div class="shopcomponent_title">${escapeHtml(watchedValues.title)}</div>
+                <div class="shopcomponent_description">${escapeHtml(watchedValues.description)}</div>
             </div>
 
             <div class="shopcomponent_slider_container_${watchedValues.layout}">
@@ -1863,7 +1864,7 @@ const CreateComponent = () => {
         ${stylesPdT1}
         ${globalStyles}
          <style>
-            ${watchedValues.componentSettings.customCss}
+            ${safeStyleText(watchedValues.componentSettings.customCss)}
         </style>
     
     `;
@@ -1943,8 +1944,8 @@ const CreateComponent = () => {
         <div class="shopcomponent_pd_container">
             ${watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.cart ? floatingCartCountBuble : ''}
             <div class="shopcomponent_title_N_description">
-                <div class="shopcomponent_title">${watchedValues.title}</div>
-                <div class="shopcomponent_description">${watchedValues.description}</div>
+                <div class="shopcomponent_title">${escapeHtml(watchedValues.title)}</div>
+                <div class="shopcomponent_description">${escapeHtml(watchedValues.description)}</div>
             </div>
 
             <div class="shopcomponent_slider_container_${watchedValues.layout}">
@@ -1966,7 +1967,7 @@ const CreateComponent = () => {
         ${stylesPdT1}
         ${globalStyles}
         <style>
-            ${watchedValues.componentSettings.customCss}
+            ${safeStyleText(watchedValues.componentSettings.customCss)}
         </style>
 
     `;
@@ -2141,11 +2142,11 @@ const CreateComponent = () => {
                                     <s-stack>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -2238,11 +2239,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -2311,11 +2312,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -2637,11 +2638,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -2714,11 +2715,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -2789,11 +2790,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -3067,11 +3068,11 @@ const CreateComponent = () => {
 
                                         <div className={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout ? 'btncollapsibleHidden' : ''} aria-disabled={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout} aria-hidden={watchedValues.componentSettings.cartBehavior === CART_BEHAVIOR.checkout}>
                                             <s-box paddingBlockEnd={'large'}>
-                                                <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                                <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                     <s-clickable
                                                         padding="small"
-                                                        background="base"
+                                                        background="subdued"
                                                         borderRadius="base"
                                                         minBlockSize="50px"
                                                         onClick={() => {
@@ -3412,11 +3413,11 @@ const CreateComponent = () => {
                                         </div>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -3694,11 +3695,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -3761,11 +3762,11 @@ const CreateComponent = () => {
                                         </s-box>
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -3895,11 +3896,11 @@ const CreateComponent = () => {
 
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -3970,11 +3971,11 @@ const CreateComponent = () => {
 
 
                                         <s-box paddingBlockEnd={'large'}>
-                                            <s-box background="base" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
+                                            <s-box background="subdued" borderRadius="base" paddingInline={'300'} paddingBlockStart={'200'} minInlineSize="350px">
 
                                                 <s-clickable
                                                     padding="small"
-                                                    background="base"
+                                                    background="subdued"
                                                     borderRadius="base"
                                                     minBlockSize="50px"
                                                     onClick={() => {
@@ -4218,11 +4219,9 @@ export const action = async ({ request }) => {
     }
     let customerTracking = formData.get('customerTracking');
     const enableQtyField = formData.get('enableQtyField') === "true" ? true : false;
-    const shopId = Number(formData.get('shopId'));
     if (customerTracking === '') {
         customerTracking = crypto.randomBytes(15).toString("base64url").slice(0, 10).toUpperCase();
     }
-    const updatedData = { ...data, customerTracking: customerTracking, enableQtyField: enableQtyField, shopId: shopId, affiliateId: Number(data.affiliateId) };
 
 const existingCmp = await db.shop.findUnique({
   where: { shopifyDomain: session.shop },
@@ -4236,6 +4235,27 @@ const existingCmp = await db.shop.findUnique({
     },
   },
 });
+
+    // The owning shop comes from the session; never let the form set ownership or counters
+    for (const key of ["id", "shopId", "totalOrderCount", "totalOrderValue", "softDelete", "createdAt", "updatedAt"]) {
+        delete data[key];
+    }
+
+    const affiliateId = Number(data.affiliateId);
+    if (Number.isInteger(affiliateId) && affiliateId > 0) {
+        const affiliate = await db.affiliate.findFirst({
+            where: { id: affiliateId, shopId: existingCmp.id },
+            select: { id: true },
+        });
+        if (!affiliate) {
+            return {
+                success: false,
+                error: "Selected affiliate was not found"
+            };
+        }
+    }
+
+    const updatedData = { ...data, customerTracking: customerTracking, enableQtyField: enableQtyField, shopId: existingCmp.id, affiliateId: affiliateId };
 
     const createComp = await db.component.create({
         data: updatedData,

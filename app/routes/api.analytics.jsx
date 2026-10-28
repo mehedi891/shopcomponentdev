@@ -8,7 +8,9 @@ export const action = async ({ request }) => {
   const data = Object.fromEntries(formData);
 
   const days = Number(data?.days) || 0;
-  const componentId = data?.componentId ? JSON.parse(data?.componentId) : null;
+  // Only a positive integer id may reach the cache key and the DATA_API query string
+  const componentIdNumber = Number(data?.componentId);
+  const componentId = Number.isInteger(componentIdNumber) && componentIdNumber > 0 ? componentIdNumber : null;
   console.log("componentID:",componentId);
   const dateRange =
     new Date(Date.now() - days * 24 * 60 * 60 * 1000)

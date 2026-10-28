@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { updateQuantity } from "../../utilities/utilisFnc";
+import { escapeHtml } from "../../utilities/htmlEscape";
 
 const BulkProductCard = ({ tracking, product, enableQtyField }) => {
   useEffect(() => {
@@ -13,8 +14,8 @@ const BulkProductCard = ({ tracking, product, enableQtyField }) => {
     }, []);
   const bulkProductCardHtml = `
 
-     <div class="product-card spcProductCard_${tracking}">
-    <shopify-context type="product" handle="${product.handle}">
+     <div class="product-card spcProductCard_${escapeHtml(tracking)}">
+    <shopify-context type="product" handle="${escapeHtml(product.handle)}">
       <template>
         <div class="product-card__container">
           <div class="product-card__media">
@@ -24,10 +25,10 @@ const BulkProductCard = ({ tracking, product, enableQtyField }) => {
           </div>
           <div class="product-card__details">
             <div class="product-card__info">
-              <h2 class="product-card__title spcProductCardTitle_${tracking}">
+              <h2 class="product-card__title spcProductCardTitle_${escapeHtml(tracking)}">
                 <shopify-data query="product.title"></shopify-data>
               </h2>
-              <div class="product-card__price spcProductCardPrice_${tracking}">
+              <div class="product-card__price spcProductCardPrice_${escapeHtml(tracking)}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -41,17 +42,17 @@ const BulkProductCard = ({ tracking, product, enableQtyField }) => {
     `
                             ${!enableQtyField ?
       `<div class="shopcomponent_variants_bulk_fixed_quantity">
-                                <div class="shopcomponent_variant_title">${variant.title}  x  ${variant.quantity}</div>
+                                <div class="shopcomponent_variant_title">${escapeHtml(variant.title)}  x  ${escapeHtml(variant.quantity)}</div>
                             </div>` : `
                                 <div class="shopcomponent_variants_bulk_enable_quantity_container">
                                     <div class="shopcomponent_variants_bulk_enable_quantity_container_title">
-                                        ${variant.title}
+                                        ${escapeHtml(variant.title)}
                                         </div>
                                     <div class="shopcomponent_variants_bulk_enable_quantity">
                                         <div
                                         onclick="spcUpdateQuantity(event,'dec')" 
                                         class="shopcomponent_variants_bulk_enable_quantity_dec">-</div>
-                                        <input class="shopcomponent_variants_bulk_enable_quantity_input" type="number" min="0" value="0" data-variant-id="${variant.id}"/>
+                                        <input class="shopcomponent_variants_bulk_enable_quantity_input" type="number" min="0" value="0" data-variant-id="${escapeHtml(variant.id)}"/>
                                         <div 
                                         onclick="spcUpdateQuantity(event,'inc')"
                                         class="shopcomponent_variants_bulk_enable_quantity_inc">+</div>

@@ -1,11 +1,11 @@
 import { useFetcher, useLoaderData, useNavigate, useNavigation } from "react-router";
 import LoadingSkeleton from "../components/LoadingSkeleton/LoadingSkeleton";
 import { authenticate } from "../shopify.server";
-import crypto from "crypto";
 import db from "../db.server";
 import { useEffect, useState } from "react";
 import { getRemainingTrialDays } from "../utilis/remainTrialDaysCount";
-import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE } from "../constants/constants";
+import { fetchCouponOffer } from "../utilis/couponOffer.server";
+import { ADD_TO_CART_TYPE, BoleanOptions, DISCOUNT_TYPE, MAX_ALLOWED_COMPONENTS, PLAN_NAME, PLAN_PRICE, PLAN_STATUS, PLAN_TYPE, SUBSCRIPTION_DISCOUNT_OFFERS } from "../constants/constants";
 import redis from "../utilis/redis.init";
 import TempPlanBannerShow from "../components/TempPlanBannerShow/TempPlanBannerShow";
 
@@ -184,57 +184,30 @@ export const loader = async ({ request }) => {
 
   if (code || (!shopData.coupon && isFresh)) {
     try {
-      const appSecret = process.env.COUPON_CODE_API_SIGNATURE;
-      const apiUrl = process.env.COUPON_CODE_API_URL;
+      const offerResponse = await fetchCouponOffer(session.shop, code);
 
-      if (appSecret && apiUrl) {
-        const timestamp = Date.now().toString();
-        const canonical = `${timestamp}:${"GET_COUPON_OFFER"}:${code}:${"embedup"}:${session.shop}`;
-        const signature = crypto.createHmac("sha256", appSecret).update(canonical).digest("hex");
+      if (offerResponse) {
+        couponData = offerResponse;
 
-        const inputFormData = new FormData();
-        inputFormData.set("target", "GET_COUPON_OFFER");
-        inputFormData.set("code", code);
-        inputFormData.set("app", "embedup");
-        inputFormData.set("shop", session.shop);
-
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 5000);
-        let couponResponse;
-        try {
-          couponResponse = await fetch(`${apiUrl}/check-coupon`, {
-            method: "POST",
-            headers: { "x-api-signature": signature, "x-api-timestamp": timestamp },
-            body: inputFormData,
-            signal: controller.signal,
-          });
-        } finally {
-          clearTimeout(timer);
-        }
-
-        if (couponResponse?.ok) {
-          couponData = await couponResponse.json().catch(() => ({}));
-
-          if (!code && couponData?.code && couponData?.offer) {
-            const discovered = couponData.code;
-            try {
-              await db.shop.update({
-                where: { shopifyDomain: session.shop },
-                data: {
-                  coupon: discovered,
-                  isAppliedCoupon: false,
-                  planActivatedAt: new Date().toISOString(),
-                  trialDays:
-                    couponData.offer?.option === "trial"
-                      ? parseInt(couponData.offer?.value?.trialDays) || 0
-                      : 0,
-                },
-              });
-              code = discovered;
-              shopData = { ...shopData, coupon: discovered };
-            } catch (dbErr) {
-              console.error("[efoli] shop coupon persist failed (non-fatal):", dbErr?.message);
-            }
+        if (!code && couponData?.code && couponData?.offer) {
+          const discovered = couponData.code;
+          try {
+            await db.shop.update({
+              where: { shopifyDomain: session.shop },
+              data: {
+                coupon: discovered,
+                isAppliedCoupon: false,
+                planActivatedAt: new Date().toISOString(),
+                trialDays:
+                  couponData.offer?.option === "trial"
+                    ? parseInt(couponData.offer?.value?.trialDays) || 0
+                    : 0,
+              },
+            });
+            code = discovered;
+            shopData = { ...shopData, coupon: discovered };
+          } catch (dbErr) {
+            console.error("[efoli] shop coupon persist failed (non-fatal):", dbErr?.message);
           }
         }
       }
@@ -253,13 +226,12 @@ export const loader = async ({ request }) => {
     shopInfo: shop?.data?.shop || {},
     paidRedirectInfo: { isFirstInstall, upgrade },
     remainTrialDays: remainTrialDays,
-    node_env: process.env.NODE_ENV || '',
     couponData,
   }
 }
 
 const Plans = () => {
-  const { shopData, shopInfo, appSubscriptions, couponData, node_env, remainTrialDays } = useLoaderData();
+  const { shopData, shopInfo, couponData, remainTrialDays } = useLoaderData();
   const fetcher = useFetcher();
   //console.log('shopData:', shopData);
   const navigation = useNavigation();
@@ -305,8 +277,7 @@ const Plans = () => {
 
 
   useEffect(() => {
-    const offerType = ["discount-on-app-sub", "revenue-and-sub-discount"];
-    if (couponData?.offer?.option && offerType.includes(couponData?.offer?.option)) {
+    if (couponData?.offer?.option && SUBSCRIPTION_DISCOUNT_OFFERS.includes(couponData?.offer?.option)) {
       setPlanPriceAndDiscount(prevState => {
         return {
           ...prevState,
@@ -366,6 +337,8 @@ const Plans = () => {
   useEffect(() => {
     if (fetcher.data?.success && fetcher.data?.redirectUrl) {
       window.open(fetcher.data?.redirectUrl, '_top');
+    } else if (fetcher.data?.success === false && fetcher.data?.message) {
+      shopify.toast.show(fetcher.data.message, { duration: 3000, isError: true });
     }
   }, [fetcher]);
 
@@ -380,10 +353,6 @@ const Plans = () => {
   }, [shopData?.plan?.planName, shopData?.plan?.planType]);
 
   //console.log(shopData);
-
-  const handleCancelSubscription = () => {
-    fetcher.submit('', { method: 'get', action: '/api/plancancel' });
-  }
 
   const handleShowCouponApplySection = () => {
     setShowCouponApplySection(prev => !prev);
@@ -467,9 +436,6 @@ const Plans = () => {
               subtitle="Your settings and embeds are saved."
               isBtnShow={false}
             />
-          }
-          {node_env === 'development' &&
-            <s-button onClick={handleCancelSubscription}>Cancel Subscription {appSubscriptions?.name}</s-button>
           }
         </s-stack>
 
@@ -951,6 +917,20 @@ export const action = async ({ request }) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
+  // Test-charge status, prices, discounts and trial days come from Shopify and our records, never the form
+  const shopPlanResponse = await admin.graphql(
+    `#graphql
+      query shopPlanForBilling {
+        shop {
+          plan {
+            partnerDevelopment
+          }
+        }
+      }`,
+  );
+  const shopPlan = await shopPlanResponse.json();
+  const isTestCharge = shopPlan?.data?.shop?.plan?.partnerDevelopment === true;
+
   // redis invalided the cache if exist start
   const pattern = `analytics:${session.shop}:*`;
   let cursor = "0";
@@ -969,19 +949,60 @@ export const action = async ({ request }) => {
 
     // console.log('isUpgrade:', isUpgrade, 'currentPlan:', currentPlan, 'data.planName:', data.planName);
 
+    const planPrice = PLAN_PRICE[`${data.planName.toLowerCase()}_${data.planType}`];
+    if (!planPrice) {
+      return {
+        success: false,
+        message: "Invalid plan selected",
+      };
+    }
+
+    const shopRecord = await db.shop.findUnique({
+      where: { shopifyDomain: session.shop },
+      select: { coupon: true, createdAt: true, trialDays: true },
+    });
+
+    // Same pricing the plans page shows: the plan's own discount, replaced by a subscription coupon if one applies
+    const price = planPrice.price;
+    let discountType = planPrice.discountType;
+    let discountValue = planPrice.discountValue;
+    let discountDuration = planPrice.discountDuration;
+
+    const couponCode = shopRecord?.coupon || "";
+    const isFreshInstall = Date.now() - new Date(shopRecord?.createdAt).getTime() < 48 * 60 * 60 * 1000;
+    if (couponCode || isFreshInstall) {
+      let couponData = null;
+      try {
+        couponData = await fetchCouponOffer(session.shop, couponCode);
+      } catch (error) {
+        console.error("[efoli] coupon lookup failed during plan purchase:", error?.message ?? error);
+        if (couponCode) {
+          return {
+            success: false,
+            message: "We couldn't verify your coupon right now. Please try again.",
+          };
+        }
+      }
+
+      const offer = couponData?.offer;
+      if (SUBSCRIPTION_DISCOUNT_OFFERS.includes(offer?.option)) {
+        discountType = DISCOUNT_TYPE.percentage;
+        discountValue = offer?.value?.subDiscount;
+        discountDuration = offer?.value?.subDurationType === "recurring" ? offer?.value?.subDiscountDuration : null;
+      }
+    }
+
     if (appSubscriptions?.length > 0) {
       for (let i = 0; i < appSubscriptions.length; i++) {
         const subscription = appSubscriptions[i];
         await billing.cancel({
           subscriptionId: subscription.id,
-          isTest: data.partnerDevelopment === 'true',
+          isTest: isTestCharge,
           prorate: true,
         });
       }
 
     }
-
-    const { price, discountType, discountValue, discountDuration } = JSON.parse(data?.planPriceAndDiscount);
 
     let discountObj = {}
     if (discountType === DISCOUNT_TYPE.percentage) {
@@ -1035,11 +1056,8 @@ export const action = async ({ request }) => {
     const variables = {
       name: data.planName,
       returnUrl: returnURL,
-      trialDays:
-        data?.remaingTrialDays
-          ? parseInt(data.remaingTrialDays, 10)
-          : parseInt(process.env.TRIAL_DAYS ?? "5", 10),
-      test: data.partnerDevelopment === "true",
+      trialDays: getRemainingTrialDays(shopRecord?.createdAt, shopRecord?.trialDays),
+      test: isTestCharge,
       lineItems: [
         {
           plan: {
@@ -1099,7 +1117,7 @@ export const action = async ({ request }) => {
         const subscription = appSubscriptions[i];
         await billing.cancel({
           subscriptionId: subscription.id,
-          isTest: data.partnerDevelopment === 'true',
+          isTest: isTestCharge,
           prorate: true,
         });
       }
@@ -1107,7 +1125,7 @@ export const action = async ({ request }) => {
     }
 
     const shopData = await db.shop.update({
-      where: { id: Number(data.shopId) },
+      where: { shopifyDomain: session.shop },
       data: {
         appPlan: data.planName,
         maxAllowedComponents: MAX_ALLOWED_COMPONENTS.free,

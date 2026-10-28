@@ -56,7 +56,7 @@ export default function App() {
   }, [isDev]);
 
   return (
-    <AppProvider embedded apiKey={apiKey}>
+    <AppProvider apiKey={apiKey}>
       <s-app-nav>
         <s-link href="/app" rel="home">Home</s-link>
         <s-link href="/app/component">Components</s-link>

@@ -16,9 +16,11 @@ export const action = async ({ request }) => {
 
   if (!isSpcOrder) return new Response();
 
-  const component = await db.component.findUnique({
+  // The tracking value is buyer-controlled; only accept a component owned by the shop that sent this webhook
+  const component = await db.component.findFirst({
     where: {
       tracking: isSpcOrder.value,
+      shop: { shopifyDomain: shop },
     },
   });
 

@@ -24,7 +24,7 @@ query cart(
 
 
   try {
-    const res = await fetch(`https://${store}/api/2025-10/graphql.json`, {
+    const res = await fetch(`https://${store}/api/2026-10/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

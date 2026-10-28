@@ -14,7 +14,8 @@ export const loader = async ({ request, params }) => {
   const { id } = params;
   const affData = await db.affiliate.findUnique({
     where: {
-      id: Number(id)
+      id: Number(id),
+      shop: { shopifyDomain: session.shop },
     }
   });
 
@@ -645,16 +646,20 @@ export const action = async ({ request, params }) => {
   const data = Object.fromEntries(formData);
 
   if (request.method === 'POST') {
+    // The owning shop comes from the session; never let the form set ownership or counters
+    for (const key of ["id", "shopId", "totalOrderCount", "totalOrderValue", "totalSubTotalValue", "totalCommission", "totalCommissionPaid", "createdAt", "updatedAt"]) {
+      delete data[key];
+    }
     const affData = await db.affiliate.update({
       where: {
-        id: Number(id)
+        id: Number(id),
+        shop: { shopifyDomain: session.shop },
       },
       data: {
         ...data,
         tieredCommission: JSON.parse(data.tieredCommission),
         payoutMethods: JSON.parse(data.payoutMethods),
         fixedCommission: JSON.parse(data.fixedCommission),
-        shopId: Number(data.shopId)
       }
     });
     if (affData?.id) {
@@ -667,7 +672,8 @@ export const action = async ({ request, params }) => {
     console.log('status:', data, data.status);
     const affData = await db.affiliate.update({
       where: {
-        id: Number(id)
+        id: Number(id),
+        shop: { shopifyDomain: session.shop },
       },
       data: {
         status: data.status
@@ -692,7 +698,8 @@ export const action = async ({ request, params }) => {
     try {
       const affData = await db.affiliate.delete({
         where: {
-          id: Number(id)
+          id: Number(id),
+          shop: { shopifyDomain: session.shop },
         }
       });
 

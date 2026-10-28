@@ -690,9 +690,16 @@ export const action = async ({ request }) => {
   //console.log('Affiliate form data submitted:', data);
   // Handle form submission logic here
   try {
-    const shopId = Number(formData.get('shopId'));
+    const shop = await db.shop.findUnique({
+      where: { shopifyDomain: session.shop },
+      select: { id: true },
+    });
+    // The owning shop comes from the session; never let the form set ownership or counters
+    for (const key of ["id", "shopId", "totalOrderCount", "totalOrderValue", "totalSubTotalValue", "totalCommission", "totalCommissionPaid", "createdAt", "updatedAt"]) {
+      delete data[key];
+    }
     const affData = await db.affiliate.create({
-      data: { ...data, shopId: shopId, tieredCommission: JSON.parse(data.tieredCommission), payoutMethods: JSON.parse(data.payoutMethods), fixedCommission: JSON.parse(data.fixedCommission) }
+      data: { ...data, shopId: shop.id, tieredCommission: JSON.parse(data.tieredCommission), payoutMethods: JSON.parse(data.payoutMethods), fixedCommission: JSON.parse(data.fixedCommission) }
     });
     if (affData?.id) {
       return {

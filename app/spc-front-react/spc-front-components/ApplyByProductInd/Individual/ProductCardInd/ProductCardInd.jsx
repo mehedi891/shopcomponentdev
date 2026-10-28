@@ -1,4 +1,4 @@
-
+import { escapeHtml, jsArg } from "../../../utilities/htmlEscape";
 
 const ProductCardInd = ({ componentId,product, tracking, componentSettings, viewBtnTxt,token,store,customerTracking,addToCartBtnTxt,checkoutBtnTxt,shop,appliesTo,layout,customTrackings,market }) => {
 
@@ -6,12 +6,12 @@ const ProductCardInd = ({ componentId,product, tracking, componentSettings, view
 
   const pdAddToCartBtnHtml = `
                 <button
-                class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCartIndFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${componentId}','${market}')"
+                class="product-card__add-button product-card__add-to-cart-button spcProductCardBtn_${escapeHtml(tracking)}"
+                onclick="spcAddToCartIndFnc(event,${jsArg(token)},${jsArg(store)},${jsArg(tracking)},${jsArg(customerTracking)},${jsArg(appliesTo)},${jsArg(componentSettings.fullView)},${jsArg(componentId)},${jsArg(market)})"
                
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                <span class="spcBtn_txt">${addToCartBtnTxt}</span>
+                <span class="spcBtn_txt">${escapeHtml(addToCartBtnTxt)}</span>
                  <span class="spcBtn_outOfStock">Out of stock</span>
               </button>
   
@@ -19,11 +19,11 @@ const ProductCardInd = ({ componentId,product, tracking, componentSettings, view
 
   const pdCheckoutBtnHtml = `
    <button
-                class="product-card__add-button product-card__checkout-button spcProductCardBtn_${tracking}"
-                onclick="spcAddToCheckoutFnc(event,'${token}','${store}','${tracking}','${customerTracking}','${appliesTo}','${componentSettings.fullView}','${customTrackings}','${componentId}')"
+                class="product-card__add-button product-card__checkout-button spcProductCardBtn_${escapeHtml(tracking)}"
+                onclick="spcAddToCheckoutFnc(event,${jsArg(token)},${jsArg(store)},${jsArg(tracking)},${jsArg(customerTracking)},${jsArg(appliesTo)},${jsArg(componentSettings.fullView)},${jsArg(customTrackings)},${jsArg(componentId)})"
                 shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
               >
-                  <span class="spcBtn_txt">${checkoutBtnTxt}</span>
+                  <span class="spcBtn_txt">${escapeHtml(checkoutBtnTxt)}</span>
                  <span class="spcBtn_outOfStock">Out of stock</span>
               </button>
   `;
@@ -83,8 +83,8 @@ const modalQuickViewHtml = `
 
 const pdQuickViewBtnCollectionHtml = `
         <button
-                class="collection product-card__add-button product-card__view-button spcProductCardBtn_${tracking}"
-                onclick="spcShowQuickView(event,'${appliesTo}')"
+                class="collection product-card__add-button product-card__view-button spcProductCardBtn_${escapeHtml(tracking)}"
+                onclick="spcShowQuickView(event,${jsArg(appliesTo)})"
               >
                 View product
               </button>
@@ -93,11 +93,11 @@ const pdQuickViewBtnCollectionHtml = `
     `;
   const productFullViewModalHtml = `
 
-             <button class="product product-card__add-button product-card__view-button spcProductCardBtn_${tracking}"
+             <button class="product product-card__add-button product-card__view-button spcProductCardBtn_${escapeHtml(tracking)}"
                 
-                onclick="spcShowQuickView(event,'${appliesTo}')"
+                onclick="spcShowQuickView(event,${jsArg(appliesTo)})"
               >
-               ${viewBtnTxt}
+               ${escapeHtml(viewBtnTxt)}
               </button>
 
                ${modalQuickViewHtml}
@@ -105,8 +105,8 @@ const pdQuickViewBtnCollectionHtml = `
 `
 
   const productCardHtml = `
-    <div class="product-card spcProductCard_${tracking}" id="shopcomponent-${tracking}">
-      <shopify-context type="product" handle="${product.handle}">
+    <div class="product-card spcProductCard_${escapeHtml(tracking)}" id="shopcomponent-${escapeHtml(tracking)}">
+      <shopify-context type="product" handle="${escapeHtml(product.handle)}">
       <template>
         <div class="product-card__container">
           <div class="product-card__media">
@@ -116,10 +116,10 @@ const pdQuickViewBtnCollectionHtml = `
           </div>
           <div class="product-card__details">
             <div class="product-card__info">
-              <h2 class="product-card__title spcProductCardTitle_${tracking}">
+              <h2 class="product-card__title spcProductCardTitle_${escapeHtml(tracking)}">
                 <shopify-data query="product.title"></shopify-data>
               </h2>
-              <div class="product-card__price spcProductCardPrice_${tracking}">
+              <div class="product-card__price spcProductCardPrice_${escapeHtml(tracking)}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"
@@ -148,11 +148,11 @@ const pdQuickViewBtnCollectionHtml = `
 
 
   const collectionCardHtml = `
-  <shopify-context type="collection" handle="${product.handle}">
+  <shopify-context type="collection" handle="${escapeHtml(product.handle)}">
       <template>
        <shopify-list-context type="product" query="collection.products" first="${shop?.plan?.planName === 'Free' ? 3 : 50}">
        <template>
-        <div class="product-card spcProductCard_${tracking}">
+        <div class="product-card spcProductCard_${escapeHtml(tracking)}">
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
@@ -161,10 +161,10 @@ const pdQuickViewBtnCollectionHtml = `
           </div>
           <div class="product-card__details shopcomponent_product_card__details">
             <div class="product-card__info">
-              <h2 class="product-card__title spcProductCardTitle_${tracking}">
+              <h2 class="product-card__title spcProductCardTitle_${escapeHtml(tracking)}">
                 <shopify-data query="product.title"></shopify-data>
               </h2>
-              <div class="product-card__price spcProductCardPrice_${tracking}">
+              <div class="product-card__price spcProductCardPrice_${escapeHtml(tracking)}">
                 <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
                 <shopify-money
                   class="product-card__compare-price"

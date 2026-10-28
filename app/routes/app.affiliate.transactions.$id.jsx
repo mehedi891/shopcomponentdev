@@ -6,7 +6,7 @@ import EmptyStateGeneric from "../components/EmptyStateGeneric/EmptyStateGeneric
 import getSymbolFromCurrency from "currency-symbol-map";
 
 export const loader = async ({ request, params }) => {
- const {admin}  = await authenticate.admin(request);
+ const {admin, session}  = await authenticate.admin(request);
   const affiliateId = Number(params.id);
 
     const response = await admin.graphql(
@@ -25,6 +25,7 @@ export const loader = async ({ request, params }) => {
   const transactions = await db.affiliateTransaction.findMany({
     where: {
       affiliateId: affiliateId,
+      affiliate: { shop: { shopifyDomain: session.shop } },
     },
     orderBy: {
       createdAt: "desc",
@@ -102,9 +103,10 @@ export default AffiliateTransaction
 
 
 export const action = async ({ request, params }) => {
-  await authenticate.admin(request);
+  const { session } = await authenticate.admin(request);
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
+  delete data.id;
   const finalData = {
     ...data,
     affiliateId: Number(data.affiliateId),
@@ -113,19 +115,21 @@ export const action = async ({ request, params }) => {
 
   try {
     const transaction = await db.$transaction(async (tx) => {
-      const createdTx = await tx.affiliateTransaction.create({
-        data: finalData,
-      });
-
+      // Throws when the affiliate belongs to another shop, rolling back the payout
       await tx.affiliate.update({
         where: {
           id: Number(data.affiliateId),
+          shop: { shopifyDomain: session.shop },
         },
         data: {
           totalCommissionPaid: {
             increment: Number(data.commissionPaid),
           },
         },
+      });
+
+      const createdTx = await tx.affiliateTransaction.create({
+        data: finalData,
       });
 
       return createdTx;

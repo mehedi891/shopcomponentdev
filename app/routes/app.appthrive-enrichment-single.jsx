@@ -21,8 +21,8 @@ export const action = async ({ request }) => {
   const bulk = formData.get('bulk');
 
 
-  const INGEST_URL = `https://app.appthrive.io/api/ingest/org_XbPoGTQPldjc/app_ayLlm5B_RZN5/merchant/${bulk}`;
-  const APPTHRIVE_SECRET = 'whsk_ba4be564cee8aa84961b618909f4df4710224db152f495e2';
+  const INGEST_URL = `https://app.appthrive.io/api/ingest/org_XbPoGTQPldjc/app_ayLlm5B_RZN5/merchant/${encodeURIComponent(bulk ?? "")}`;
+  const APPTHRIVE_SECRET = process.env.APPTHRIVE_WEBHOOK_SECRET;
 
   console.log("Bulk:", bulk, INGEST_URL);
 
